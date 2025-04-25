@@ -192,7 +192,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
 
 
             var clientSession = ServerMemory.FindClientSession(gameid);
-
+            
             clientSession.Role = role;
             clientSession.ClientName = name;
             
