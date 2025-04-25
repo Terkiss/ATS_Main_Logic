@@ -1,0 +1,493 @@
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-34][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-35][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-36][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-37][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-38][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-39][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-41][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-42][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-43][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 02:11:34: [2024-09-23-02-10-59][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:11:34: [2024-09-23-02-10-59][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:19:34: [2024-09-23-02-19-02][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:19:34: [2024-09-23-02-19-02][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:19:34: [2024-09-23-02-19-16][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 0와의 연결 끊김 
+
+2024-09-23 02:19:34: [2024-09-23-02-19-16][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 0와의 연결 끊김 
+
+2024-09-23 02:19:35: [2024-09-23-02-19-16][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 0와의 연결 끊김 
+
+2024-09-23 02:19:35: [2024-09-23-02-19-17][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:19:35: [2024-09-23-02-19-17][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:21:35: [2024-09-23-02-20-54][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 1와의 연결 끊김 
+
+2024-09-23 02:21:35: [2024-09-23-02-20-54][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 1와의 연결 끊김 
+
+2024-09-23 02:21:35: [2024-09-23-02-20-54][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 1와의 연결 끊김 
+
+2024-09-23 02:21:35: [2024-09-23-02-20-58][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:21:35: [2024-09-23-02-20-58][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:21:35: [2024-09-23-02-21-24][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:21:35: [2024-09-23-02-21-24][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:27:35: [2024-09-23-02-26-45][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 2와의 연결 끊김 
+
+2024-09-23 02:27:35: [2024-09-23-02-26-46][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:27:35: [2024-09-23-02-26-46][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:28:35: [2024-09-23-02-27-42][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 3와의 연결 끊김 
+
+2024-09-23 02:28:35: [2024-09-23-02-27-44][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:28:35: [2024-09-23-02-27-44][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:31:35: [2024-09-23-02-30-39][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 4와의 연결 끊김 
+
+2024-09-23 02:31:35: [2024-09-23-02-30-41][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:31:35: [2024-09-23-02-30-41][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:31:35: [2024-09-23-02-30-57][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:31:35: [2024-09-23-02-30-57][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 02:31:35: [2024-09-23-02-31-08][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 5와의 연결 끊김 
+
+2024-09-23 02:31:35: [2024-09-23-02-31-09][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 02:31:35: [2024-09-23-02-31-09][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 10:58:00: [2024-09-23-02-34-25][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-25][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-26][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-27][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-28][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-29][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-30][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-31][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-32][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-33][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 10:58:20: [2024-09-23-02-34-38][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 10:58:20: [2024-09-23-02-34-38][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-47][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-48][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-49][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-50][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-51][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-52][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-53][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-54][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 10:59:47: [2024-09-23-10-58-55][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 10:59:47: [2024-09-23-10-59-03][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 10:59:47: [2024-09-23-10-59-03][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:00:48: [2024-09-23-10-59-56][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 0와의 연결 끊김 
+
+2024-09-23 11:01:04: [2024-09-23-10-59-57][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:01:04: [2024-09-23-10-59-57][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:02:04: [2024-09-23-11-01-09][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 1와의 연결 끊김 
+
+2024-09-23 11:02:04: [2024-09-23-11-01-10][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:02:04: [2024-09-23-11-01-10][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:06:04: [2024-09-23-11-05-58][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 2와의 연결 끊김 
+
+2024-09-23 11:11:04: [2024-09-23-11-10-56][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:11:04: [2024-09-23-11-10-56][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:12:04: [2024-09-23-11-11-30][CLASS = ReceiveCompleted][ATTENTION]: 플레이어 3와의 연결 끊김 
+
+2024-09-23 11:12:04: [2024-09-23-11-12-01][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:12:04: [2024-09-23-11-12-01][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:16:04: [2024-09-23-11-15-15][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:16:04: [2024-09-23-11-15-15][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:17:04: [2024-09-23-11-16-25][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:17:04: [2024-09-23-11-16-25][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:18:04: [2024-09-23-11-17-29][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:18:04: [2024-09-23-11-17-29][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:48:04: [2024-09-23-11-47-56][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:48:04: [2024-09-23-11-47-56][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:52:04: [2024-09-23-11-51-32][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:52:04: [2024-09-23-11-51-32][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 11:52:04: [2024-09-23-11-51-54][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 11:52:04: [2024-09-23-11-51-54][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-10][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-11][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-12][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-13][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-15][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-16][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-17][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-18][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-19][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 12:53:10: [2024-09-23-12-52-46][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 12:53:10: [2024-09-23-12-52-46][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 12:53:10: [2024-09-23-12-52-59][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 12:53:10: [2024-09-23-12-52-59][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-41][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-42][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-43][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-44][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-45][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-46][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-47][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-48][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 12:56:41: [2024-09-23-12-55-49][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 13:00:41: [2024-09-23-12-59-48][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 13:00:41: [2024-09-23-12-59-48][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 13:00:41: [2024-09-23-13-00-03][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 13:00:41: [2024-09-23-13-00-03][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-56][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-57][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-58][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 13:01:56: [2024-09-23-13-00-59][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-00][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-01][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-02][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-03][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-04][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 13:01:56: [2024-09-23-13-01-08][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 13:01:56: [2024-09-23-13-01-08][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 13:01:56: [2024-09-23-13-01-18][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":0,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:03:03: [2024-09-23-13-02-08][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":0,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-22][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 13:06:13: [2024-09-23-13-05-22][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:13288 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-34][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:13288 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-42][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:13288 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-43][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:13288 
+
+2024-09-23 13:06:13: [2024-09-23-13-05-44][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: config is not null 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: UDP = False 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-52][CLASS = Main][INFO]: IP = True 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-53][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-54][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-55][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-56][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-57][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-58][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-23 13:08:52: [2024-09-23-13-07-59][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-23 13:08:52: [2024-09-23-13-08-00][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-23 13:08:52: [2024-09-23-13-08-07][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-23 13:08:52: [2024-09-23-13-08-07][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:13415 
+
+2024-09-23 13:11:52: [2024-09-23-13-11-11][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+

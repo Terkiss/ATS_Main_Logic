@@ -1,0 +1,60 @@
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: config is not null 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: UDP = False 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = Main][INFO]: IP = True 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-18 16:55:18: [2024-09-18-16-54-18][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: config is not null 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: UDP = False 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-30][CLASS = Main][INFO]: IP = True 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-31][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-32][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-33][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-34][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-35][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-36][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-37][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-18 18:46:30: [2024-09-18-18-45-38][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+

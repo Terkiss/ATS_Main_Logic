@@ -1,0 +1,30 @@
+2024-04-18 12:29:37: [2024-04-18-12-28-36][CLASS = Main][INFO]: config is not null 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: GUID = 4d7baa91-45b9-4d7d-a9aa-4209f954a1a3 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: PORT = 3030 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: MAX_CONNECTION = 10000 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: UDP = False 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = Main][INFO]: IP = True 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server Port : 3030 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server Max Connection : 10000 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-04-18 12:29:37: [2024-04-18-12-28-37][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+

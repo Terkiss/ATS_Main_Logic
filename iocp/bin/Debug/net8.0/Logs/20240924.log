@@ -1,0 +1,418 @@
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: config is not null 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: UDP = False 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-08][CLASS = Main][INFO]: IP = True 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-09][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-10][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-11][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-12][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-13][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-14][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-15][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-16][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-24 02:47:08: [2024-09-24-02-46-21][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:47:08: [2024-09-24-02-46-21][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:47:08: [2024-09-24-02-46-27][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:47:08: [2024-09-24-02-46-27][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:47:08: [2024-09-24-02-46-33][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:47:08: [2024-09-24-02-46-33][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:47:08: [2024-09-24-02-46-42][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:47:08: [2024-09-24-02-46-42][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:47:08: [2024-09-24-02-46-53][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:47:08: [2024-09-24-02-46-53][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:47:08: [2024-09-24-02-47-04][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-12][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-13][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-14][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-15][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:1687 
+
+2024-09-24 02:48:08: [2024-09-24-02-47-16][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: config is not null 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: IP = Server Environment 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: GUID = 289bddf4-4576-4666-aa11-66c85e28c445 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: PORT = 3000 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: MAX_CONNECTION = 3000 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: UDP = False 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-46][CLASS = Main][INFO]: IP = True 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-47][CLASS = TcpServerStart][INFO]: Server Start 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-48][CLASS = TcpServerStart][INFO]: Server Version : 0.01.0 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-49][CLASS = TcpServerStart][INFO]: Server Port : 3000 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-50][CLASS = TcpServerStart][INFO]: Server Max Connection : 3000 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-51][CLASS = TcpServerStart][INFO]: Server is TCP : True 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-52][CLASS = TcpServerStart][INFO]: Server is UDP : False 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-53][CLASS = TcpServerStart][ATTENTION]: Server Configuration Complete!!! 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-54][CLASS = TcpServerStart][ATTENTION]: Server Running!!! 
+
+2024-09-24 02:55:46: [2024-09-24-02-54-59][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 02:55:46: [2024-09-24-02-54-59][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = ReceiveCompleted][INFO]: Receive Data From Client : {"ProtocolSelector":2,"Command":1,"HostId":0,"Id":"ade345","PW":"12341234","NickName":""}
+ 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: 로그인 요청 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: ID : ade345 PW : 12341234 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: HostID : 0 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: Command : 1 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: Socket : 127.0.0.1:2070 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: nick :  
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][INFO]: 섹스 
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][WARNING]: 섹스
+line number: 264
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][ERROR]: 섹스
+line number: 265
+
+2024-09-24 02:55:46: [2024-09-24-02-55-01][CLASS = LoginProtocolProcessorAsync][ATTENTION]: 섹스 
+
+2024-09-24 03:05:46: [2024-09-24-03-04-57][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 03:05:46: [2024-09-24-03-04-57][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
+2024-09-24 03:05:46: [2024-09-24-03-05-29][CLASS = AcceptCompleted][WARNING]: Client Connected - ID: Unknown
+line number: 254
+
+2024-09-24 03:05:46: [2024-09-24-03-05-29][CLASS = AcceptCompleted][WARNING]: Waiting for next connection...
+line number: 277
+
