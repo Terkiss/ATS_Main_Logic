@@ -10,8 +10,8 @@ namespace R19Management
 {
     public class DataBaseConnectHelper
     {
-        string uri = "Server=private.dotge.site;Port=3306;Database=books;Uid=ade345;Pwd=dbslwms123";
-
+        //string uri = "Server=private.dotge.site;Port=3306;Database=books;Uid=ade345;Pwd=dbslwms123";
+        string uri = "2";
         private MySqlConnection conn;
         public DataBaseConnectHelper()
         { 

@@ -15,8 +15,16 @@ namespace TeruTeruServer.ManageLogic.Protocol
 {
     public class RpcStub
     {
-       // private static int _nextPlayerIndex = 1; // 서버에서 관리하는 플레이어 인덱스
-      //  private static readonly Dictionary<int, PlayerData> _playerData = new Dictionary<int, PlayerData>();
+        // private static int _nextPlayerIndex = 1; // 서버에서 관리하는 플레이어 인덱스
+        //  private static readonly Dictionary<int, PlayerData> _playerData = new Dictionary<int, PlayerData>();
+
+
+
+        public RpcStub()
+        {
+   
+        }
+
 
         public byte[] HandleRequest(Socket socket, byte[] requestBytes)
         {
@@ -30,7 +38,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
                     case MethodsSelector.RequestConnection:
                         // 연결 요청 처리
                         ConnectionData connectionData = MarshalUtil.Deserialize<ConnectionData>(requestBytes, 1);
-                        ProcessConnection(connectionData, socket);
+                        result = ProcessConnection(connectionData, socket);
                         break;
                     case MethodsSelector.RequestRegisterRole:
                         // 역할 등록 요청 처리
@@ -85,8 +93,18 @@ namespace TeruTeruServer.ManageLogic.Protocol
                 Console.WriteLine($"요청 처리 중 예외 발생: {e.Message}");
                 return null;
             }
-    
-            byte[] bytes = result != null ? MarshalUtil.Serialize(result) : null;
+
+            byte[] bytes;
+            if (methodId == MethodsSelector.RequestConnection)
+            {
+                bytes = (byte[])result;
+            }
+            else
+            {
+                bytes = result != null ? MarshalUtil.Serialize(result) : null;
+            }
+
+         
 
             if (bytes == null)
             {
@@ -105,7 +123,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
         }
        
 
-        private void ProcessConnection(ConnectionData connectionData, Socket socket)
+        private byte[] ProcessConnection(ConnectionData connectionData, Socket socket)
         {
             // 서버 메모리 클레스로부터 메인서버 를 얻어온다
             MainServer mainServer = ServerMemory.MainServer;
@@ -113,6 +131,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
             if (mainServer.players.ContainsValue(socket))
             {
                 Console.WriteLine("이미 등록된 소켓입니다.");
+                return null;
             }
             else
             {
@@ -140,8 +159,6 @@ namespace TeruTeruServer.ManageLogic.Protocol
                     clientSession.GameID = gameId;
 
 
-                    byte sendType = (byte)SendType.Direct;
-                    byte protocolType = (byte)MethodsSelector.RequestConnection;
 
 
                     ConnectProtocol connectProtocol = new ConnectProtocol
@@ -154,20 +171,20 @@ namespace TeruTeruServer.ManageLogic.Protocol
 
                     string json = JsonSerializer.Serialize(connectProtocol);
                     byte[] tempByte = Encoding.UTF8.GetBytes(json);
-                    byte[] sendData = new byte[tempByte.Length + 2];
-                    sendData[0] = sendType;
-                    sendData[1] = protocolType;
-                    Array.Copy(tempByte, 0, sendData, 2, tempByte.Length);
+              
+
+              
 
 
-          
 
-                    mainServer.SendData(socket, sendData);
+                    return tempByte;
+                   // mainServer.SendData(socket, sendData);
                 }
                 else
                 {
                     // 실패 로깅
                     Console.WriteLine("체크 실패");
+                    return null;
                 }
             }
         }
@@ -195,34 +212,69 @@ namespace TeruTeruServer.ManageLogic.Protocol
             
             clientSession.Role = role;
             clientSession.ClientName = name;
-            
+
+
+
+            byte sendType = (byte)SendType.Direct;
+            byte protocolType = (byte)MethodsSelector.RequestRegisterRole;
+            string success = "Success";
+            byte[] data = Encoding.UTF8.GetBytes(success);
+            byte[] bytes = new byte[256];
+            for (int i = 0; i < data.Length; i++)
+            {
+                bytes[i] = data[i];
+            }
+            for (int i = data.Length; i < 256; i++)
+            {
+                bytes[i] = 0;
+            }
+            roleData.data = bytes;
+            roleData.index = clientSession.HostID;
+
+            var sendBytes = MarshalUtil.Serialize(roleData);
+            byte[] responsByte = new byte[sendBytes.Length + 2];
+            responsByte[0] = sendType;
+            responsByte[1] = protocolType;
+            Array.Copy(sendBytes, 0, responsByte, 2, sendBytes.Length);
+            // 클라이언트에게 전송
+            ServerMemory.MainServer.SendData(socket, responsByte);
+
         }
 
         private void ReceivImage(SendImageData sendImageData)
         {
-            // Receve folder creadte 
-            // 상대경로로 Receve 폴더 생성
-            string path = @"Receve";
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
 
-            // 이미지 파일 생성
+            int hostID = sendImageData.hostID;
+            string gameID = Encoding.UTF8.GetString(sendImageData.userID);
+        
+            gameID = gameID.TrimEnd('\0');
 
-            string fileName = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff")+"image.jpg";
+            ServerMemory.AddImageWork_PreOrder_Queue(sendImageData);
 
-            string filePath = System.IO.Path.Combine(path, fileName);
+            //TeruTeruLogger.LogInfo($"Received image data: {sendImageData.data.Length} bytes from {gameID}");
+            //// Receve folder creadte 
+            //// 상대경로로 Receve 폴더 생성
+            //string path = @"Receve";
+            //if (!System.IO.Directory.Exists(path))
+            //{
+            //    System.IO.Directory.CreateDirectory(path);
+            //}
+
+            //// 이미지 파일 생성
+
+            //string fileName = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff")+"image.jpg";
+
+            //string filePath = System.IO.Path.Combine(path, fileName);
 
 
-            byte[] imgByte = new byte[sendImageData.imgSize];
+            //byte[] imgByte = new byte[sendImageData.imgSize];
 
-            for (int i = 0; i < sendImageData.imgSize; i++)
-            {
-                imgByte[i] = sendImageData.data[i];
-            }
+            //for (int i = 0; i < sendImageData.imgSize; i++)
+            //{
+            //    imgByte[i] = sendImageData.data[i];
+            //}
 
-            System.IO.File.WriteAllBytes(filePath, imgByte);
+            //System.IO.File.WriteAllBytes(filePath, imgByte);
         }
 
 

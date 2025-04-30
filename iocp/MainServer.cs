@@ -43,6 +43,7 @@ namespace TeruTeruServer
 
         private ServerLogic serverLogic;
 
+        private RpcProxy rpcProxy;
 
         // 송신 버퍼 크기 속성
         public int SendBufferSize
@@ -102,6 +103,7 @@ namespace TeruTeruServer
             serverLogic = new ServerLogic(this);
 
             ServerMemory.MainServer = this;
+            rpcProxy = new RpcProxy();
         }
         public MainServer(ServerConnectConfigParameter config)
         {
@@ -120,6 +122,7 @@ namespace TeruTeruServer
             serverLogic = new ServerLogic(this);
 
             ServerMemory.MainServer = this;
+            rpcProxy = new RpcProxy();
         }
 
         /// <summary>
@@ -208,6 +211,104 @@ namespace TeruTeruServer
                 if (strCMD.Equals("exit"))
                 {
                     break;
+                }
+                else if (strCMD.Equals("Queue_Count"))
+                {
+                    var preOrderCount = ServerMemory.GetImageWork_PreOrder_QueueCount();
+                    var completeCount = ServerMemory.GetImageWork_Complete_QueueCount();
+
+                    TeruTeruLogger.LogInfo($"preOrderCount : {preOrderCount}, CompleteCount : {completeCount}");
+                }
+                else if (strCMD.Equals("2"))
+                {
+                    int Count = 0;
+                    // 상대경로로 Receve 폴더 생성
+                    string path = @"Receve";
+                    if (!System.IO.Directory.Exists(path))
+                    {
+                        System.IO.Directory.CreateDirectory(path);
+                    }
+                    while (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData sendImageData))
+                    {
+
+
+                        // 이미지 파일 생성
+
+                        string fileName = $"image_{Count}.jpg";
+
+                        string filePath = System.IO.Path.Combine(path, fileName);
+
+
+                        if (sendImageData.imgSize < sendImageData.data.Length)
+                        {
+                            byte[] imgByte = new byte[sendImageData.imgSize];
+
+                            for (int i = 0; i < sendImageData.imgSize; i++)
+                            {
+                                imgByte[i] = sendImageData.data[i];
+                            }
+
+                            System.IO.File.WriteAllBytes(filePath, imgByte);
+                        }
+                        else
+                        {
+                            System.IO.File.WriteAllBytes(filePath, sendImageData.data);
+                        }
+                        Count++;
+                    }
+
+
+                    //// Receve folder creadte 
+                    //// 상대경로로 Receve 폴더 생성
+                    //string path = @"Receve";
+                    //if (!System.IO.Directory.Exists(path))
+                    //{
+                    //    System.IO.Directory.CreateDirectory(path);
+                    //}
+
+                    //// 이미지 파일 생성
+
+                    //string fileName = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff") + "image.jpg";
+
+                    //string filePath = System.IO.Path.Combine(path, fileName);
+
+
+                    //byte[] imgByte = new byte[sendImageData.imgSize];
+
+                    //for (int i = 0; i < sendImageData.imgSize; i++)
+                    //{
+                    //    imgByte[i] = sendImageData.data[i];
+                    //}
+
+                    //System.IO.File.WriteAllBytes(filePath, imgByte);
+                }
+                else if (strCMD.Equals("Worker_Start"))
+                {
+                    Thread workerThread = new Thread(
+                        () =>
+                        {
+                            while (true)
+                            {
+                                // 작업 큐에서 작업을 가져와서 처리
+                                if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData PreOrderItem))
+                                {
+                            
+                                    //TeruTeruLogger.LogInfo($"PreOrderItem : {PreOrderItem.imgSize}, {PreOrderItem.hostID}");
+                                    
+                                    rpcProxy.RequestObjectDetect(PreOrderItem);
+
+                                }
+
+                                if(ServerMemory.GetImageWork_Complete_Queue(out SendImageData completeItem))
+                                {
+
+                               
+                                    TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.imgSize}, {completeItem.hostID}");
+                                }
+                            }
+                        }
+                        );
+                    workerThread.Start();
                 }
 
             }

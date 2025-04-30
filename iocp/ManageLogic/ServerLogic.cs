@@ -14,6 +14,7 @@ namespace TeruTeruServer.ManageLogic
     public class ServerLogic
     {
         private MainServer mainServer;
+        RpcStub stub = new RpcStub();
         // 서버로직 생성자 작성
         public ServerLogic(MainServer mainServer)
         {
@@ -31,7 +32,7 @@ namespace TeruTeruServer.ManageLogic
 
             if (receivDataCount > 0)
             {
-                RpcStub stub = new RpcStub();
+          
                 byte[] responseBytes = stub.HandleRequest(socket, buffer);
                 if (responseBytes != null)
                 {

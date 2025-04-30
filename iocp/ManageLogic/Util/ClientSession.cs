@@ -20,7 +20,7 @@ namespace TeruTeruServer.ManageLogic.Util
         public String Role { get; set; }
         public String ClientName { get; set; }
 
-        public string ClientRole { get; set; }
+    
 
 
 

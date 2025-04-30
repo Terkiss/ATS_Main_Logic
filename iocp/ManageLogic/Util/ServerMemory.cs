@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using TeruTeruServer.ManageLogic.Protocol;
 
 namespace TeruTeruServer.ManageLogic.Util
 {
@@ -18,6 +20,12 @@ namespace TeruTeruServer.ManageLogic.Util
 
         private static Dictionary<int, ClientSession> hosts = new Dictionary<int, ClientSession>();
         private static Dictionary<string, int> gameID2HostID = new Dictionary<string, int>();
+
+
+        private static ConcurrentQueue<SendImageData> imageWork_PreOrder_Queue = new ConcurrentQueue<SendImageData>();
+        private static ConcurrentQueue<SendImageData> imageWork_Complete_Queue = new ConcurrentQueue<SendImageData>();
+
+
         /// <summary>
         /// 호스트 ID 생성기
         /// </summary>
@@ -125,6 +133,54 @@ namespace TeruTeruServer.ManageLogic.Util
                 return null;
             }
         }
+
+
+        public static void AddImageWork_PreOrder_Queue(SendImageData imageData)
+        {
+            imageWork_PreOrder_Queue.Enqueue(imageData);
+        }
+        public static void AddImageWork_Complete_Queue(SendImageData imageData)
+        {
+            imageWork_Complete_Queue.Enqueue(imageData);
+        }
+        public static SendImageData GetImageWork_PreOrder_Queue()
+        {
+            if (imageWork_PreOrder_Queue.TryDequeue(out SendImageData imageData))
+            {
+                return imageData;
+            }
+            return default;
+        }
+        public static bool GetImageWork_PreOrder_Queue(out SendImageData data)
+        {
+            bool check = imageWork_PreOrder_Queue.TryDequeue(out SendImageData imageData);
+            data = imageData;
+            return check;
+        }
+   
+        public static SendImageData GetImageWork_Complete_Queue()
+        {
+            if (imageWork_Complete_Queue.TryDequeue(out SendImageData imageData))
+            {
+                return imageData;
+            }
+            return default;
+        }
+        public static bool GetImageWork_Complete_Queue(out SendImageData data)
+        {
+            bool check = imageWork_Complete_Queue.TryDequeue(out SendImageData imageData);
+            data = imageData;
+            return check;
+        }
+        public static int GetImageWork_PreOrder_QueueCount()
+        {
+            return imageWork_PreOrder_Queue.Count;
+        }
+        public static int GetImageWork_Complete_QueueCount()
+        {
+            return imageWork_Complete_Queue.Count;
+        }
+
     }
 }
 

@@ -37,7 +37,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2097152)]
         public byte[] data;
     }
-
+    
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ChatData

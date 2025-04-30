@@ -11,8 +11,9 @@ namespace TeruTeruServer.ManageLogic.Protocol
         RequestConnection = 0,
         RequestRegisterRole = 1,
         SendImage = 2,
-        SendPlayerData = 3,
-        GeneratePlayer = 4,
+        RequestObjectDetect = 3,
+        ObjectDetectResult = 4,
+      
         SendChatData = 5,
         NotifyPlayerExit = 6,
     }
