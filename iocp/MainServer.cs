@@ -12,6 +12,7 @@ using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
 using System.IO;
+using TeruTeruServer.Command;
 
 namespace TeruTeruServer
 {
@@ -46,6 +47,8 @@ namespace TeruTeruServer
         private ServerLogic serverLogic;
 
         private RpcProxy rpcProxy;
+
+        private CommandHandler commandHandler;
 
         // 송신 버퍼 크기 속성
         public int SendBufferSize
@@ -105,6 +108,8 @@ namespace TeruTeruServer
             serverLogic = new ServerLogic(this);
             ServerMemory.MainServer = this;
             rpcProxy = new RpcProxy();
+
+            commandHandler = new CommandHandler(this);
         }
 
 
@@ -201,83 +206,8 @@ namespace TeruTeruServer
 
         private bool HandleConsoleCommand(string command)
         {
-            switch (command)
-            {
-                case "exit":
-                    return false;
-
-                case "Queue_Count":
-                    HandleQueueCount();
-                    break;
-
-                case "2":
-                    HandleImageDump();
-                    break;
-
-                case "Worker_Start":
-                    StartWorkerThread();
-                    break;
-
-                default:
-                    Console.WriteLine($"알 수 없는 명령어: {command}");
-                    break;
-            }
-
-            return true;
+            return this.commandHandler.Handle(command);
         }
-
-        private void HandleQueueCount()
-        {
-            var preOrderCount = ServerMemory.GetImageWork_PreOrder_QueueCount();
-            var completeCount = ServerMemory.GetImageWork_Complete_QueueCount();
-            TeruTeruLogger.LogInfo($"preOrderCount : {preOrderCount}, CompleteCount : {completeCount}");
-        }
-
-        private void HandleImageDump()
-        {
-            int Count = 0;
-            string path = @"Receve";
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            while (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData sendImageData))
-            {
-                string fileName = $"image_{Count}.jpg";
-                string filePath = Path.Combine(path, fileName);
-
-                if (sendImageData.imgSize < sendImageData.data.Length)
-                {
-                    byte[] imgByte = new byte[sendImageData.imgSize];
-                    Array.Copy(sendImageData.data, imgByte, sendImageData.imgSize);
-                    File.WriteAllBytes(filePath, imgByte);
-                }
-                else
-                {
-                    File.WriteAllBytes(filePath, sendImageData.data);
-                }
-
-                Count++;
-            }
-        }
-
-        private void StartWorkerThread()
-        {
-            Thread workerThread = new Thread(() =>
-            {
-                while (true)
-                {
-                    if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData preOrderItem))
-                        rpcProxy.RequestObjectDetect(preOrderItem);
-
-                    if (ServerMemory.GetImageWork_Complete_Queue(out SendImageData completeItem))
-                        TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.imgSize}, {completeItem.hostID}");
-                }
-            });
-            workerThread.Start();
-        }
-
-
-
 
         private void AcceptCompleted(object sender, SocketAsyncEventArgs e)
         {
