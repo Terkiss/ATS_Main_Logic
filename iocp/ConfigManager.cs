@@ -23,94 +23,175 @@ namespace TeruTeruServer
             LoadConfig();
         }
 
+        //private void LoadConfig()
+        //{
+        //    string configFilePath = "config.txt";
+
+        //    if (File.Exists(configFilePath))
+        //    {
+        //        // 파일이 존재할 경우 설정값 읽어오기
+        //        string[] lines = File.ReadAllLines(configFilePath);
+
+        //        foreach (string line in lines)
+        //        {
+        //            string[] parts = line.Split('=');
+        //            if (parts.Length == 2)
+        //            {
+        //                string key = parts[0].Trim();
+        //                string value = parts[1].Trim();
+
+        //                switch (key)
+        //                {
+        //                    case "port":
+        //                        port = int.Parse(value);
+        //                        break;
+        //                    case "max_connection":
+        //                        maxConnection = int.Parse(value);
+        //                        break;
+        //                    case "isUdp":
+        //                        isUdp = bool.Parse(value);
+        //                        break;
+        //                    case "isTcp":
+        //                        isTcp = bool.Parse(value);
+        //                        break;
+        //                    case "SendMassageSize":
+        //                        sendBufferSize = int.Parse(value);
+        //                        break;
+        //                    case "ReceiveMassageSize":
+        //                        receiveBufferSize = int.Parse(value);
+        //                        break;
+        //                    case "Guid":
+        //                        Guid = value;
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // 파일이 존재하지 않을 경우 기본 설정값 지정
+        //        Console.WriteLine("config.txt 파일이 존재하지 않습니다. 기본 설정값으로 실행합니다.");
+        //        Console.WriteLine("설정값을 입력하세요.");
+
+        //        Console.Write("port :");
+        //        string portString = Console.ReadLine();
+        //        Console.Write("max connection :");
+        //        string maxConnectionString = Console.ReadLine();
+
+        //        // 1이면 true 0이면 false
+        //        Console.WriteLine("isUdp, isTcp는 1이면 true 0이면 false");
+        //        Console.Write("isUdp :");
+        //        string isUdpString = Console.ReadLine();
+        //        Console.Write("isTcp :");
+        //        string isTcpString = Console.ReadLine();
+        //        Console.Write("SendMassageSize(Default 4096) :");
+        //        string sendMassageSizeString = Console.ReadLine();
+        //        Console.Write("ReceiveMassageSize(Default 4096) :");
+        //        string receiveMassageSizeString = Console.ReadLine();
+
+        //        sendBufferSize = int.Parse(sendMassageSizeString);
+        //        receiveBufferSize = int.Parse(receiveMassageSizeString);
+
+
+        //        Console.Write("입력 완료");
+
+        //        Guid = MSGuidGenerator().ToString();
+
+        //        port = int.Parse(portString);
+        //        maxConnection = int.Parse( maxConnectionString);
+        //        isUdp = (int.Parse(isUdpString) == 1) ? true:false ;
+        //        isTcp = (int.Parse(isTcpString) == 1) ? true : false;
+
+        //        if(isUdp == true && isTcp == true)
+        //        {
+        //            Console.WriteLine("isUdp, isTcp 둘다 true일 수 없습니다.");
+        //            Console.WriteLine("Default인 Tcp 로 설정 합니다");
+        //            isUdp = false;
+        //        }
+        //        SaveConfig();
+        //    }
+        //}
+
         private void LoadConfig()
         {
             string configFilePath = "config.txt";
 
             if (File.Exists(configFilePath))
             {
-                // 파일이 존재할 경우 설정값 읽어오기
-                string[] lines = File.ReadAllLines(configFilePath);
-
-                foreach (string line in lines)
-                {
-                    string[] parts = line.Split('=');
-                    if (parts.Length == 2)
-                    {
-                        string key = parts[0].Trim();
-                        string value = parts[1].Trim();
-
-                        switch (key)
-                        {
-                            case "port":
-                                port = int.Parse(value);
-                                break;
-                            case "max_connection":
-                                maxConnection = int.Parse(value);
-                                break;
-                            case "isUdp":
-                                isUdp = bool.Parse(value);
-                                break;
-                            case "isTcp":
-                                isTcp = bool.Parse(value);
-                                break;
-                            case "SendMassageSize":
-                                sendBufferSize = int.Parse(value);
-                                break;
-                            case "ReceiveMassageSize":
-                                receiveBufferSize = int.Parse(value);
-                                break;
-                            case "Guid":
-                                Guid = value;
-                                break;
-                        }
-                    }
-                }
+                LoadFromFile(configFilePath);
             }
             else
             {
-                // 파일이 존재하지 않을 경우 기본 설정값 지정
-                Console.WriteLine("config.txt 파일이 존재하지 않습니다. 기본 설정값으로 실행합니다.");
-                Console.WriteLine("설정값을 입력하세요.");
-   
-                Console.Write("port :");
-                string portString = Console.ReadLine();
-                Console.Write("max connection :");
-                string maxConnectionString = Console.ReadLine();
-
-                // 1이면 true 0이면 false
-                Console.WriteLine("isUdp, isTcp는 1이면 true 0이면 false");
-                Console.Write("isUdp :");
-                string isUdpString = Console.ReadLine();
-                Console.Write("isTcp :");
-                string isTcpString = Console.ReadLine();
-                Console.Write("SendMassageSize(Default 4096) :");
-                string sendMassageSizeString = Console.ReadLine();
-                Console.Write("ReceiveMassageSize(Default 4096) :");
-                string receiveMassageSizeString = Console.ReadLine();
-
-                sendBufferSize = int.Parse(sendMassageSizeString);
-                receiveBufferSize = int.Parse(receiveMassageSizeString);
-         
-                
-                Console.Write("입력 완료");
-                
-                Guid = MSGuidGenerator().ToString();
-
-                port = int.Parse(portString);
-                maxConnection = int.Parse( maxConnectionString);
-                isUdp = (int.Parse(isUdpString) == 1) ? true:false ;
-                isTcp = (int.Parse(isTcpString) == 1) ? true : false;
-            
-                if(isUdp == true && isTcp == true)
-                {
-                    Console.WriteLine("isUdp, isTcp 둘다 true일 수 없습니다.");
-                    Console.WriteLine("Default인 Tcp 로 설정 합니다");
-                    isUdp = false;
-                }
-                SaveConfig();
+                PromptConfigFromUser();
+                SaveConfig();  // 저장 위치 동일
             }
         }
+
+        private void LoadFromFile(string path)
+        {
+            foreach (string line in File.ReadAllLines(path))
+            {
+                string[] parts = line.Split('=');
+                if (parts.Length != 2) continue;
+
+                string key = parts[0].Trim();
+                string value = parts[1].Trim();
+
+                switch (key)
+                {
+                    case "port": port = int.Parse(value); break;
+                    case "max_connection": maxConnection = int.Parse(value); break;
+                    case "isUdp": isUdp = bool.Parse(value); break;
+                    case "isTcp": isTcp = bool.Parse(value); break;
+                    case "SendMassageSize": sendBufferSize = int.Parse(value); break;
+                    case "ReceiveMassageSize": receiveBufferSize = int.Parse(value); break;
+                    case "Guid": Guid = value; break;
+                }
+            }
+        }
+
+        private void PromptConfigFromUser()
+        {
+            Console.WriteLine("config.txt 파일이 존재하지 않습니다. 기본 설정값으로 실행합니다.");
+            Console.WriteLine("설정값을 입력하세요.");
+
+            port = PromptInt("port");
+            maxConnection = PromptInt("max connection");
+
+            Console.WriteLine("isUdp, isTcp는 1이면 true, 0이면 false");
+            isUdp = PromptBool("isUdp");
+            isTcp = PromptBool("isTcp");
+
+            if (isUdp && isTcp)
+            {
+                Console.WriteLine("isUdp, isTcp 둘다 true일 수 없습니다. TCP만 true로 설정합니다.");
+                isUdp = false;
+            }
+
+            sendBufferSize = PromptInt("SendMassageSize(Default 4096)", 4096);
+            receiveBufferSize = PromptInt("ReceiveMassageSize(Default 4096)", 4096);
+
+            Guid = MSGuidGenerator().ToString();
+
+            Console.WriteLine("입력 완료");
+        }
+
+        private static int PromptInt(string label, int defaultValue = -1)
+        {
+            Console.Write($"{label} : ");
+            string input = Console.ReadLine();
+            return int.TryParse(input, out int result) ? result : defaultValue;
+        }
+
+        private static bool PromptBool(string label)
+        {
+            Console.Write($"{label} (1/0) : ");
+            string input = Console.ReadLine();
+            return input == "1";
+        }
+
+
+
 
         private void SaveConfig()
         {

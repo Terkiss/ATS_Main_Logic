@@ -1,7 +1,0 @@
-port=3030
-max_connection=10000
-isUdp=False
-isTcp=True
-SendMassageSize=65536
-ReceiveMassageSize=65536
-Guid=4d7baa91-45b9-4d7d-a9aa-4209f954a1a3
