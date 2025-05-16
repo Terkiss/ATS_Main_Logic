@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TeruTeruServer
 {
@@ -172,131 +173,110 @@ namespace TeruTeruServer
             Console.WriteLine("Server Running");
             Console.ResetColor();
 
-            // 클라이언트 연결 처리를 수행합니다.
-            ProcessConnection(ServerSocket);
+            // 클라이언트 수락 시작
+            StartAcceptLoop(ServerSocket);
+
+            // 콘솔 명령 루프 실행
+            RunCommandLoop();
         }
-        /// <summary>
-        /// 클라이언트 연결을 처리하는 메서드입니다.
-        /// </summary>
-        /// <param name="listenSocket">리스닝 소켓</param>
-        public void ProcessConnection(Socket listenSocket)
+
+        private void StartAcceptLoop(Socket listenSocket)
         {
-            // 클라이언트 연결 수락을 비동기로 처리하기 위한 이벤트 및 핸들러 설정
             SocketAsyncEventArgs acceptEventArgs = new SocketAsyncEventArgs();
             acceptEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>(AcceptCompleted);
             listenSocket.AcceptAsync(acceptEventArgs);
+        }
 
-
-            // 서버 관리 명령 루프 (예: 'exit' 명령을 입력하면 종료)
+        private void RunCommandLoop()
+        {
             while (true)
             {
                 Thread.Sleep(1000);
                 string strCMD = Console.ReadLine();
-                if (strCMD.Equals("exit"))
-                {
+
+                if (!HandleConsoleCommand(strCMD))
                     break;
-                }
-                else if (strCMD.Equals("Queue_Count"))
-                {
-                    var preOrderCount = ServerMemory.GetImageWork_PreOrder_QueueCount();
-                    var completeCount = ServerMemory.GetImageWork_Complete_QueueCount();
-
-                    TeruTeruLogger.LogInfo($"preOrderCount : {preOrderCount}, CompleteCount : {completeCount}");
-                }
-                else if (strCMD.Equals("2"))
-                {
-                    int Count = 0;
-                    // 상대경로로 Receve 폴더 생성
-                    string path = @"Receve";
-                    if (!System.IO.Directory.Exists(path))
-                    {
-                        System.IO.Directory.CreateDirectory(path);
-                    }
-                    while (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData sendImageData))
-                    {
-
-
-                        // 이미지 파일 생성
-
-                        string fileName = $"image_{Count}.jpg";
-
-                        string filePath = System.IO.Path.Combine(path, fileName);
-
-
-                        if (sendImageData.imgSize < sendImageData.data.Length)
-                        {
-                            byte[] imgByte = new byte[sendImageData.imgSize];
-
-                            for (int i = 0; i < sendImageData.imgSize; i++)
-                            {
-                                imgByte[i] = sendImageData.data[i];
-                            }
-
-                            System.IO.File.WriteAllBytes(filePath, imgByte);
-                        }
-                        else
-                        {
-                            System.IO.File.WriteAllBytes(filePath, sendImageData.data);
-                        }
-                        Count++;
-                    }
-
-
-                    //// Receve folder creadte 
-                    //// 상대경로로 Receve 폴더 생성
-                    //string path = @"Receve";
-                    //if (!System.IO.Directory.Exists(path))
-                    //{
-                    //    System.IO.Directory.CreateDirectory(path);
-                    //}
-
-                    //// 이미지 파일 생성
-
-                    //string fileName = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff") + "image.jpg";
-
-                    //string filePath = System.IO.Path.Combine(path, fileName);
-
-
-                    //byte[] imgByte = new byte[sendImageData.imgSize];
-
-                    //for (int i = 0; i < sendImageData.imgSize; i++)
-                    //{
-                    //    imgByte[i] = sendImageData.data[i];
-                    //}
-
-                    //System.IO.File.WriteAllBytes(filePath, imgByte);
-                }
-                else if (strCMD.Equals("Worker_Start"))
-                {
-                    Thread workerThread = new Thread(
-                        () =>
-                        {
-                            while (true)
-                            {
-                                // 작업 큐에서 작업을 가져와서 처리
-                                if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData PreOrderItem))
-                                {
-                            
-                                    //TeruTeruLogger.LogInfo($"PreOrderItem : {PreOrderItem.imgSize}, {PreOrderItem.hostID}");
-                                    
-                                    rpcProxy.RequestObjectDetect(PreOrderItem);
-
-                                }
-
-                                if(ServerMemory.GetImageWork_Complete_Queue(out SendImageData completeItem))
-                                {
-
-                               
-                                    TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.imgSize}, {completeItem.hostID}");
-                                }
-                            }
-                        }
-                        );
-                    workerThread.Start();
-                }
-
             }
         }
+
+        private bool HandleConsoleCommand(string command)
+        {
+            switch (command)
+            {
+                case "exit":
+                    return false;
+
+                case "Queue_Count":
+                    HandleQueueCount();
+                    break;
+
+                case "2":
+                    HandleImageDump();
+                    break;
+
+                case "Worker_Start":
+                    StartWorkerThread();
+                    break;
+
+                default:
+                    Console.WriteLine($"알 수 없는 명령어: {command}");
+                    break;
+            }
+
+            return true;
+        }
+
+        private void HandleQueueCount()
+        {
+            var preOrderCount = ServerMemory.GetImageWork_PreOrder_QueueCount();
+            var completeCount = ServerMemory.GetImageWork_Complete_QueueCount();
+            TeruTeruLogger.LogInfo($"preOrderCount : {preOrderCount}, CompleteCount : {completeCount}");
+        }
+
+        private void HandleImageDump()
+        {
+            int Count = 0;
+            string path = @"Receve";
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            while (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData sendImageData))
+            {
+                string fileName = $"image_{Count}.jpg";
+                string filePath = Path.Combine(path, fileName);
+
+                if (sendImageData.imgSize < sendImageData.data.Length)
+                {
+                    byte[] imgByte = new byte[sendImageData.imgSize];
+                    Array.Copy(sendImageData.data, imgByte, sendImageData.imgSize);
+                    File.WriteAllBytes(filePath, imgByte);
+                }
+                else
+                {
+                    File.WriteAllBytes(filePath, sendImageData.data);
+                }
+
+                Count++;
+            }
+        }
+
+        private void StartWorkerThread()
+        {
+            Thread workerThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData preOrderItem))
+                        rpcProxy.RequestObjectDetect(preOrderItem);
+
+                    if (ServerMemory.GetImageWork_Complete_Queue(out SendImageData completeItem))
+                        TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.imgSize}, {completeItem.hostID}");
+                }
+            });
+            workerThread.Start();
+        }
+
+
 
 
         private void AcceptCompleted(object sender, SocketAsyncEventArgs e)

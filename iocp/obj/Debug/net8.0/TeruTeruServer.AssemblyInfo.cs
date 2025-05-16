@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dbf8601e1127853dd7ca0d76c9783c1114b819fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0caaee3cd02efaaa29f68176340a9d3698f591a")]
 [assembly: System.Reflection.AssemblyProductAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
