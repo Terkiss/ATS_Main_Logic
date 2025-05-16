@@ -347,12 +347,8 @@ namespace TeruTeruServer
             return args;
         }
 
-        /// <summary>
-        /// 클라이언트로부터 데이터 수신 완료 이벤트 핸들러입니다.
-        /// </summary>
-        /// <param name="sender">이벤트 발생자</param>
-        /// <param name="e">SocketAsyncEventArgs 객체</param>
-        public async void ReceiveCompleted(object sender, SocketAsyncEventArgs e)
+
+        public async void Old_ReceiveCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
@@ -423,6 +419,79 @@ namespace TeruTeruServer
             // 데이터를 수신하고 다시 데이터 수신을 시작합니다.
             e.AcceptSocket.ReceiveAsync(e);
         }
+
+
+        private async void ReceiveCompleted(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+            {
+                ProcessReceivedData(e);
+            }
+            else if (e.SocketError == SocketError.ConnectionReset)
+            {
+                HandleConnectionReset(e);
+            }
+
+            // 다음 수신을 계속 등록
+            e.AcceptSocket.ReceiveAsync(e);
+        }
+
+
+
+        private void ProcessReceivedData(SocketAsyncEventArgs e)
+        {
+            byte[] buffer = e.Buffer;
+            int count = e.BytesTransferred;
+
+            var sendType = (SendType)buffer[0];
+
+            if (sendType == SendType.Direct)
+            {
+                ProcessDirect(buffer, count, e.AcceptSocket);
+            }
+            else if (sendType == SendType.Json)
+            { 
+                ProcessJson(buffer, count, e.AcceptSocket);
+            }
+        }
+
+
+        private void ProcessDirect(byte[] buffer, int count, Socket socket)
+        { 
+            byte[] data = new byte[count - 1];
+
+            Array.Copy(buffer, 1, data, 0, count - 1);
+
+            serverLogic.ProcessDirectProtocol(data, socket);
+        }
+
+        private void ProcessJson(byte[] buffer, int count, Socket socket)
+        { 
+            byte[] data = new byte[count - 1];
+            Array.Copy(buffer, 1, data, 0, count - 1);
+            string json = Encoding.ASCII.GetString(data);
+
+            TeruTeruLogger.LogInfo("Received JSON: " + json);
+
+            serverLogic.ProcessJsonProtocol(json, ProtocolSelect.ConnectProtocol, socket);
+        }
+
+        private void HandleConnectionReset(SocketAsyncEventArgs e)
+        {
+            // 클라이언트와의 연결이 끊겼을 때 (ConnectionReset 예외 발생)
+            try
+            {
+                int playerId = (int)e.UserToken;
+                Console.WriteLine("플레이어 " + playerId + "와의 연결 끊김");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error closing socket: " + ex.Message);
+            }
+        }
+
+
+
         public async void SendData(Socket socket, byte[] data)
         {
             if (!await TrySend(socket, data))
