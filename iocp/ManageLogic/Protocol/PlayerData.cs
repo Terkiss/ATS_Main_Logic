@@ -37,7 +37,22 @@ namespace TeruTeruServer.ManageLogic.Protocol
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2097152)]
         public byte[] data;
     }
-    
+
+    [StructLayout(LayoutKind.Sequential, Pack =1)]
+    public struct YoloDetectResult
+    {
+        public int hostID; // 플레이어 인덱스
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
+        public string UserID;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2097152)]
+        public byte[] data;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1048576)]
+        public string DetectionResult;
+    }
+
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ChatData
@@ -49,7 +64,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
         public string sender;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1024)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 2048)]
         public string message;
     }
 

@@ -33,8 +33,16 @@ namespace TeruTeruServer.Command
                     if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData preOrderItem))
                         rpcProxy.RequestObjectDetect(preOrderItem);
 
-                    if (ServerMemory.GetImageWork_Complete_Queue(out SendImageData completeItem))
-                        TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.imgSize}, {completeItem.hostID}");
+                    if (ServerMemory.GetImageWork_Complete_Queue(out YoloDetectResult completeItem))
+                    {
+                        //이 구간 은 완료 콜백
+                        TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.UserID}, {completeItem.hostID}");
+
+                        TeruTeruLogger.LogInfo("JSON Result: " + completeItem.DetectionResult);
+
+                    }
+                    
+
                 }
             });
             workerThread.Start();

@@ -45,6 +45,13 @@ namespace TeruTeruServer.ManageLogic.Protocol
                     DetectClient.Add(item);
                 }
             }
+
+            if (DetectClient.Count == 0)
+            {
+                TeruTeruLogger.LogInfo("No Detector Client");
+                return;
+            }
+
             // 디텍트 클라이언트 중 랜덤하게 하나를 선택
             Random random = new Random();
             int randomIndex = random.Next(0, DetectClient.Count);

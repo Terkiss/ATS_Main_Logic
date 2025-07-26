@@ -50,11 +50,23 @@ namespace TeruTeruServer.ManageLogic.Protocol
                         break;
                     case MethodsSelector.SendImage: // 이미지 수신  처리
                         SendImageData sendImageData = MarshalUtil.Deserialize<SendImageData>(requestBytes, 1);
-                        Console.WriteLine($"Received image data: {sendImageData.data.Length} bytes");
-
+                       
                         ReceivImage(sendImageData);
 
                         break;
+                    case MethodsSelector.ObjectDetectResult:
+                        TeruTeruLogger.LogAttention("ObjectDetectResult 요청 처리 시작");
+                        YoloDetectResult sendImageDataDetect = MarshalUtil.Deserialize<YoloDetectResult>(requestBytes, 1);
+
+                        //LOG
+                        TeruTeruLogger.LogInfo($"Received object detection result from {sendImageDataDetect.UserID} with size {sendImageDataDetect.data.Length} bytes");
+                        TeruTeruLogger.LogInfo($"Detection Result: {sendImageDataDetect.DetectionResult}");
+                        // TeruTeruLogger.LogInfo($"Received image data: {sendImageDataDetect.data.Length} bytes from {sendImageDataDetect.UserID}");
+                        // TeruTeruLogger.LogInfo($"Detection Result: {sendImageDataDetect.DetectionResult}");
+                        // YOLO 디텍트 결과 처리
+                        break;
+
+       
 
                     //case MethodsSelector.SendPlayerData: // 플레이어 데이터 처리
                     //    PlayerData playerData = MarshalUtil.Deserialize<PlayerData>(requestBytes, 1);
@@ -90,6 +102,23 @@ namespace TeruTeruServer.ManageLogic.Protocol
             catch (Exception e)
             {
                 // 예외 발생시 로깅
+
+                // 상세 로깅
+                TeruTeruLogger.LogError($"예외 발생: {e.Message}");
+
+                // 모든 변수 출력
+                TeruTeruLogger.LogError($"예외 발생: {e.StackTrace}");
+                TeruTeruLogger.LogError($"예외 발생: {e.InnerException}");
+                TeruTeruLogger.LogError($"예외 발생: {e.TargetSite}");
+                TeruTeruLogger.LogError($"예외 발생: {e.Source}");
+                TeruTeruLogger.LogError($"예외 발생: {e.Data}");
+                TeruTeruLogger.LogError($"예외 발생: {e.GetType()}");
+                TeruTeruLogger.LogError($"예외 발생: {e.ToString()}");
+
+                TeruTeruLogger.LogError(((int)methodId).ToString());
+
+
+
                 Console.WriteLine($"요청 처리 중 예외 발생: {e.Message}");
                 return null;
             }

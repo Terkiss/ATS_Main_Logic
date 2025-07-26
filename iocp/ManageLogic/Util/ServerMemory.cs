@@ -23,7 +23,7 @@ namespace TeruTeruServer.ManageLogic.Util
 
 
         private static ConcurrentQueue<SendImageData> imageWork_PreOrder_Queue = new ConcurrentQueue<SendImageData>();
-        private static ConcurrentQueue<SendImageData> imageWork_Complete_Queue = new ConcurrentQueue<SendImageData>();
+        private static ConcurrentQueue<YoloDetectResult> imageWork_Complete_Queue = new ConcurrentQueue<YoloDetectResult>();
 
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             imageWork_PreOrder_Queue.Enqueue(imageData);
         }
-        public static void AddImageWork_Complete_Queue(SendImageData imageData)
+        public static void AddImageWork_Complete_Queue(YoloDetectResult imageData)
         {
             imageWork_Complete_Queue.Enqueue(imageData);
         }
@@ -158,17 +158,17 @@ namespace TeruTeruServer.ManageLogic.Util
             return check;
         }
    
-        public static SendImageData GetImageWork_Complete_Queue()
+        public static YoloDetectResult GetImageWork_Complete_Queue()
         {
-            if (imageWork_Complete_Queue.TryDequeue(out SendImageData imageData))
+            if (imageWork_Complete_Queue.TryDequeue(out YoloDetectResult imageData))
             {
                 return imageData;
             }
             return default;
         }
-        public static bool GetImageWork_Complete_Queue(out SendImageData data)
+        public static bool GetImageWork_Complete_Queue(out YoloDetectResult data)
         {
-            bool check = imageWork_Complete_Queue.TryDequeue(out SendImageData imageData);
+            bool check = imageWork_Complete_Queue.TryDequeue(out YoloDetectResult imageData);
             data = imageData;
             return check;
         }
