@@ -1,0 +1,13 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\Project\2024\Kabusiki_Main_Server\iocp\test.cs(9,20): warning CS8981: The type name 'test' only contains lower-cased ascii characters. Such names may become reserved for the language. [D:\Project\2024\Kabusiki_Main_Server\iocp\TeruTeruServer.csproj]
+D:\Project\2024\Kabusiki_Main_Server\iocp\MainServer.cs(504,38): error CS0246: The type or namespace name 'EndPoint' could not be found (are you missing a using directive or an assembly reference?) [D:\Project\2024\Kabusiki_Main_Server\iocp\TeruTeruServer.csproj]
+
+Build FAILED.
+
+D:\Project\2024\Kabusiki_Main_Server\iocp\test.cs(9,20): warning CS8981: The type name 'test' only contains lower-cased ascii characters. Such names may become reserved for the language. [D:\Project\2024\Kabusiki_Main_Server\iocp\TeruTeruServer.csproj]
+D:\Project\2024\Kabusiki_Main_Server\iocp\MainServer.cs(504,38): error CS0246: The type or namespace name 'EndPoint' could not be found (are you missing a using directive or an assembly reference?) [D:\Project\2024\Kabusiki_Main_Server\iocp\TeruTeruServer.csproj]
+    1 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.95

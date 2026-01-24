@@ -9,56 +9,46 @@ namespace TeruTeruServer.ManageLogic.Protocol
 {
     public class RpcProxy
     {
+        private MainServer _mainServer;
 
-        MainServer mainServer;
         public RpcProxy()
         {
-            // Constructor logic here
-
-            mainServer = ServerMemory.MainServer;
-
-
+            _mainServer = ServerMemory.MainServer;
         }
-
-
 
         public void RequestObjectDetect(SendImageData sendImageData)
         {
-
-            if (sendImageData.imgSize == 0)
+            if (sendImageData.ImgSize == 0)
             { 
-                TeruTeruLogger.LogInfo("Image size is 0");
+                TeruTeruLogger.LogInfo("이미지 크기가 0입니다.");
                 return;
             }
 
-            var hostID = sendImageData.hostID;
-            var GameID = Encoding.UTF8.GetString(sendImageData.userID).TrimEnd('\0');
-            TeruTeruLogger.LogInfo($"RequestObjectDetect: hostID = {hostID}, GameID = {GameID}");
+            var hostID = sendImageData.HostID;
+            var gameID = Encoding.UTF8.GetString(sendImageData.UserID).TrimEnd('\0');
+            TeruTeruLogger.LogInfo($"RequestObjectDetect: HostID = {hostID}, GameID = {gameID}");
 
             var clientSessionList = ServerMemory.GetClientSessions();
 
-            List<ClientSession> DetectClient = new List<ClientSession>();
+            List<ClientSession> detectClients = new List<ClientSession>();
             foreach (var item in clientSessionList)
             {
                 if (item.Role.Equals("Detector"))
                 { 
-                    DetectClient.Add(item);
+                    detectClients.Add(item);
                 }
             }
 
-            if (DetectClient.Count == 0)
+            if (detectClients.Count == 0)
             {
-                TeruTeruLogger.LogInfo("No Detector Client");
+                TeruTeruLogger.LogInfo("탐지(Detector) 클라이언트가 없습니다.");
                 return;
             }
 
-            // 디텍트 클라이언트 중 랜덤하게 하나를 선택
             Random random = new Random();
-            int randomIndex = random.Next(0, DetectClient.Count);
-            var selectedClient = DetectClient[randomIndex];
-            TeruTeruLogger.LogInfo($"Selected Client: {selectedClient.HostID}");
-            // SendImageData sendImageData = new SendImageData();
-            
+            int randomIndex = random.Next(0, detectClients.Count);
+            var selectedClient = detectClients[randomIndex];
+            TeruTeruLogger.LogInfo($"선택된 클라이언트: {selectedClient.HostID}");
 
             var sendByte = MarshalUtil.Serialize<SendImageData>(sendImageData);
 
@@ -68,10 +58,7 @@ namespace TeruTeruServer.ManageLogic.Protocol
 
             Array.Copy(sendByte, 0, requestByte, 2, sendByte.Length);
 
-            // Send the data to the selected client
-            mainServer.SendData(selectedClient.HostID, requestByte);
-     
+            _mainServer.SendData(selectedClient.HostID, requestByte);
         }
-
     }
 }

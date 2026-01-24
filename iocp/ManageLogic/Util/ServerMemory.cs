@@ -13,21 +13,19 @@ namespace TeruTeruServer.ManageLogic.Util
     public class ServerMemory
     {
         public static MainServer MainServer { get; set; }
-        /// <summary>
-        /// 호스트 ID 생성기 락 오브젝트
-        /// </summary>
         public static object HostIDGeneratorLock = new object();
 
-        private static Dictionary<int, ClientSession> hosts = new Dictionary<int, ClientSession>();
-        private static Dictionary<string, int> gameID2HostID = new Dictionary<string, int>();
+        private static Dictionary<int, ClientSession> _hosts = new Dictionary<int, ClientSession>();
+        private static Dictionary<string, int> _gameID2HostID = new Dictionary<string, int>();
 
+        private static ConcurrentQueue<SendImageData> _imageWorkPreOrderQueue = new ConcurrentQueue<SendImageData>();
+        private static ConcurrentQueue<YoloDetectResult> _imageWorkCompleteQueue = new ConcurrentQueue<YoloDetectResult>();
+        private static int _currentHostID = 0;
 
-        private static ConcurrentQueue<SendImageData> imageWork_PreOrder_Queue = new ConcurrentQueue<SendImageData>();
-        private static ConcurrentQueue<YoloDetectResult> imageWork_Complete_Queue = new ConcurrentQueue<YoloDetectResult>();
 
 
         /// <summary>
-        /// 호스트 ID 생성기
+        /// 새로운 고유 호스트 ID를 생성합니다.
         /// </summary>
         public static int GetHostID
         {
@@ -35,12 +33,10 @@ namespace TeruTeruServer.ManageLogic.Util
             {
                 lock (HostIDGeneratorLock)
                 {
-                    return currentHostID++;
+                    return _currentHostID++;
                 }
             }
-        } private static int currentHostID = 0;
-
-
+        }
 
         public static Object HostsLock = new Object();
         public static object GameID2HostIDLock = new object();
@@ -49,7 +45,7 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             lock (HostsLock)
             {
-                return new List<ClientSession>(hosts.Values);
+                return new List<ClientSession>(_hosts.Values);
             }
         }
 
@@ -58,15 +54,16 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             lock (HostsLock)
             {
-                hosts.Add(hostID, host);
+                _hosts.Add(hostID, host);
             }
-            return hosts;
+            return _hosts;
         }
+
         public static void RemoveHostFromDictionary(int hostID)
         {
             lock (HostsLock)
             {
-                hosts.Remove(hostID);
+                _hosts.Remove(hostID);
             }
         }
 
@@ -74,28 +71,30 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             lock (GameID2HostIDLock)
             {
-                if (!gameID2HostID.ContainsKey(gameID))
+                if (!_gameID2HostID.ContainsKey(gameID))
                 {
-                    gameID2HostID.Add(gameID, hostID);
+                    _gameID2HostID.Add(gameID, hostID);
                 }
             }
         }
+
         public static void RemoveGameIDFromDictionary(string gameID)
         {
             lock (GameID2HostIDLock)
             {
-                if (gameID2HostID.ContainsKey(gameID))
+                if (_gameID2HostID.ContainsKey(gameID))
                 {
-                    gameID2HostID.Remove(gameID);
+                    _gameID2HostID.Remove(gameID);
                 }
             }
         }
+
         public static void RemoveGameIDFromDictionary(int hostID)
         {
             lock (GameID2HostIDLock)
             {
                 string key = string.Empty;
-                foreach (var item in gameID2HostID)
+                foreach (var item in _gameID2HostID)
                 {
                     if (item.Value == hostID)
                     {
@@ -105,9 +104,9 @@ namespace TeruTeruServer.ManageLogic.Util
                 }
                 if (!string.IsNullOrEmpty(key))
                 {
-                    gameID2HostID.Remove(key);
+                    _gameID2HostID.Remove(key);
                 }
-                hosts.Remove(hostID);
+                _hosts.Remove(hostID);
             }
         }
 
@@ -116,19 +115,20 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             lock (HostsLock)
             {
-                if (hosts.ContainsKey(hostID)) {
-                    return hosts[hostID];
+                if (_hosts.ContainsKey(hostID)) {
+                    return _hosts[hostID];
                 }
                 return null;
             }
         }
+
         public static ClientSession FindClientSession(string gameID)
         {
             lock (GameID2HostIDLock)
             {
-                if (gameID2HostID.ContainsKey(gameID))
+                if (_gameID2HostID.ContainsKey(gameID))
                 {
-                    return FindClientSession(gameID2HostID[gameID]);
+                    return FindClientSession(_gameID2HostID[gameID]);
                 }
                 return null;
             }
@@ -137,48 +137,54 @@ namespace TeruTeruServer.ManageLogic.Util
 
         public static void AddImageWork_PreOrder_Queue(SendImageData imageData)
         {
-            imageWork_PreOrder_Queue.Enqueue(imageData);
+            _imageWorkPreOrderQueue.Enqueue(imageData);
         }
+
         public static void AddImageWork_Complete_Queue(YoloDetectResult imageData)
         {
-            imageWork_Complete_Queue.Enqueue(imageData);
+            _imageWorkCompleteQueue.Enqueue(imageData);
         }
+
         public static SendImageData GetImageWork_PreOrder_Queue()
         {
-            if (imageWork_PreOrder_Queue.TryDequeue(out SendImageData imageData))
+            if (_imageWorkPreOrderQueue.TryDequeue(out SendImageData imageData))
             {
                 return imageData;
             }
             return default;
         }
+
         public static bool GetImageWork_PreOrder_Queue(out SendImageData data)
         {
-            bool check = imageWork_PreOrder_Queue.TryDequeue(out SendImageData imageData);
+            bool check = _imageWorkPreOrderQueue.TryDequeue(out SendImageData imageData);
             data = imageData;
             return check;
         }
    
         public static YoloDetectResult GetImageWork_Complete_Queue()
         {
-            if (imageWork_Complete_Queue.TryDequeue(out YoloDetectResult imageData))
+            if (_imageWorkCompleteQueue.TryDequeue(out YoloDetectResult imageData))
             {
                 return imageData;
             }
             return default;
         }
+
         public static bool GetImageWork_Complete_Queue(out YoloDetectResult data)
         {
-            bool check = imageWork_Complete_Queue.TryDequeue(out YoloDetectResult imageData);
+            bool check = _imageWorkCompleteQueue.TryDequeue(out YoloDetectResult imageData);
             data = imageData;
             return check;
         }
+
         public static int GetImageWork_PreOrder_QueueCount()
         {
-            return imageWork_PreOrder_Queue.Count;
+            return _imageWorkPreOrderQueue.Count;
         }
+
         public static int GetImageWork_Complete_QueueCount()
         {
-            return imageWork_Complete_Queue.Count;
+            return _imageWorkCompleteQueue.Count;
         }
 
     }

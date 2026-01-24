@@ -6,24 +6,14 @@ using System.Threading.Tasks;
 
 namespace TeruTeruServer
 {
+    /// <summary>
+    /// 서버 연결 설정을 저장하는 파라미터 클래스입니다.
+    /// </summary>
     public class ServerConnectConfigParameter
     {
-        public string IP
-        {
-            get;
-            set;
-        }
-
-        public int Port
-        {
-            get;
-            set;
-        }
-        public int MaxConnection
-        {
-            get;
-            set;
-        }
+        public string IP { get; set; } // 서버 IP 주소
+        public int Port { get; set; } // 서버 포트 번호
+        public int MaxConnection { get; set; } // 최대 연결 수
 
         public enum NetworkType
         {
@@ -32,15 +22,14 @@ namespace TeruTeruServer
             UDP
         }
         /// <summary>
-        /// 0 -> udp 
-        /// 1 -> tcp
+        /// 네트워크 프로토콜 타입 설정 (UDP/TCP)
         /// </summary>
-        public bool isTcp
+        public bool IsTcp
         {
             get;
             set;
         }
-        public bool isUdp
+        public bool IsUdp
         {
             get;
             set;
@@ -83,33 +72,32 @@ namespace TeruTeruServer
                 throw new NullReferenceException();
             }
 
-            this.isTcp = (type == NetworkType.TCP) ? true : false;
+            this.IsTcp = (type == NetworkType.TCP) ? true : false;
         }
 
 
         public bool SetTcp(bool isTcp)
         {
-            this.isTcp = isTcp;
-            return this.isTcp;
+            this.IsTcp = isTcp;
+            return this.IsTcp;
         }
         public bool SetUdp(bool isUdp)
         {
-            this.isUdp = isUdp;
-            return this.isUdp;
+            this.IsUdp = isUdp;
+            return this.IsUdp;
         }
 
         public override string ToString()
         {
-            string anser = "";
-            anser += $"ip={IP}\n"; 
-            anser += $"guid={Guid}\n";
-            anser += $"port={Port}\n";
-            anser += $"max_connection={MaxConnection}\n";
-            anser += $"isUdp={isUdp}\n";
-            anser += $"isTcp={isTcp}\n";
+            string answer = "";
+            answer += $"ip={IP}\n"; 
+            answer += $"guid={Guid}\n";
+            answer += $"port={Port}\n";
+            answer += $"max_connection={MaxConnection}\n";
+            answer += $"isUdp={IsUdp}\n";
+            answer += $"isTcp={IsTcp}\n";
 
-            return anser;
-            
+            return answer;
         }
 
 

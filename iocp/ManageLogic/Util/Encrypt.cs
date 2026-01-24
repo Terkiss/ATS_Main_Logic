@@ -5,6 +5,9 @@ using System.Text;
 
 namespace TeruTeruServer.ManageLogic.Util
 {
+    /// <summary>
+    /// AES 알고리즘을 사용하여 문자열 암호화 및 복호화를 수행하는 클래스입니다.
+    /// </summary>
     public class Encrypt
     {
         public static string EncryptStringAES(string inputText, string password)
@@ -15,7 +18,7 @@ namespace TeruTeruServer.ManageLogic.Util
                 aesAlg.IV = GenerateRandomIV();
 
                 // PBKDF2를 사용하여 안전한 키 생성
-                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); // salt can also be random
+                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); // salt로 복호화 시에도 동일한 IV를 사용함
                 aesAlg.Key = keyGenerator.GetBytes(aesAlg.KeySize / 8);
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -49,8 +52,8 @@ namespace TeruTeruServer.ManageLogic.Util
 
                 aesAlg.IV = iv;
 
-                // Use PBKDF2 to generate the key
-                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); // salt should be the same as used in encryption
+                // PBKDF2를 사용하여 키를 생성 (암호화 시와 동일한 salt 보장)
+                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); 
                 aesAlg.Key = keyGenerator.GetBytes(aesAlg.KeySize / 8);
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);

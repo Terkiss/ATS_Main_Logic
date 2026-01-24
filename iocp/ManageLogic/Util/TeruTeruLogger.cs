@@ -12,7 +12,9 @@ namespace TeruTeruServer.ManageLogic.Util
     public class TeruTeruLogger
     {
         public TeruTeruLogger Instance { get; } = new TeruTeruLogger();
-        public static Logger logger = new Logger();
+        
+        // 로깅 기능을 수행하는 내부 로거 인스턴스
+        public static Logger LoggerInstance = new Logger();
 
 
 
@@ -25,7 +27,7 @@ namespace TeruTeruServer.ManageLogic.Util
             Console.WriteLine(log);
             Console.ResetColor();
 
-            logger.SetLogMessage(LogLevel.INFO, log);
+            LoggerInstance.SetLogMessage(LogLevel.INFO, log);
         }
 
         public static void LogAttention(string logMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
@@ -37,42 +39,43 @@ namespace TeruTeruServer.ManageLogic.Util
             Console.WriteLine(log);
             Console.ResetColor();
 
-            logger.SetLogMessage(LogLevel.ATTENTION, log);
+            LoggerInstance.SetLogMessage(LogLevel.ATTENTION, log);
         }
 
         public static void LogError(string errorMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
             string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][ERROR]: {errorMessage}\n";
-            log += $"line number: {lineNumber}\n";
+            log += $"라인 번호: {lineNumber}\n";
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(log);
             Console.ResetColor();
 
-            logger.SetLogMessage(LogLevel.ERROR, log);
+            LoggerInstance.SetLogMessage(LogLevel.ERROR, log);
 
         }
 
         public static void LogWarning(string warningMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
             string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][WARNING]: {warningMessage}\n";
-            log += $"line number: {lineNumber}\n";
+            log += $"라인 번호: {lineNumber}\n";
 
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(log);
             Console.ResetColor();
 
-            logger.SetLogMessage(LogLevel.WARNING, log);
+            LoggerInstance.SetLogMessage(LogLevel.WARNING, log);
         }
 
 
         public static void LogInvisible(string logMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
             string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][INVISIBLE]: {logMessage}\n";
-            log += $"line number: {lineNumber}\n";
+            log += $"라인 번호: {lineNumber}\n";
 
-            logger.SetLogMessage(LogLevel.HARDWARE, log);
+            // 하드웨어 관련 로그는 별도로 저장
+            LoggerInstance.SetLogMessage(LogLevel.HARDWARE, log);
         }
     }
 
@@ -87,49 +90,44 @@ namespace TeruTeruServer.ManageLogic.Util
 
     public class Logger
     {
-        private string logDirectory;
-        private string logFileName;
-        private string hardwareLogFileName;
-        private Queue<(int, string)> LogQuque = new Queue<(int, string)>();
+        private string _logDirectory;
+        private string _logFileName;
+        private string _hardwareLogFileName;
+        private Queue<(int, string)> _logQueue = new Queue<(int, string)>();
 
 
 
         public Logger()
         {
-            // 로그 파일이 저장될 디렉토리 설정
-            logDirectory = "Logs";
+            _logDirectory = "Logs";
 
-            if (!Directory.Exists(logDirectory))
+            if (!Directory.Exists(_logDirectory))
             {
-                Directory.CreateDirectory(logDirectory);
+                Directory.CreateDirectory(_logDirectory);
             }
 
-            // 로그 파일 이름을 날짜 기반으로 생성
-            logFileName = $"{DateTime.Now:yyyyMMdd}.log";
-            hardwareLogFileName = $"{DateTime.Now:yyyyMMdd}_hardware.log";
+            _logFileName = $"{DateTime.Now:yyyyMMdd}.log";
+            _hardwareLogFileName = $"{DateTime.Now:yyyyMMdd}_hardware.log";
 
             Thread logMainLoop = new Thread(new ThreadStart(LogMainLoop));
+            logMainLoop.IsBackground = true;
             logMainLoop.Start();
         }
 
 
         public void Log(string logMessage)
         {
-            // 날짜와 메시지를 로그 파일에 추가
             string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}: {logMessage}";
-            File.AppendAllText(Path.Combine(logDirectory, logFileName), logEntry + Environment.NewLine);
+            File.AppendAllText(Path.Combine(_logDirectory, _logFileName), logEntry + Environment.NewLine);
         }
         public void LogHardware(string logMessage)
         {
-            // 날짜와 메시지를 로그 파일에 추가
             string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}: {logMessage}";
-            File.AppendAllText(Path.Combine(logDirectory, hardwareLogFileName), logEntry + Environment.NewLine);
+            File.AppendAllText(Path.Combine(_logDirectory, _hardwareLogFileName), logEntry + Environment.NewLine);
         }
         public void SetLogMessage(LogLevel logLevel, string logMessage)
         {
-            // 로그 메세지를 큐에 담는다
-            LogQuque.Enqueue(((int)logLevel, logMessage));
-
+            _logQueue.Enqueue(((int)logLevel, logMessage));
         }
 
         // 로그 메인 루프는 1분에 한번 주기로 파일에 저장 한다.
@@ -137,13 +135,11 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             while (true)
             {
-
                 Thread.Sleep(60000);
 
-                // 큐에 담긴 로그 메세지를 파일에 저장한다.
-                while (LogQuque.Count > 0)
+                while (_logQueue.Count > 0)
                 {
-                    var log = LogQuque.Dequeue();
+                    var log = _logQueue.Dequeue();
 
                     if ((LogLevel)log.Item1 == LogLevel.HARDWARE)
                     {
@@ -154,7 +150,6 @@ namespace TeruTeruServer.ManageLogic.Util
                         Log(log.Item2);
                     }
                 }
-
             }
         }
 

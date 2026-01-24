@@ -8,64 +8,77 @@ using System.Threading.Tasks;
 namespace TeruTeruServer.ManageLogic.Protocol
 {
 
+    /// <summary>
+    /// 서버 연결을 위한 데이터 구조체입니다.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ConnectionData
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
-        public string guid;
+        public string Guid; // 서버 연결 확인을 위한 고유 GUID
     }
 
+    /// <summary>
+    /// 일반적인 데이터 전송을 위한 구조체입니다.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SendData
     {
-        public int index;
+        public int Index; // 플레이어 또는 객체의 인덱스
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] data;
+        public byte[] Data; // 실제 데이터 바이트 배열
     }
 
 
+    /// <summary>
+    /// 이미지 데이터 전송을 위한 구조체입니다.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SendImageData
     {
-        public int hostID;
+        public int HostID; // 호스트 식별 ID
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] userID;
+        public byte[] UserID; // 사용자 ID (byte 배열 형태)
 
-        public int imgSize;
+        public int ImgSize; // 이미지 데이터 크기
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2097152)]
-        public byte[] data;
+        public byte[] Data; // 이미지 이진 데이터
     }
 
+    /// <summary>
+    /// YOLO 객체 탐지 결과를 담는 구조체입니다.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack =1)]
     public struct YoloDetectResult
     {
-        public int hostID; // 플레이어 인덱스
+        public int HostID; // 호스트 식별 ID
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 50)]
-        public string UserID;
+        public string UserID; // 사용자 ID (문자열 형태)
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2097152)]
-        public byte[] data;
+        public byte[] Data; // 관련 이미지 데이터 (필요 시)
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1048576)]
-        public string DetectionResult;
+        public string DetectionResult; // JSON 형식의 탐지 결과 문자열
     }
 
 
+    /// <summary>
+    /// 채팅 참여 데이터 구조체입니다.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ChatData
     {
-        public int index;
-
-
+        public int Index; // 보낸 플레이어 인덱스
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
-        public string sender;
+        public string Sender; // 발신자 이름
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 2048)]
-        public string message;
+        public string Message; // 채팅 메시지 내용
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

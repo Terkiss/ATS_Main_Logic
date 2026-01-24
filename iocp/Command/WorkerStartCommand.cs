@@ -9,45 +9,46 @@ using TeruTeruServer.ManageLogic.Util;
 
 namespace TeruTeruServer.Command
 {
+    /// <summary>
+    /// 백그라운드 워커 쓰레드를 시작하여 이미지 분석 요청을 처리하는 명령어 클래스입니다.
+    /// </summary>
     public class WorkerStartCommand : ICommand
     {
+        private RpcProxy _rpcProxy;
+        private bool _isRunning = false; // 워커 쓰레드 실행 여부 플래그
 
-        private RpcProxy rpcProxy;
-        private bool isRunning = false;
         public WorkerStartCommand()
         {
-            rpcProxy = new RpcProxy();
+            _rpcProxy = new RpcProxy();
         }
 
         public bool Execute(string[] args)
         {
-            if (isRunning)
+            if (_isRunning)
             {
-                return true; // 이미 실행중인 경우
+                return true; 
             }
             Thread workerThread = new Thread(() =>
             {
                 while (true)
                 {
                     Thread.Sleep(30);
+                    // 이미지 분석 대기 큐에서 데이터를 하나씩 꺼내 탐지 요청
                     if (ServerMemory.GetImageWork_PreOrder_Queue(out SendImageData preOrderItem))
-                        rpcProxy.RequestObjectDetect(preOrderItem);
+                        _rpcProxy.RequestObjectDetect(preOrderItem);
 
+                    // 분석 완료 큐에 결과가 있으면 로그 출력
                     if (ServerMemory.GetImageWork_Complete_Queue(out YoloDetectResult completeItem))
                     {
-                        //이 구간 은 완료 콜백
-                        TeruTeruLogger.LogInfo($"CompleteItem : {completeItem.UserID}, {completeItem.hostID}");
-
-                        TeruTeruLogger.LogInfo("JSON Result: " + completeItem.DetectionResult);
-
+                        TeruTeruLogger.LogInfo($"분석 완료 유저: {completeItem.UserID}, 호스트: {completeItem.HostID}");
+                        TeruTeruLogger.LogInfo("탐지 결과 JSON: " + completeItem.DetectionResult);
                     }
-                    
-
                 }
             });
+            workerThread.IsBackground = true;
             workerThread.Start();
-            isRunning = true;
-            return true; // 프로그램 계속
+            _isRunning = true;
+            return true;
         }
     }
 }

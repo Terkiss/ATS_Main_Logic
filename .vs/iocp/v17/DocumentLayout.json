@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "D:\\Project\\2024\\Kabusiki_Main_Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\teruteruserver.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
-      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\teruteruserver.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\mainserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\mainserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\util\\teruterulogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\managelogic\\util\\teruterulogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\serverlogic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\managelogic\\serverlogic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\mainserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\mainserver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\util\\servermemory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\managelogic\\util\\servermemory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\teruteruserver.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\teruteruserver.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\protocol\\rpcstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -87,10 +91,6 @@
       "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\util\\teruterulogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\managelogic\\util\\teruterulogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|d:\\project\\2024\\kabusiki_main_server\\iocp\\managelogic\\util\\utility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F7AED98D-896F-411A-952B-3F2B77E5EB8F}|iocp\\TeruTeruServer.csproj|solutionrelative:iocp\\managelogic\\util\\utility.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -118,7 +118,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Bookmark",
@@ -130,7 +130,15 @@
             },
             {
               "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
               "$type": "Document",
@@ -140,49 +148,14 @@
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\ServerMemory.cs",
               "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\ServerMemory.cs",
               "RelativeToolTip": "iocp\\ManageLogic\\Util\\ServerMemory.cs",
-              "ViewState": "AgIAAHEAAACAzMzMzMwmwBwAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAHAAAACAzMzMzMwmwBoAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-23T10:38:19.509Z"
+              "WhenOpened": "2025-07-23T10:38:19.509Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ServerLogic.cs",
-              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\ServerLogic.cs",
-              "RelativeDocumentMoniker": "iocp\\ManageLogic\\ServerLogic.cs",
-              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\ServerLogic.cs",
-              "RelativeToolTip": "iocp\\ManageLogic\\ServerLogic.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-11T20:12:46.916Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "RpcProxy.cs",
-              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
-              "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
-              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
-              "RelativeToolTip": "iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
-              "ViewState": "AgIAAAkAAACAZmZmZmYowCoAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-30T19:09:30.66Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "CommandHandler.cs",
-              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\CommandHandler.cs",
-              "RelativeDocumentMoniker": "iocp\\Command\\CommandHandler.cs",
-              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\CommandHandler.cs",
-              "RelativeToolTip": "iocp\\Command\\CommandHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T20:59:22.862Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "ExitCommand.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\ExitCommand.cs",
               "RelativeDocumentMoniker": "iocp\\Command\\ExitCommand.cs",
@@ -194,7 +167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "TeruTeruServer",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\TeruTeruServer.csproj",
               "RelativeDocumentMoniker": "iocp\\TeruTeruServer.csproj",
@@ -206,7 +179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "WorkerStartCommand.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\WorkerStartCommand.cs",
               "RelativeDocumentMoniker": "iocp\\Command\\WorkerStartCommand.cs",
@@ -218,7 +191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "DatabaseConnector.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\DB\\DatabaseConnector.cs",
               "RelativeDocumentMoniker": "iocp\\DB\\DatabaseConnector.cs",
@@ -230,7 +203,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "ConnectProtocol.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\ConnectProtocol.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\ConnectProtocol.cs",
@@ -242,7 +215,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "PlayerData.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\PlayerData.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\PlayerData.cs",
@@ -254,7 +227,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "ProtocolSelector.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\ProtocolSelector.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\ProtocolSelector.cs",
@@ -266,7 +239,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "ICommand.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\ICommand.cs",
               "RelativeDocumentMoniker": "iocp\\Command\\ICommand.cs",
@@ -278,7 +251,70 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 1,
+              "Title": "TeruTeruLogger.cs",
+              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
+              "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
+              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
+              "RelativeToolTip": "iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAIwGoAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-11T20:13:05.705Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainServer.cs",
+              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\MainServer.cs",
+              "RelativeDocumentMoniker": "iocp\\MainServer.cs",
+              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\MainServer.cs",
+              "RelativeToolTip": "iocp\\MainServer.cs",
+              "ViewState": "AgIAAG0AAAAAAAAAAADwv00AAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-23T10:40:07.599Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ServerLogic.cs",
+              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\ServerLogic.cs",
+              "RelativeDocumentMoniker": "iocp\\ManageLogic\\ServerLogic.cs",
+              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\ServerLogic.cs",
+              "RelativeToolTip": "iocp\\ManageLogic\\ServerLogic.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAAAHwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-11T20:12:46.916Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CommandHandler.cs",
+              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\CommandHandler.cs",
+              "RelativeDocumentMoniker": "iocp\\Command\\CommandHandler.cs",
+              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\CommandHandler.cs",
+              "RelativeToolTip": "iocp\\Command\\CommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-16T20:59:22.862Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "RpcProxy.cs",
+              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
+              "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
+              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
+              "RelativeToolTip": "iocp\\ManageLogic\\Protocol\\RpcProxy.cs",
+              "ViewState": "AgIAAAkAAACAZmZmZmYowCoAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T19:09:30.66Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "RpcStub.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\RpcStub.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\RpcStub.cs",
@@ -290,19 +326,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainServer.cs",
-              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\MainServer.cs",
-              "RelativeDocumentMoniker": "iocp\\MainServer.cs",
-              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\MainServer.cs",
-              "RelativeToolTip": "iocp\\MainServer.cs",
-              "ViewState": "AgIAAOABAAAAAAAAAAAcwOoBAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-23T10:40:07.599Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "MethodsSelector.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Protocol\\MethodsSelector.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Protocol\\MethodsSelector.cs",
@@ -314,7 +338,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "QueueCountCommand.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Command\\QueueCountCommand.cs",
               "RelativeDocumentMoniker": "iocp\\Command\\QueueCountCommand.cs",
@@ -326,7 +350,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "MarshalUtil.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\MarshalUtil.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\MarshalUtil.cs",
@@ -338,7 +362,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "ConfigManager.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ConfigManager.cs",
               "RelativeDocumentMoniker": "iocp\\ConfigManager.cs",
@@ -350,7 +374,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "ClientSession.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\ClientSession.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\ClientSession.cs",
@@ -362,7 +386,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "Encrypt.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\Encrypt.cs",
               "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\Encrypt.cs",
@@ -398,7 +422,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\Program.cs",
               "RelativeDocumentMoniker": "iocp\\Program.cs",
@@ -407,18 +431,6 @@
               "ViewState": "AgIAABAAAAAAAAAAAAAAwCgAAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-11T20:10:57.458Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "TeruTeruLogger.cs",
-              "DocumentMoniker": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
-              "RelativeDocumentMoniker": "iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
-              "ToolTip": "D:\\Project\\2024\\Kabusiki_Main_Server\\iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
-              "RelativeToolTip": "iocp\\ManageLogic\\Util\\TeruTeruLogger.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAIwGgAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-11T20:13:05.705Z"
             },
             {
               "$type": "Document",
@@ -455,10 +467,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-11T20:11:47.044Z"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
             }
           ]
         },

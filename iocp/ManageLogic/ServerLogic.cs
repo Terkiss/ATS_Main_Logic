@@ -13,12 +13,12 @@ namespace TeruTeruServer.ManageLogic
 {
     public class ServerLogic
     {
-        private MainServer mainServer;
-        RpcStub stub = new RpcStub();
-        // 서버로직 생성자 작성
+        private MainServer _mainServer;
+        private RpcStub _rpcStub = new RpcStub();
+
         public ServerLogic(MainServer mainServer)
         {
-            this.mainServer = mainServer;
+            this._mainServer = mainServer;
         }
 
         /// <summary>
@@ -28,15 +28,14 @@ namespace TeruTeruServer.ManageLogic
         /// <param name="socket">데이터를 전송한 클라이언트와 연결된 소켓입니다.</param>
         public void ProcessDirectProtocol(byte[] buffer, Socket socket)
         {
-            var receivDataCount = buffer.Length;
+            var receivedDataCount = buffer.Length;
 
-            if (receivDataCount > 0)
+            if (receivedDataCount > 0)
             {
-          
-                byte[] responseBytes = stub.HandleRequest(socket, buffer);
+                byte[] responseBytes = _rpcStub.HandleRequest(socket, buffer);
                 if (responseBytes != null)
                 {
-                    mainServer.SendData(socket, responseBytes);
+                    _mainServer.SendData(socket, responseBytes);
                 }
             }
         }
@@ -61,9 +60,9 @@ namespace TeruTeruServer.ManageLogic
 
         private void ConProtocol(Socket socket, ConnectProtocol protocol)
         {
-            if (mainServer.players.ContainsValue(socket))
+            if (_mainServer.players.ContainsValue(socket))
             {
-                Console.WriteLine("이미 등록된 소켓입니다.");
+                Console.WriteLine("소켓이 이미 등록되어 있습니다.");
             }
             else
             {
@@ -73,7 +72,7 @@ namespace TeruTeruServer.ManageLogic
                 Console.WriteLine($"UUID Print : {protocol.Guid}");
                 var hostID = ServerMemory.GetHostID;
 
-                bool guidCheck = (mainServer.GUID.Equals(protocol.Guid)) ? true : false;
+                bool guidCheck = (_mainServer.GUID.Equals(protocol.Guid)) ? true : false;
 
                 // GUID 체크 출력
                 Console.WriteLine($"GUID Check : {guidCheck}");
@@ -82,9 +81,9 @@ namespace TeruTeruServer.ManageLogic
 
                 if (guidCheck)
                 {
-                    Console.WriteLine("체크 성공 등록 절차");
+                    Console.WriteLine("GUID 검증 성공. 클라이언트를 등록합니다...");
 
-                    mainServer.players.Add(hostID, socket);
+                    _mainServer.players.Add(hostID, socket);
 
                     ClientSession clientSession = new ClientSession(hostID, socket, gameId);
 
@@ -93,7 +92,6 @@ namespace TeruTeruServer.ManageLogic
 
                     byte sendType = (byte)SendType.Json;
                     byte protocolType = (byte)ProtocolSelect.ConnectProtocol;
-
 
                     ConnectProtocol connectProtocol = new ConnectProtocol
                     {
@@ -109,13 +107,11 @@ namespace TeruTeruServer.ManageLogic
                     sendData[1] = protocolType;
                     Array.Copy(tempByte, 0, sendData, 2, tempByte.Length);
 
-
-                    mainServer.SendData(socket, sendData);
+                    _mainServer.SendData(socket, sendData);
                 }
                 else
                 {
-                    // 실패 로깅
-                    Console.WriteLine("체크 실패");
+                    Console.WriteLine("GUID 검증 실패.");
                 }
             }
 

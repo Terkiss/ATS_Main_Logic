@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace TeruTeruServer.Command
 {
+    /// <summary>
+    /// 콘솔로부터 입력된 명령어를 해석하고 실행하는 핸들러 클래스입니다.
+    /// </summary>
     public class CommandHandler
     {
+        // 명령어 이름을 키로, 명령어 실행 객체를 값으로 가지는 딕셔너리
         private readonly Dictionary<string, ICommand> _commands = new();
 
         public CommandHandler(MainServer server)

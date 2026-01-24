@@ -9,6 +9,9 @@ using TeruTeruServer.ManageLogic.Util;
 
 namespace TeruTeruServer.Command
 {
+    /// <summary>
+    /// 수신 대기 중인 이미지 데이터를 파일로 덤프하는 명령어 클래스입니다.
+    /// </summary>
     public class ImageDumpCommand : ICommand
     {
         public bool Execute(string[] args)
@@ -23,15 +26,15 @@ namespace TeruTeruServer.Command
                 string fileName = $"image_{Count}.jpg";
                 string filePath = Path.Combine(path, fileName);
 
-                if (sendImageData.imgSize < sendImageData.data.Length)
+                if (sendImageData.ImgSize < sendImageData.Data.Length)
                 {
-                    byte[] imgByte = new byte[sendImageData.imgSize];
-                    Array.Copy(sendImageData.data, imgByte, sendImageData.imgSize);
+                    byte[] imgByte = new byte[sendImageData.ImgSize];
+                    Array.Copy(sendImageData.Data, imgByte, sendImageData.ImgSize);
                     File.WriteAllBytes(filePath, imgByte);
                 }
                 else
                 {
-                    File.WriteAllBytes(filePath, sendImageData.data);
+                    File.WriteAllBytes(filePath, sendImageData.Data);
                 }
 
                 Count++;
