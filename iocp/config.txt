@@ -1,0 +1,7 @@
+port=3000
+max_connection=1000
+isUdp=False
+isTcp=True
+SendMassageSize=4096
+ReceiveMassageSize=4096
+Guid=0699ec21-906a-46b9-89bd-23cf811b44e6

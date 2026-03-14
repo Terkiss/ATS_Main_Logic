@@ -1,4 +1,4 @@
-# TeruTeru Server (Kabusiki_Main_Server)
+# TeruTeru Server
 
 고성능 비동기 IO(IOCP) 기반의 C# 서버 엔진입니다. 유니티 클라이언트와의 통신 및 객체 탐지(YOLO) 작업을 위한 중계 서버 역할을 수행합니다.
 
