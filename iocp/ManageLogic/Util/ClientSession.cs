@@ -22,6 +22,7 @@ namespace TeruTeruServer.ManageLogic.Util
 
         public string Role { get; set; } // 클라이언트 역할 (예: Detector)
         public string ClientName { get; set; } // 클라이언트 이름
+        public string AuthToken { get; set; } // 인증 토큰 (Phase 2 추가)
 
     
 

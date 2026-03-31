@@ -1,6 +1,9 @@
-﻿using TeruTeruServer.ManageLogic;
+using TeruTeruServer.ManageLogic;
 using TeruTeruServer.ManageLogic.Protocol;
 using TeruTeruServer.ManageLogic.Util;
+using TeruTeruServer.Command;
+using TeruTeruServer.Pipeline;
+using TeruTeruServer.Network;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -13,18 +16,14 @@ using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
 using System.IO;
-using TeruTeruServer.Command;
 
 namespace TeruTeruServer
 {
-    public class MainServer
+    public class MainServer : IMessageSender
     {
-        // 플레이어 소켓 정보를 저장하는 딕셔너리
-        public Dictionary<int, Socket> players;
-
-        // 플레이어 정보 접근을 위한 잠금 객체
-        public object playerLock;
-
+        private readonly ISessionManager _sessionManager;
+        private readonly ILogicService _serverLogic;
+        
         // 동시 접속 가능한 최대 연결 수
         private int _maxConnection;
 
@@ -45,11 +44,9 @@ namespace TeruTeruServer
         // 고유 서버 식별자
         public string GUID;
 
-        private ServerLogic _serverLogic;
-
         private RpcProxy _rpcProxy;
-
         private CommandHandler _commandHandler;
+        private PacketPipeline _pipeline;
 
         // 전송 버퍼 크기 프로퍼티
         public int SendBufferSize
@@ -65,16 +62,10 @@ namespace TeruTeruServer
             set => _receiveBufferSize = value;
         }
 
-
-        public MainServer(int maxConnection, int port, bool isUdp, bool isTcp)
+        public MainServer(ServerConnectConfigParameter config, ILogicService logicService, ISessionManager sessionManager)
         {
-            this.Initialize(maxConnection, port, isUdp, isTcp);
-            GUID = Guid.NewGuid().ToString();
-            Console.WriteLine("Server Guid : " + GUID);
-        }
-
-        public MainServer(ServerConnectConfigParameter config)
-        {
+            this._sessionManager = sessionManager;
+            this._serverLogic = logicService;
             this.Initialize(config.MaxConnection, config.Port, config.IsUdp, config.IsTcp);
             this._sendBufferSize = config.SendBufferSize;
             this._receiveBufferSize = config.ReceiveBufferSize;
@@ -88,22 +79,18 @@ namespace TeruTeruServer
             this._isUdp = isUdp;
             this._isTcp = isTcp;
 
-            players = new Dictionary<int, Socket>();
-            playerLock = new object();
-            players.Clear();
-
-            _serverLogic = new ServerLogic(this);
             ServerMemory.MainServer = this;
             _rpcProxy = new RpcProxy();
             _commandHandler = new CommandHandler(this);
+
+            // 파이프라인 초기화 및 미들웨어 등록
+            _pipeline = new PacketPipeline();
+            _pipeline.Use(new ValidationMiddleware());
+            _pipeline.Use(new DecryptionMiddleware());
+            _pipeline.Use(new AuthMiddleware()); 
+            _pipeline.Use(new RoutingMiddleware(_serverLogic));
         }
 
-
-
-
-        /// <summary>
-        /// 서버를 시작하는 메서드입니다.
-        /// </summary>
         public void StartServer()
         {
             Console.Write("Server Type: ");
@@ -118,7 +105,6 @@ namespace TeruTeruServer
                 {
                     throw new ArgumentNullException("guid", "TCP 서버를 시작할 때 GUID는 null일 수 없습니다.");
                 }
-
                 TcpServerStart();
             }
             else
@@ -127,10 +113,6 @@ namespace TeruTeruServer
             }
         }
 
-
-        /// <summary>
-        /// TCP 서버를 시작하는 메서드입니다.
-        /// </summary>
         private void TcpServerStart()
         {
             _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -146,7 +128,6 @@ namespace TeruTeruServer
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Server Configuration Complete!!!");
-
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Server Running");
             Console.ResetColor();
@@ -168,7 +149,6 @@ namespace TeruTeruServer
             {
                 Thread.Sleep(1000);
                 string strCMD = Console.ReadLine();
-
                 if (!HandleConsoleCommand(strCMD))
                     break;
             }
@@ -190,7 +170,6 @@ namespace TeruTeruServer
                 TeruTeruLogger.LogError("수락(Accept) 실패: " + e.SocketError.ToString());
             }
 
-            // 다음 수락 대기 (UDP의 경우 listenSocket이 null이 될 수 있으므로 체크)
             if (_isTcp && _serverSocket != null)
             {
                 e.AcceptSocket = null;
@@ -206,45 +185,38 @@ namespace TeruTeruServer
         {
             var acceptedSocket = e.AcceptSocket;
             this.LogAcceptedConnection(acceptedSocket);
-
             var receiveArgs = CreateReceiveArgs(acceptedSocket);
-
-            // 비동기 수신 시작
             acceptedSocket.ReceiveAsync(receiveArgs);
         }
 
         private void LogAcceptedConnection(Socket socket)
         {
-            string user = "Unknown";
-            Console.WriteLine("User? : " + user);
             Console.WriteLine("Date  : " + DateTime.Now);
             if (socket.RemoteEndPoint != null)
             {
                 Console.WriteLine("Remote : " + socket.RemoteEndPoint.ToString());
             }
         }
+
         private SocketAsyncEventArgs CreateReceiveArgs(Socket socket)
         { 
             var args = new SocketAsyncEventArgs();
-
             args.Completed += new EventHandler<SocketAsyncEventArgs>(ReceiveCompleted);
             args.SetBuffer(new byte[_receiveBufferSize], 0, _receiveBufferSize);
-            args.UserToken = "Unknown"; // 처리 중 업데이트 예정
             args.AcceptSocket = socket;
             return args;
         }
-
-
-
-
 
         private async void ReceiveCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
-                ProcessReceivedData(e.AcceptSocket, e.Buffer, e.BytesTransferred);
+                byte[] data = new byte[e.BytesTransferred];
+                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
                 
-                // 다음 수신을 계속 등록
+                var context = new PacketContext(e.AcceptSocket, data);
+                await _pipeline.ExecuteAsync(context);
+                
                 try
                 {
                     e.AcceptSocket.ReceiveAsync(e);
@@ -257,54 +229,14 @@ namespace TeruTeruServer
             }
         }
 
-
-
-        private void ProcessReceivedData(Socket socket, byte[] buffer, int count)
-        {
-            var sendType = (SendType)buffer[0];
-
-            if (sendType == SendType.Direct)
-            {
-                ProcessDirect(buffer, count, socket);
-            }
-            else if (sendType == SendType.Json)
-            { 
-                ProcessJson(buffer, count, socket);
-            }
-        }
-
-
-        private void ProcessDirect(byte[] buffer, int count, Socket socket)
-        { 
-            byte[] data = new byte[count - 1];
-            Array.Copy(buffer, 1, data, 0, count - 1);
-
-            _serverLogic.ProcessDirectProtocol(data, socket);
-        }
-
-        private void ProcessJson(byte[] buffer, int count, Socket socket)
-        { 
-            byte[] data = new byte[count - 1];
-            Array.Copy(buffer, 1, data, 0, count - 1);
-            string json = Encoding.ASCII.GetString(data);
-
-            TeruTeruLogger.LogInfo("Received JSON: " + json);
-
-            _serverLogic.ProcessJsonProtocol(json, ProtocolSelect.ConnectProtocol, socket);
-        }
-
         private void HandleConnectionReset(SocketAsyncEventArgs e)
         {
-            // 클라이언트와의 연결이 끊겼을 때 (ConnectionReset 예외 발생)
             try
             {
-                if (e.UserToken is int playerId)
+                if (_sessionManager.TryGetHostIdBySocket(e.AcceptSocket, out int playerId))
                 {
                     Console.WriteLine("플레이어 " + playerId + "와의 연결 끊김");
-                }
-                else
-                {
-                    Console.WriteLine("알 수 없는 클라이언트와의 연결 끊김 (UserToken: " + e.UserToken + ")");
+                    HandleDisconnectedSocket(playerId, e.AcceptSocket);
                 }
             }
             catch (Exception ex)
@@ -313,31 +245,23 @@ namespace TeruTeruServer
             }
         }
 
-
-
         public async void SendData(Socket socket, byte[] data)
         {
             if (!await TrySend(socket, data))
             {
-                Console.WriteLine("연결이 끊긴 소켓입니다. 전송하지 않습니다.");
+                Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
                 socket.Close();
 
-                // 기존: var key = players.FirstOrDefault(x => x.Value == socket).Key;
-                // 변경: TryGetValueBySocket
-                if (TryGetHostIDBySocket(socket, out int hostID))
+                if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
                 {
                     HandleDisconnectedSocket(hostID, socket);
-                }
-                else
-                {
-                    Console.WriteLine("소켓에 해당하는 플레이어를 찾을 수 없습니다.");
                 }
             }
         }
 
         public async void SendData(int hostID, byte[] data)
         {
-            if (players.TryGetValue(hostID, out var socket))
+            if (_sessionManager.Players.TryGetValue(hostID, out var socket))
             {
                 if (!await TrySend(socket, data))
                 {
@@ -345,25 +269,10 @@ namespace TeruTeruServer
                 }
             }
         }
-        private bool TryGetHostIDBySocket(Socket socket, out int hostID)
-        {
-            foreach (var kvp in players)
-            {
-                if (kvp.Value == socket)
-                {
-                    hostID = kvp.Key;
-                    return true;
-                }
-            }
-            hostID = -1;
-            return false;
-        }
-
-
 
         private async Task<bool> TrySend(Socket socket, byte[] data)
         {
-            if (socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0))
+            if (socket != null && socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0))
             {
                 try
                 {
@@ -378,30 +287,24 @@ namespace TeruTeruServer
             return false;
         }
 
-
-
-
         private System.Timers.Timer socketCheckTimer;
         public void StartSocketCheck()
         {
-            
-            socketCheckTimer = new System.Timers.Timer(1000); // 10,000ms = 10초
+            socketCheckTimer = new System.Timers.Timer(1000);
             socketCheckTimer.Elapsed += (sender, e) => SocketCheck();
-            socketCheckTimer.AutoReset = true; // 반복적으로 실행
-            socketCheckTimer.Enabled = true;   // 타이머 시작
+            socketCheckTimer.AutoReset = true;
+            socketCheckTimer.Enabled = true;
         }
 
         public void StopSocketCheck()
         {
-            socketCheckTimer.Stop();   // 타이머 중지
-            socketCheckTimer.Dispose(); // 타이머 해제
+            socketCheckTimer?.Stop();
+            socketCheckTimer?.Dispose();
         }
-
-
 
         public void SocketCheck()
         {
-            foreach (var player in players)
+            foreach (var player in _sessionManager.Players)
             {
                 if (!IsConnected(player.Value))
                 {
@@ -414,35 +317,44 @@ namespace TeruTeruServer
         {
             if (_isUdp)
             {
-                // UDP는 연결 지향이 아니므로 소켓이 유효하고 열려 있는지만 체크
                 return socket != null && !socket.SafeHandle.IsInvalid && !socket.SafeHandle.IsClosed;
             }
-            return socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+            return socket != null && socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
         }
+
         public void HandleDisconnectedSocket(int hostID, Socket socket)
         {
-            Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
-            
-            if (_isUdp && socket.RemoteEndPoint != null)
+            if (_sessionManager.TryRemovePlayer(hostID, out _))
             {
-                _udpSessions.TryRemove(socket.RemoteEndPoint, out _);
+                TeruTeruLogger.LogInfo($"플레이어 {hostID} 연결 종료 처리 중...");
+
+                if (_isUdp && socket.RemoteEndPoint != null)
+                {
+                    _udpSessions.TryRemove(socket.RemoteEndPoint, out _);
+                }
+
+                try
+                {
+                    socket.Close();
+                }
+                catch (Exception ex)
+                {
+                    TeruTeruLogger.LogError($"소켓 닫기 오류: {ex.Message}");
+                }
+
+                ServerMemory.RemoveGameIDFromDictionary(hostID);
+
+                byte[] tempArray = new byte[2];
+                tempArray[0] = (byte)MethodsSelector.NotifyPlayerExit;
+                tempArray[1] = (byte)hostID;
+                RpcStub rpcStub = new RpcStub(this, _sessionManager);
+                var result = rpcStub.HandleRequest(socket, tempArray);
+
+                if (result == null)
+                {
+                    TeruTeruLogger.LogInfo("플레이어 " + hostID + " 퇴장 알림 전송 완료");
+                }
             }
-
-            socket.Close();
-
-            ServerMemory.RemoveGameIDFromDictionary(hostID);
-            players.Remove(hostID);
-
-            byte[] tempArray = new byte[2];
-            tempArray[0] = (byte)MethodsSelector.NotifyPlayerExit;
-            tempArray[1] = (byte)hostID;
-            RpcStub rpcStub = new RpcStub();
-            var result = rpcStub.HandleRequest(socket, tempArray);
-
-            if(result == null)
-            {
-                Console.WriteLine("플레이어 "+hostID+" 퇴장");
-            }  
         }
 
         private void UdpServerStart()
@@ -460,7 +372,6 @@ namespace TeruTeruServer
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("UDP Server Configuration Complete!!!");
-
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("UDP Server Running");
             Console.ResetColor();
@@ -482,14 +393,16 @@ namespace TeruTeruServer
             }
         }
 
-        private void OnUdpReceiveFromCompleted(object sender, SocketAsyncEventArgs e)
+        private async void OnUdpReceiveFromCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
-                HandleNewUdpPacket(e);
+                byte[] data = new byte[e.BytesTransferred];
+                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+                var context = new PacketContext(e.AcceptSocket, data);
+                await _pipeline.ExecuteAsync(context);
             }
             
-            // 다음 패킷 수신 대기
             e.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
             try
             {
@@ -501,24 +414,20 @@ namespace TeruTeruServer
             catch (ObjectDisposedException) { }
         }
 
-        // 특정 Endpoint와 통신하는 소켓들을 관리하기 위한 딕셔너리
         private ConcurrentDictionary<EndPoint, Socket> _udpSessions = new ConcurrentDictionary<EndPoint, Socket>();
 
-        private void HandleNewUdpPacket(SocketAsyncEventArgs e)
+        private async void HandleNewUdpPacket(SocketAsyncEventArgs e)
         {
             EndPoint remoteEP = e.RemoteEndPoint;
-
-            // 이미 활성화된 세션 소켓이 있는지 확인
             if (_udpSessions.TryGetValue(remoteEP, out Socket sessionSocket))
             {
-                // 기존 세션이 있으면 해당 소켓으로 데이터 처리 (하지만 보통은 OS가 해당 소켓으로 바로 전달함)
                 byte[] data = new byte[e.BytesTransferred];
                 Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                ProcessReceivedData(sessionSocket, data, e.BytesTransferred);
+                var context = new PacketContext(sessionSocket, data);
+                await _pipeline.ExecuteAsync(context);
             }
             else
             {
-                // 새로운 클라이언트로부터의 첫 패킷
                 Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 clientSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _port));
@@ -527,14 +436,10 @@ namespace TeruTeruServer
                 if (_udpSessions.TryAdd(remoteEP, clientSocket))
                 {
                     var receiveArgs = CreateReceiveArgs(clientSocket);
-                    
                     byte[] firstPacketData = new byte[e.BytesTransferred];
                     Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
-                    
-                    // 첫 패킷 처리
-                    ProcessReceivedData(clientSocket, firstPacketData, e.BytesTransferred);
-                    
-                    // 이후 패킷은 이 세션 소켓에서 비동기 수신
+                    var context = new PacketContext(clientSocket, firstPacketData);
+                    await _pipeline.ExecuteAsync(context);
                     clientSocket.ReceiveAsync(receiveArgs);
                 }
                 else
@@ -544,6 +449,4 @@ namespace TeruTeruServer
             }
         }
     }
-    
 }
-

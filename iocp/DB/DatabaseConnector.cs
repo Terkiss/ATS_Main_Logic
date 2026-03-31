@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace TeruTeruServer.DB
 {
@@ -34,84 +35,80 @@ namespace TeruTeruServer.DB
         /// <summary>
         /// 데이터 베이스 를 실제 작동하는 헬퍼 클래스 
         /// </summary>
-        public class DatabaseHelper
+        public class DatabaseHelper : IDatabaseService
         {
-            //private MySqlConnection conn;
             string uri;
-            //string databaseURI = "Server=101.79.9.44;Port=3306;Database=hearmyhearoes;Uid=terukiss;Pwd=dbslwms123";
-            //string databaseURI = "Server=3.34.181.122;Port=3306;Database=hearmyhearoes;Uid=ade345;Pwd=coldblazedbslwms123";
 
             public DatabaseHelper(string databaseURI)
             {
-                // this.conn = dataBaseOpen(databaseURI);
-                // conn.Open();
-
                 uri = databaseURI;
-
             }
-            public MySqlConnection dataBaseOpen(string databaseURI)
+
+            public MySqlConnection dataBaseOpen()
             {
-                return new MySqlConnection(databaseURI);
+                return new MySqlConnection(uri);
             }
-
 
             /// <summary>
-            /// SQL RUN  NO RESULT
+            /// SQL RUN NO RESULT
             /// </summary>
-            /// <param name="sql"></param>
-            public void sqlRun(string sql)
+            public void SqlRun(string sql, MySqlParameter[] parameters = null)
             {
-                using (var conn = dataBaseOpen(uri))
+                using (var conn = dataBaseOpen())
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = (MySqlCommand)conn.CreateCommand())
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
-
-                        cmd.CommandText = sql;
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
                         cmd.ExecuteNonQuery();
                     }
-                    //conn.Close();
-                    //conn.Dispose();
                 }
             }
 
             /// <summary>
             /// SQL BATCH RUN NO RESULT
             /// </summary>
-            /// <param name="sqls"></param>
-            public void sqlBatchRun(List<string> sqls)
+            public void SqlBatchRun(List<string> sqls)
             {
-
-                using (MySqlConnection conn = dataBaseOpen(uri))
+                using (MySqlConnection conn = dataBaseOpen())
                 {
-
-
                     conn.Open();
-
-                    MySqlTransaction transaction = conn.BeginTransaction();
-
-
-                    foreach (var sql in sqls)
+                    using (MySqlTransaction transaction = conn.BeginTransaction())
                     {
-                        MySqlCommand cmd2 = new MySqlCommand(sql, conn, transaction);
-                        cmd2.ExecuteNonQuery();
-
+                        try
+                        {
+                            foreach (var sql in sqls)
+                            {
+                                using (MySqlCommand cmd = new MySqlCommand(sql, conn, transaction))
+                                {
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
                     }
-                    transaction.Commit();
-                    //conn.Close();
-                    //conn.Dispose();
                 }
             }
 
-
-            public async void sqlParrelRun(string sql)
+            public async Task SqlParrelRun(string sql, MySqlParameter[] parameters = null)
             {
-                using (MySqlConnection conn = dataBaseOpen(uri))
+                using (MySqlConnection conn = dataBaseOpen())
                 {
                     await conn.OpenAsync();
-
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }
@@ -120,178 +117,99 @@ namespace TeruTeruServer.DB
             /// <summary>
             /// sql 결과물의 열 수를 반환 합니다.
             /// </summary>
-            /// <param name="sql"></param>
-            /// <returns></returns>
-            public int sqlrunForCounter(string sql)
+            public int SqlRunForCounter(string sql, MySqlParameter[] parameters = null)
             {
                 int i = 0;
-                using (var conn = dataBaseOpen(uri))
+                using (var conn = dataBaseOpen())
                 {
-
                     conn.Open();
-
-
-
-
-                    using (MySqlCommand cmd = (MySqlCommand)conn.CreateCommand())
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
-                        cmd.CommandText = sql;
-                        //var reader = cmd.ExecuteReader();
-
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 i++;
                             }
-
                         }
-
                     }
-                    //conn.Close();
-                    //conn.Dispose();
                 }
-
                 return i;
             }
 
-            /// <summary>
-            /// sql Result 함수
-            /// 
-            /// </summary>
-            /// <param name="reader">mysql reader</param>
             public delegate void SqlResult(MySqlDataReader reader);
 
             /// <summary>
-            /// sql run 결과로 mysqldatareader를 반환 합니다
-            /// 발견된 이슈는thread 풀이 꽉 채워지는 문제가 있음
-            /// 풀이 꽉 채워져서 database가 잠기는 문제  
-            /// 사용하지 말것 
+            /// 데이터 베이스 sql를 실행하고 콜백을 이용하여 처리합니다.
             /// </summary>
-            /// <param name="sql"></param>
-            /// <returns></returns>
-            public MySqlDataReader sqlRunResult(string sql)
+            public void SqlRunResult(string sql, SqlResult sqlResult, MySqlParameter[] parameters = null)
             {
-                var conn = dataBaseOpen(uri);
-                conn.Open();
-                MySqlDataReader reader;
-                using (MySqlCommand cmd = (MySqlCommand)conn.CreateCommand())
-                {
-                    cmd.CommandText = sql;
-                    reader = cmd.ExecuteReader();
-
-                    return reader;
-                }
-            }
-
-            /// <summary>
-            /// 데이터 베이스 sql를 실행하고 
-            /// 받은 mysqldatareader를 콜백 을 이용해서 외부에서 처리하고 
-            /// 콜백 콜이 끝나면 해당 연결을 닫습니다.
-            /// 
-            /// 
-            /// </summary>
-            /// <param name="sql"> sql 문</param>
-            /// <param name="sqlResult"> 콜백 </param>
-            public void sqlRunResult(string sql, SqlResult sqlResult)
-            {
-                using (var conn = dataBaseOpen(uri))
+                using (var conn = dataBaseOpen())
                 {
                     conn.Open();
-                    // MySqlDataReader reader;
-                    using (MySqlCommand cmd = (MySqlCommand)conn.CreateCommand())
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
-                        cmd.CommandText = sql;
-                        // reader = cmd.ExecuteReader();
-
-
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
                         using (var reader = cmd.ExecuteReader())
                         {
                             sqlResult?.Invoke(reader);
                         }
                     }
-                    //conn.Close();
-                    //conn.Dispose();
                 }
             }
 
-
             /// <summary>
-            /// 테이블 이름과 filed 데이터만 넣으면 자동으로 데이터 베이스에 입력 합니다.
+            /// 테이블 이름과 field 데이터만 넣으면 자동으로 데이터 베이스에 입력 합니다. (매개변수화된 쿼리 사용)
             /// </summary>
-            /// <param name="tableName"></param>
-            /// <param name="field"></param>
-            public void insert(string tableName, string[] field)
+            public void Insert(string tableName, string[] field)
             {
                 string fieldSelect = "show full columns FROM " + tableName;
+                List<string> fieldNames = new List<string>();
 
-                List<string> fieldName = new List<string>();
-
-                var conn = dataBaseOpen(uri);
-                conn.Open();
-
-                using (MySqlCommand cmd = (MySqlCommand)conn.CreateCommand())
+                using (var conn = dataBaseOpen())
                 {
-                    cmd.CommandText = fieldSelect;
-
-                    using (MySqlDataReader reader = (MySqlDataReader)cmd.ExecuteReader())
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand(fieldSelect, conn))
                     {
-                        // 데이터 베이스 컬럼 조회
-                        while (reader.Read())
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            fieldName.Add(reader.GetString(0));
+                            while (reader.Read())
+                            {
+                                fieldNames.Add(reader.GetString(0));
+                            }
                         }
                     }
 
-                    string sql = insertCommandGen(fieldName, tableName, field);
+                    if (fieldNames.Count == field.Length)
+                    {
+                        StringBuilder sqlBuilder = new StringBuilder();
+                        sqlBuilder.Append($"INSERT INTO {tableName} (");
+                        sqlBuilder.Append(string.Join(", ", fieldNames));
+                        sqlBuilder.Append(") VALUES (");
+                        
+                        List<MySqlParameter> parameters = new List<MySqlParameter>();
+                        for (int i = 0; i < field.Length; i++)
+                        {
+                            string paramName = $"@p{i}";
+                            sqlBuilder.Append(i == field.Length - 1 ? paramName : paramName + ", ");
+                            parameters.Add(new MySqlParameter(paramName, field[i]));
+                        }
+                        sqlBuilder.Append(");");
 
-                    cmd.CommandText = sql;
-
-                    cmd.ExecuteNonQuery();
+                        using (MySqlCommand insertCmd = new MySqlCommand(sqlBuilder.ToString(), conn))
+                        {
+                            insertCmd.Parameters.AddRange(parameters.ToArray());
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
                 }
-                conn.Close();
-                conn.Dispose();
-            }
-
-            /// <summary>
-            /// sql 젠
-            /// </summary>
-            /// <param name="fieldName"></param>
-            /// <param name="tableName"></param>
-            /// <param name="field"></param>
-            /// <returns></returns>
-            private string insertCommandGen(List<string> fieldName, string tableName, string[] field)
-            {
-                string sqlCommand = "";
-                if (fieldName.Count == field.Length)
-                {
-                    sqlCommand = "insert into " + tableName + "(";
-
-                    for (int i = 0; i < fieldName.Count; i++)
-                    {
-                        if (i == fieldName.Count - 1)
-                        {
-                            sqlCommand += fieldName[i] + ") values(";
-                        }
-                        else
-                        {
-                            sqlCommand += fieldName[i] + ",";
-                        }
-                    }
-                    for (int i = 0; i < field.Length; i++)
-                    {
-                        if (i == field.Length - 1)
-                        {
-                            sqlCommand += "'" + field[i] + "') ;";
-                        }
-                        else
-                        {
-                            sqlCommand += "'" + field[i] + "',";
-                        }
-                    }
-                    return sqlCommand;
-                }
-                return sqlCommand;
             }
         }
     }
