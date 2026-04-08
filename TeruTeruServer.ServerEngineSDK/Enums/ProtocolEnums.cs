@@ -1,4 +1,4 @@
-namespace TeruTeruServer.Common.Enums
+namespace TeruTeruServer.ServerEngineSDK.Enums
 {
     public enum SendType : byte
     {

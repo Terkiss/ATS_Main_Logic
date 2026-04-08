@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\TeruTeruServer.Common\TeruTeruServer.Common.csproj" />
+    <ProjectReference Include="..\TeruTeruServer.ServerEngineSDK\TeruTeruServer.ServerEngineSDK.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -3,17 +3,16 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using TeruTeruServer.Common.Protocol;
-using TeruTeruServer.Common.Enums;
+using TeruTeruServer.ServerEngineSDK.Protocol;
+using TeruTeruServer.ServerEngineSDK.Enums;
 
-namespace TeruTeruServer.ManageLogic.Util
+namespace TeruTeruServer.ServerEngineSDK.Util
 {
     /// <summary>
     /// 서버 메모리 클래스
     /// </summary>
     public class ServerMemory
     {
-        public static MainServer MainServer { get; set; }
         public static object HostIDGeneratorLock = new object();
 
         private static Dictionary<int, ClientSession> _hosts = new Dictionary<int, ClientSession>();

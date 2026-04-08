@@ -1,6 +1,6 @@
-using TeruTeruServer.Common.Enums;
+using TeruTeruServer.ServerEngineSDK.Enums;
 
-namespace TeruTeruServer.Common.Protocol
+namespace TeruTeruServer.ServerEngineSDK.Protocol
 {
     public abstract class BaseProtocol
     {

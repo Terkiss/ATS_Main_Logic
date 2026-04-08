@@ -1,10 +1,11 @@
+using TeruTeruServer.ServerEngineSDK.Interfaces;
 using TeruTeruServer.ManageLogic;
-using TeruTeruServer.Common.Protocol;
-using TeruTeruServer.Common.Enums;
-using TeruTeruServer.ManageLogic.Util;
+using TeruTeruServer.ServerEngineSDK.Protocol;
+using TeruTeruServer.ServerEngineSDK.Enums;
+using TeruTeruServer.ServerEngineSDK.Util;
 using TeruTeruServer.Command;
 using TeruTeruServer.Pipeline;
-using TeruTeruServer.Common.Interfaces;
+using TeruTeruServer.ServerEngineSDK.Interfaces;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -80,8 +81,7 @@ namespace TeruTeruServer
             this._isUdp = isUdp;
             this._isTcp = isTcp;
 
-            ServerMemory.MainServer = this;
-            _rpcProxy = new RpcProxy();
+            _rpcProxy = new RpcProxy(this, _sessionManager);
             _commandHandler = new CommandHandler(this);
 
             // 파이프라인 초기화 및 미들웨어 등록

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TeruTeruServer.ManageLogic.Util
+namespace TeruTeruServer.ServerEngineSDK.Util
 {
     public class TeruTeruLogger
     {

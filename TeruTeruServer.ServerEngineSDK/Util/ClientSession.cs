@@ -1,5 +1,5 @@
-﻿using TeruTeruServer.Common.Protocol;
-using TeruTeruServer.Common.Enums;
+﻿using TeruTeruServer.ServerEngineSDK.Protocol;
+using TeruTeruServer.ServerEngineSDK.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TeruTeruServer.ManageLogic.Util
+namespace TeruTeruServer.ServerEngineSDK.Util
 {
     /// <summary>
     /// 클라이언트 세션 정보를 관리하는 클래스입니다.

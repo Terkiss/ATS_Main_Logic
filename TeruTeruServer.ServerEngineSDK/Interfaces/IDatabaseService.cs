@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-namespace TeruTeruServer.DB
+namespace TeruTeruServer.ServerEngineSDK.Interfaces
 {
     public interface IDatabaseService
     {

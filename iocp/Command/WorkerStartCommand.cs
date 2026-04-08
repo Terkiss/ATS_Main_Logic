@@ -1,12 +1,13 @@
+using TeruTeruServer.ServerEngineSDK.Interfaces;
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TeruTeruServer.Common.Protocol;
-using TeruTeruServer.Common.Enums;
-using TeruTeruServer.ManageLogic.Util;
+using TeruTeruServer.ServerEngineSDK.Protocol;
+using TeruTeruServer.ServerEngineSDK.Enums;
+using TeruTeruServer.ServerEngineSDK.Util;
 
 namespace TeruTeruServer.Command
 {
