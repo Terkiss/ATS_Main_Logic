@@ -3,8 +3,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TeruTeruServer.ServerEngineSDK.Enums;
-using TeruTeruServer.ServerEngineSDK.Protocol;
+using TeruTeruServer.SDK.Enums;
+using TeruTeruServer.SDK.Protocol;
 
 namespace DummyClient
 {
@@ -16,7 +16,7 @@ namespace DummyClient
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine("=== [Dummy Client] Testing TeruTeruServer.ServerEngineSDK SDK Architecture ===");
+            Console.WriteLine("=== [Dummy Client] Testing TeruTeruServer.SDK SDK Architecture ===");
             
             try
             {

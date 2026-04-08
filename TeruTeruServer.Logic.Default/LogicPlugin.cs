@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using TeruTeruServer.ServerEngineSDK.Enums;
-using TeruTeruServer.ServerEngineSDK.Interfaces;
-using TeruTeruServer.ServerEngineSDK.Protocol;
-using TeruTeruServer.ServerEngineSDK.Util; // 추후 Util도 Common으로 옮기는 것 권장
+using TeruTeruServer.SDK.Enums;
+using TeruTeruServer.SDK.Interfaces;
+using TeruTeruServer.SDK.Protocol;
+using TeruTeruServer.SDK.Util; // 추후 Util도 Common으로 옮기는 것 권장
 
 namespace TeruTeruServer.Logic.Default
 {

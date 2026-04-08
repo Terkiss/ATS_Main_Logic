@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TeruTeruServer.ServerEngineSDK\TeruTeruServer.ServerEngineSDK.csproj" />
+    <ProjectReference Include="..\TeruTeruServer.SDK\TeruTeruServer.SDK.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +17,8 @@
 
   <!-- 빌드 후 서버의 plugins 폴더로 자동 복사 (Hot Reloading 지원용) -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp $(OutDir)$(TargetName).dll ../iocp/plugins/" />
+    <Exec Command="mkdir -p ../TeruTeruServer.Cli/plugins" />
+    <Exec Command="cp $(OutDir)$(TargetName).dll ../TeruTeruServer.Cli/plugins/" />
   </Target>
 
 </Project>
