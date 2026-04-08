@@ -3,7 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 
 namespace TeruTeruServer.ManageLogic.Util
 {

@@ -1,0 +1,12 @@
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/bin/Debug/net8.0/TeruTeruServer.Common.deps.json
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/bin/Debug/net8.0/TeruTeruServer.Common.dll
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/bin/Debug/net8.0/TeruTeruServer.Common.pdb
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.GeneratedMSBuildEditorConfig.editorconfig
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.AssemblyInfoInputs.cache
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.AssemblyInfo.cs
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.csproj.CoreCompileInputs.cache
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.sourcelink.json
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.dll
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/refint/TeruTeruServer.Common.dll
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/TeruTeruServer.Common.pdb
+/Users/yujeonghun/Project/ATS_Main_Logic/TeruTeruServer.Common/obj/Debug/net8.0/ref/TeruTeruServer.Common.dll

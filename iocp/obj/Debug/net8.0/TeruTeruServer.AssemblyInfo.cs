@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2a72cda3c12530e8cd851d810309fb765af38b49")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa33c905a3849a9fd8b50f16acc02ed4129ce764")]
 [assembly: System.Reflection.AssemblyProductAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TeruTeruServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,5 @@
-﻿using TeruTeruServer.ManageLogic.Protocol;
+﻿using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,6 @@
 using System.Net.Sockets;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 
 namespace TeruTeruServer.ManageLogic
 {

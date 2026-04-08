@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 
 namespace TeruTeruServer.Command

@@ -263,3 +263,5 @@ D:/Project/CKP/ATS_Server/iocp/obj/Debug/net8.0/ref/TeruTeruServer.dll
 /Users/yujeonghun/Project/ATS_Main_Logic/iocp/bin/Debug/net8.0/Microsoft.IdentityModel.Logging.dll
 /Users/yujeonghun/Project/ATS_Main_Logic/iocp/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/yujeonghun/Project/ATS_Main_Logic/iocp/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/yujeonghun/Project/ATS_Main_Logic/iocp/bin/Debug/net8.0/TeruTeruServer.Common.dll
+/Users/yujeonghun/Project/ATS_Main_Logic/iocp/bin/Debug/net8.0/TeruTeruServer.Common.pdb

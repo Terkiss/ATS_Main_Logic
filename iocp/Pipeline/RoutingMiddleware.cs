@@ -1,14 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using TeruTeruServer.ManageLogic;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 
 namespace TeruTeruServer.Pipeline
 {
-    /// <summary>
-    /// 최종 비즈니스 로직(ServerLogic)으로 패킷을 라우팅하는 미들웨어입니다.
-    /// </summary>
     public class RoutingMiddleware : IPacketMiddleware
     {
         private readonly ILogicService _serverLogic;
@@ -21,24 +19,25 @@ namespace TeruTeruServer.Pipeline
         public Task InvokeAsync(PacketContext context, Func<Task> next)
         {
             var buffer = context.RawData;
-            var count = buffer.Length;
-            var socket = context.ClientSocket;
+            if (buffer.Length < 2) return Task.CompletedTask;
 
             var sendType = (SendType)buffer[0];
+            var protocolType = (ProtocolSelect)buffer[1]; // 프로토콜 타입 추출
 
             if (sendType == SendType.Direct)
             {
-                byte[] data = new byte[count - 1];
-                Array.Copy(buffer, 1, data, 0, count - 1);
-                _serverLogic.ProcessDirectProtocol(data, socket);
+                byte[] data = new byte[buffer.Length - 1];
+                Array.Copy(buffer, 1, data, 0, buffer.Length - 1);
+                _serverLogic.ProcessDirectProtocol(data, context.ClientSocket);
             }
             else if (sendType == SendType.Json)
             {
-                byte[] data = new byte[count - 1];
-                Array.Copy(buffer, 1, data, 0, count - 1);
-                string json = System.Text.Encoding.ASCII.GetString(data);
-                TeruTeruLogger.LogInfo("Received JSON via Pipeline: " + json);
-                _serverLogic.ProcessJsonProtocol(json, ProtocolSelect.ConnectProtocol, socket);
+                byte[] data = new byte[buffer.Length - 2];
+                Array.Copy(buffer, 2, data, 0, buffer.Length - 2);
+                string json = System.Text.Encoding.UTF8.GetString(data);
+                
+                TeruTeruLogger.LogInfo($"Routing JSON: {protocolType}");
+                _serverLogic.ProcessJsonProtocol(json, protocolType, context.ClientSocket);
             }
 
             context.IsProcessed = true;

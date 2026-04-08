@@ -1,9 +1,10 @@
 using TeruTeruServer.ManageLogic;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 using TeruTeruServer.Command;
 using TeruTeruServer.Pipeline;
-using TeruTeruServer.Network;
+using TeruTeruServer.Common.Interfaces;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -345,7 +346,7 @@ namespace TeruTeruServer
                 ServerMemory.RemoveGameIDFromDictionary(hostID);
 
                 byte[] tempArray = new byte[2];
-                tempArray[0] = (byte)MethodsSelector.NotifyPlayerExit;
+                tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
                 tempArray[1] = (byte)hostID;
                 RpcStub rpcStub = new RpcStub(this, _sessionManager);
                 var result = rpcStub.HandleRequest(socket, tempArray);

@@ -1,9 +1,10 @@
 using TeruTeruServer;
 using TeruTeruServer.ManageLogic;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 using TeruTeruServer.DB;
-using TeruTeruServer.Network;
+using TeruTeruServer.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 

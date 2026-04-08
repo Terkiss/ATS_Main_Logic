@@ -3,56 +3,63 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 
 namespace TeruTeruServer.Pipeline
 {
-    /// <summary>
-    /// 패킷의 JWT 인증 토큰 유효성을 검사하는 미들웨어입니다.
-    /// </summary>
     public class AuthMiddleware : IPacketMiddleware
     {
-        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; // TODO: 환경 설정으로 분리
+        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; 
 
         public async Task InvokeAsync(PacketContext context, Func<Task> next)
         {
             var buffer = context.RawData;
-            if (buffer.Length < 2) 
-            {
-                await next();
-                return;
-            }
+            if (buffer.Length < 2) return;
 
             var sendType = (SendType)buffer[0];
             var protocolType = buffer[1];
 
-            // 연결 프로토콜(Connect)이나 로그인 프로토콜은 인증 없이 통과
+            // 1. 인증 면제 프로토콜 체크 (연결 및 로그인)
             if (sendType == SendType.Json && (protocolType == (byte)ProtocolSelect.ConnectProtocol || protocolType == (byte)ProtocolSelect.LoginProtocol))
             {
                 await next();
                 return;
             }
 
-            // TODO: 상용 환경에서는 패킷 헤더에 토큰 길이를 포함하고 바이트를 추출해야 함
-            // 현재는 프로토타입 검증을 위해 JSON 패킷 내에 토큰이 있다고 가정하거나 세션 체크 수행
-            
-            // 실전 구현: context.RawData에서 토큰 추출 로직 필요
-            // 여기서는 디렉터님의 지시에 따라 JWT 검증 로직의 뼈대를 구현함
-            
+            // 2. 패킷 헤더에서 토큰 추출 시도
+            // 구조: [SendType(1)][ProtocolType(1)][TokenLength(4)][Token(N)][Data(M)]
             try
             {
-                // 토큰 검증 로직 예시 (실제 구현 시 클라이언트 패킷 구조에 맞춰 토큰 위치 특정 필요)
-                // string token = ExtractTokenFromPacket(context.RawData);
-                // ValidateToken(token);
-                
-                await next(); // 검증 성공 시 다음 단계로
+                if (buffer.Length < 6) throw new Exception("Packet too short for auth header.");
+
+                int tokenLength = BitConverter.ToInt32(buffer, 2);
+                if (tokenLength > 0)
+                {
+                    if (buffer.Length < 6 + tokenLength) throw new Exception("Invalid token length in header.");
+                    
+                    string token = Encoding.UTF8.GetString(buffer, 6, tokenLength);
+                    ValidateToken(token);
+
+                    // 검증 성공 시, 실제 데이터만 남기도록 RawData 재설정 (다음 미들웨어 편의성)
+                    byte[] actualData = new byte[buffer.Length - (6 + tokenLength) + 2];
+                    actualData[0] = buffer[0]; // SendType
+                    actualData[1] = buffer[1]; // ProtocolType
+                    Array.Copy(buffer, 6 + tokenLength, actualData, 2, buffer.Length - (6 + tokenLength));
+                    context.RawData = actualData;
+
+                    await next();
+                }
+                else
+                {
+                    throw new Exception("Auth token missing.");
+                }
             }
             catch (Exception ex)
             {
-                TeruTeruLogger.LogError($"인증 실패: {ex.Message}");
-                // 인증 실패 시 즉각 세션 종료 처리 가능
-                context.ClientSocket.Close();
+                TeruTeruLogger.LogError($"[Auth Failed] {ex.Message} - Remote: {context.ClientSocket.RemoteEndPoint}");
+                context.ClientSocket.Close(); // 즉각 차단
                 context.IsProcessed = true;
             }
         }

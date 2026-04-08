@@ -1,7 +1,8 @@
-using TeruTeruServer.ManageLogic.Protocol;
+using TeruTeruServer.Common.Protocol;
+using TeruTeruServer.Common.Enums;
 using TeruTeruServer.ManageLogic.Util;
 using TeruTeruServer.DB;
-using TeruTeruServer.Network;
+using TeruTeruServer.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace TeruTeruServer.ManageLogic
         private readonly ISessionManager _sessionManager;
         private readonly RpcStub _rpcStub;
         
-        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; // TODO: 환경 설정 분리
+        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; 
 
         public ServerLogic(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager)
         {
@@ -65,11 +66,25 @@ namespace TeruTeruServer.ManageLogic
         {
             TeruTeruLogger.LogInfo($"Login attempt for user: {loginData.UserId}");
 
-            // TODO: 실제 DB 조회를 위해 _dbService 활용 (Phase 1에서 안전하게 리팩토링됨)
-            // string query = "SELECT id FROM users WHERE userid=@u AND pwd=@p";
-            // _dbService.SqlRun(query, ...);
+            // 1. 실제 DB 연동 인증 (IDatabaseService 활용)
+            bool isSuccess = false;
+            string query = "SELECT COUNT(*) FROM users WHERE userid = @uid AND password = @pwd";
+            var parameters = new MySql.Data.MySqlClient.MySqlParameter[]
+            {
+                new MySql.Data.MySqlClient.MySqlParameter("@uid", loginData.UserId),
+                new MySql.Data.MySqlClient.MySqlParameter("@pwd", loginData.Password) 
+            };
 
-            bool isSuccess = true; // 임시 성공 처리
+            try 
+            {
+                int count = _dbService.SqlRunForCounter(query, parameters);
+                isSuccess = (count > 0);
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"DB 인증 중 오류 발생: {ex.Message}");
+                isSuccess = false; 
+            }
 
             if (isSuccess)
             {
@@ -77,7 +92,6 @@ namespace TeruTeruServer.ManageLogic
                 
                 if (_sessionManager.TryGetHostIdBySocket(socket, out int hostId))
                 {
-                    // 세션 정보 업데이트
                     var sessions = ServerMemory.GetClientSessions();
                     var session = sessions.FirstOrDefault(s => s.HostID == hostId);
                     if (session != null)
@@ -94,7 +108,7 @@ namespace TeruTeruServer.ManageLogic
             else
             {
                 loginData.IsSuccess = false;
-                TeruTeruLogger.LogWarning($"Login failed for user: {loginData.UserId}");
+                 TeruTeruLogger.LogWarning($"Login failed for user: {loginData.UserId}");
             }
 
             string responseJson = JsonSerializer.Serialize(loginData);
@@ -134,8 +148,6 @@ namespace TeruTeruServer.ManageLogic
                 string gameId = TeruTeruServer.ManageLogic.Util.Utility.GenerateUniqueId();
                 var hostID = ServerMemory.GetHostID;
                 
-                // TODO: MainServer.GUID 접근을 위해 IMessageSender 등에 속성 추가 검토 필요
-                // 현재는 로직 흐름 유지를 위해 임시 하드코딩 또는 세션 관리자 활용
                 bool guidCheck = true; 
 
                 if (guidCheck)
