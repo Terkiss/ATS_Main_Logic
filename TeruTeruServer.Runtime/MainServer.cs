@@ -1,12 +1,9 @@
 using TeruTeruServer.SDK.Interfaces;
-using TeruTeruServer.Runtime;
 using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Enums;
 using TeruTeruServer.SDK.Util;
 using TeruTeruServer.Commands;
 using TeruTeruServer.Runtime.Pipeline;
-using TeruTeruServer.SDK.Interfaces;
-using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -37,18 +34,18 @@ namespace TeruTeruServer.Runtime
         private bool _isTcp;
 
         // 대기 중인 메인 서버 소켓
-        private Socket _serverSocket;
+        private Socket? _serverSocket;
 
         // 네트워크 I/O 버퍼 크기
         private int _sendBufferSize;
         private int _receiveBufferSize;
 
         // 고유 서버 식별자
-        public string GUID;
+        public string? GUID;
 
-        private RpcProxy _rpcProxy;
-        private CommandHandler _commandHandler;
-        private PacketPipeline _pipeline;
+        private RpcProxy? _rpcProxy;
+        private CommandHandler? _commandHandler;
+        private PacketPipeline? _pipeline;
 
         // 전송 버퍼 크기 프로퍼티
         public int SendBufferSize
@@ -89,7 +86,7 @@ namespace TeruTeruServer.Runtime
             _pipeline.Use(new ValidationMiddleware());
             _pipeline.Use(new DecryptionMiddleware());
             _pipeline.Use(new AuthMiddleware()); 
-            _pipeline.Use(new RoutingMiddleware(_serverLogic));
+            _pipeline.Use(new RoutingMiddleware(_serverLogic)); // 엔진은 걍 로직에 던지기만 함
         }
 
         public void StartServer()
@@ -149,18 +146,18 @@ namespace TeruTeruServer.Runtime
             while (true)
             {
                 Thread.Sleep(1000);
-                string strCMD = Console.ReadLine();
-                if (!HandleConsoleCommand(strCMD))
+                string? strCMD = Console.ReadLine();
+                if (strCMD == null || !HandleConsoleCommand(strCMD))
                     break;
             }
         }
 
         private bool HandleConsoleCommand(string command)
         {
-            return _commandHandler.Handle(command);
+            return _commandHandler?.Handle(command) ?? false;
         }
 
-        private void AcceptCompleted(object sender, SocketAsyncEventArgs e)
+        private void AcceptCompleted(object? sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success)
             {
@@ -185,9 +182,12 @@ namespace TeruTeruServer.Runtime
         private void HandleAcceptedSocket(SocketAsyncEventArgs e)
         {
             var acceptedSocket = e.AcceptSocket;
-            this.LogAcceptedConnection(acceptedSocket);
-            var receiveArgs = CreateReceiveArgs(acceptedSocket);
-            acceptedSocket.ReceiveAsync(receiveArgs);
+            if (acceptedSocket != null)
+            {
+                this.LogAcceptedConnection(acceptedSocket);
+                var receiveArgs = CreateReceiveArgs(acceptedSocket);
+                acceptedSocket.ReceiveAsync(receiveArgs);
+            }
         }
 
         private void LogAcceptedConnection(Socket socket)
@@ -208,15 +208,21 @@ namespace TeruTeruServer.Runtime
             return args;
         }
 
-        private async void ReceiveCompleted(object sender, SocketAsyncEventArgs e)
+        private async void ReceiveCompleted(object? sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0 && e.AcceptSocket != null)
             {
                 byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                
-                var context = new PacketContext(e.AcceptSocket, data);
-                await _pipeline.ExecuteAsync(context);
+                if (e.Buffer != null)
+                {
+                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+                    
+                    var context = new PacketContext(e.AcceptSocket, data);
+                    if (_pipeline != null)
+                    {
+                        await _pipeline.ExecuteAsync(context);
+                    }
+                }
                 
                 try
                 {
@@ -234,7 +240,7 @@ namespace TeruTeruServer.Runtime
         {
             try
             {
-                if (_sessionManager.TryGetHostIdBySocket(e.AcceptSocket, out int playerId))
+                if (e.AcceptSocket != null && _sessionManager.TryGetHostIdBySocket(e.AcceptSocket, out int playerId))
                 {
                     Console.WriteLine("플레이어 " + playerId + "와의 연결 끊김");
                     HandleDisconnectedSocket(playerId, e.AcceptSocket);
@@ -288,7 +294,7 @@ namespace TeruTeruServer.Runtime
             return false;
         }
 
-        private System.Timers.Timer socketCheckTimer;
+        private System.Timers.Timer? socketCheckTimer;
         public void StartSocketCheck()
         {
             socketCheckTimer = new System.Timers.Timer(1000);
@@ -344,25 +350,17 @@ namespace TeruTeruServer.Runtime
                 }
 
                 ServerMemory.RemoveGameIDFromDictionary(hostID);
-
-                byte[] tempArray = new byte[2];
-                tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
-                tempArray[1] = (byte)hostID;
-                RpcStub rpcStub = new RpcStub(this, _sessionManager);
-                var result = rpcStub.HandleRequest(socket, tempArray);
-
-                if (result == null)
-                {
-                    TeruTeruLogger.LogInfo("플레이어 " + hostID + " 퇴장 알림 전송 완료");
-                }
             }
         }
 
         private void UdpServerStart()
         {
-            _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _serverSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _serverSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _port));
+            if (_serverSocket == null)
+            {
+                _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                _serverSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                _serverSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _port));
+            }
 
             Console.WriteLine("UDP Server Start");
             Console.WriteLine("Server Version : 0.00.2");
@@ -383,31 +381,42 @@ namespace TeruTeruServer.Runtime
 
         private void StartUdpAcceptLoop()
         {
+            if (_serverSocket == null) return;
             SocketAsyncEventArgs udpArgs = new SocketAsyncEventArgs();
             udpArgs.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
             udpArgs.SetBuffer(new byte[_receiveBufferSize], 0, _receiveBufferSize);
             udpArgs.Completed += OnUdpReceiveFromCompleted;
             
-            if (!_serverSocket.ReceiveFromAsync(udpArgs))
+            try
             {
-                OnUdpReceiveFromCompleted(_serverSocket, udpArgs);
+                if (!_serverSocket.ReceiveFromAsync(udpArgs))
+                {
+                    OnUdpReceiveFromCompleted(_serverSocket, udpArgs);
+                }
             }
+            catch (ObjectDisposedException) { }
         }
 
-        private async void OnUdpReceiveFromCompleted(object sender, SocketAsyncEventArgs e)
+        private async void OnUdpReceiveFromCompleted(object? sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
                 byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                var context = new PacketContext(e.AcceptSocket, data);
-                await _pipeline.ExecuteAsync(context);
+                if (e.Buffer != null)
+                {
+                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+                    var context = new PacketContext(e.AcceptSocket!, data);
+                    if (_pipeline != null)
+                    {
+                        await _pipeline.ExecuteAsync(context);
+                    }
+                }
             }
             
             e.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
             try
             {
-                if (!_serverSocket.ReceiveFromAsync(e))
+                if (_serverSocket != null && !_serverSocket.ReceiveFromAsync(e))
                 {
                     OnUdpReceiveFromCompleted(_serverSocket, e);
                 }
@@ -419,13 +428,21 @@ namespace TeruTeruServer.Runtime
 
         private async void HandleNewUdpPacket(SocketAsyncEventArgs e)
         {
-            EndPoint remoteEP = e.RemoteEndPoint;
-            if (_udpSessions.TryGetValue(remoteEP, out Socket sessionSocket))
+            EndPoint? remoteEP = e.RemoteEndPoint;
+            if (remoteEP == null) return;
+
+            if (_udpSessions.TryGetValue(remoteEP, out Socket? sessionSocket))
             {
                 byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                var context = new PacketContext(sessionSocket, data);
-                await _pipeline.ExecuteAsync(context);
+                if (e.Buffer != null)
+                {
+                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+                    var context = new PacketContext(sessionSocket, data);
+                    if (_pipeline != null)
+                    {
+                        await _pipeline.ExecuteAsync(context);
+                    }
+                }
             }
             else
             {
@@ -438,10 +455,16 @@ namespace TeruTeruServer.Runtime
                 {
                     var receiveArgs = CreateReceiveArgs(clientSocket);
                     byte[] firstPacketData = new byte[e.BytesTransferred];
-                    Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
-                    var context = new PacketContext(clientSocket, firstPacketData);
-                    await _pipeline.ExecuteAsync(context);
-                    clientSocket.ReceiveAsync(receiveArgs);
+                    if (e.Buffer != null)
+                    {
+                        Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
+                        var context = new PacketContext(clientSocket, firstPacketData);
+                        if (_pipeline != null)
+                        {
+                            await _pipeline.ExecuteAsync(context);
+                        }
+                        clientSocket.ReceiveAsync(receiveArgs);
+                    }
                 }
                 else
                 {

@@ -1,5 +1,7 @@
 using TeruTeruServer.SDK.Interfaces;
 using System;
+using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TeruTeruServer.Runtime;
 using TeruTeruServer.SDK.Protocol;
@@ -17,13 +19,13 @@ namespace TeruTeruServer.Runtime.Pipeline
             _serverLogic = serverLogic;
         }
 
-        public Task InvokeAsync(PacketContext context, Func<Task> next)
+        public async Task InvokeAsync(PacketContext context, Func<Task> next)
         {
             var buffer = context.RawData;
-            if (buffer.Length < 2) return Task.CompletedTask;
+            if (buffer.Length < 2) return;
 
             var sendType = (SendType)buffer[0];
-            var protocolType = (ProtocolSelect)buffer[1]; // 프로토콜 타입 추출
+            var protocolType = (ProtocolSelect)buffer[1];
 
             if (sendType == SendType.Direct)
             {
@@ -37,12 +39,12 @@ namespace TeruTeruServer.Runtime.Pipeline
                 Array.Copy(buffer, 2, data, 0, buffer.Length - 2);
                 string json = System.Text.Encoding.UTF8.GetString(data);
                 
-                TeruTeruLogger.LogInfo($"Routing JSON: {protocolType}");
+                // 엔진은 단순히 로직에 던져주기만 함 (라우팅 책임은 로직에 있음)
                 _serverLogic.ProcessJsonProtocol(json, protocolType, context.ClientSocket);
             }
 
             context.IsProcessed = true;
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 }

@@ -11,7 +11,8 @@ using System.Security.Claims;
 using TeruTeruServer.SDK.Enums;
 using TeruTeruServer.SDK.Interfaces;
 using TeruTeruServer.SDK.Protocol;
-using TeruTeruServer.SDK.Util; // 추후 Util도 Common으로 옮기는 것 권장
+using TeruTeruServer.SDK.Util;
+using TeruTeruServer.SDK.Attributes;
 
 namespace TeruTeruServer.Logic.Default
 {
@@ -20,16 +21,21 @@ namespace TeruTeruServer.Logic.Default
         private readonly IMessageSender _messageSender;
         private readonly IDatabaseService _dbService;
         private readonly ISessionManager _sessionManager;
+        private readonly IProtocolRouter _router;
         private readonly RpcProxy _rpcProxy;
         
         private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; 
 
-        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager)
+        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router)
         {
             _messageSender = messageSender;
             _dbService = dbService;
             _sessionManager = sessionManager;
+            _router = router;
             _rpcProxy = new RpcProxy(_messageSender, _sessionManager);
+
+            // 중요: 라우터에 자기 자신을 등록하여 어트리뷰트 분석 활성화
+            _router.Initialize(this);
         }
 
         public void ProcessDirectProtocol(byte[] buffer, Socket socket)
@@ -39,54 +45,64 @@ namespace TeruTeruServer.Logic.Default
             var sendType = (SendType)buffer[0];
             var protocolType = (ProtocolSelect)buffer[1];
 
-            if (sendType == SendType.Json)
-            {
-                string json = Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
-                HandleJsonProtocol(json, protocolType, socket);
-            }
-            else if (sendType == SendType.Direct && protocolType == ProtocolSelect.ImageDumpCommand)
+            if (sendType == SendType.Direct && protocolType == ProtocolSelect.ImageDumpCommand)
             {
                 ProcessImageData(buffer, socket);
             }
         }
 
-        public void ProcessJsonProtocol(string json, ProtocolSelect protocol, Socket socket)
+        public async void ProcessJsonProtocol(string json, ProtocolSelect protocol, Socket socket)
         {
-            HandleJsonProtocol(json, protocol, socket);
+            // [플러그인 내부 라우팅] 엔진의 개입 없이 라우터가 어트리뷰트를 보고 분기 처리
+            string resultJson = await _router.RouteAsync(json, protocol, socket);
+            
+            // 결과가 있는 경우 클라이언트에게 응답 (필요 시)
+            // Tip: RPC 응답은 라우터 내부에서 처리하거나 여기서 공통 처리 가능
         }
 
-        private void HandleJsonProtocol(string json, ProtocolSelect protocol, Socket socket)
-        {
-            switch (protocol)
-            {
-                case ProtocolSelect.ConnectProtocol:
-                    ConProtocol(socket, JsonSerializer.Deserialize<ConnectProtocol>(json));
-                    break;
-                case ProtocolSelect.LoginProtocol:
-                    HandleLogin(socket, JsonSerializer.Deserialize<LoginProtocol>(json));
-                    break;
-            }
-        }
+        // --- [수동 연결 (Enum 기반)] ---
 
-        private void HandleLogin(Socket socket, LoginProtocol loginData)
+        [Protocol(ProtocolSelect.LoginProtocol)]
+        public void HandleLogin(Socket socket, LoginProtocol loginData)
         {
-            // [기존 로그인 로직]
             string token = GenerateJwtToken(loginData.UserId);
             loginData.IsSuccess = true;
             loginData.AuthToken = token;
             _rpcProxy.SendJsonResponse(socket, ProtocolSelect.LoginProtocol, loginData);
         }
 
-        private void ConProtocol(Socket socket, ConnectProtocol protocol)
+        [Protocol(ProtocolSelect.ConnectProtocol)]
+        public void ConProtocol(Socket socket, ConnectProtocol protocol)
         {
-            // [기존 연결 로직]
             protocol.IsSuccess = true;
             _rpcProxy.SendJsonResponse(socket, ProtocolSelect.ConnectProtocol, protocol);
         }
 
+        // --- [자동 연결 (RPC 방식)] ---
+
+        [Rpc("Echo")]
+        public async Task<string> HandleEcho(Socket socket, string message)
+        {
+            TeruTeruLogger.LogInfo($"RPC Echo called with: {message}");
+            return $"Server Echo: {message} at {DateTime.Now}";
+        }
+
+        [Rpc("GetServerInfo")]
+        public async Task<object> GetServerInfo(Socket socket)
+        {
+            return new 
+            {
+                ServerName = "TeruTeru Server AI Engine",
+                Version = "2.0.0-phase3-plugin-routing",
+                CurrentTime = DateTime.Now,
+                ActiveSessions = _sessionManager.Players.Count
+            };
+        }
+
+        // --- [기타 로직] ---
+
         private void ProcessImageData(byte[] buffer, Socket socket)
         {
-            // [기존 이미지 처리 로직]
             byte[] imageData = new byte[buffer.Length - 2];
             Array.Copy(buffer, 2, imageData, 0, imageData.Length);
 
@@ -97,8 +113,6 @@ namespace TeruTeruServer.Logic.Default
                 ImgSize = imageData.Length,
                 Timestamp = DateTime.UtcNow
             };
-
-            // ServerMemory.SetImageData(sendImgData); // 서버 엔진과 공유 데이터 통신 필요
             _rpcProxy.RequestObjectDetect(sendImgData);
         }
 

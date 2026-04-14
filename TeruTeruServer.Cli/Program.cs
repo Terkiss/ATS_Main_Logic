@@ -5,6 +5,7 @@ using TeruTeruServer.SDK.Interfaces;
 using TeruTeruServer.SDK.Util;
 using TeruTeruServer.Runtime.DB;
 using TeruTeruServer.Runtime;
+using TeruTeruServer.Runtime.Rpc;
 
 namespace TeruTeruServer.Cli
 {
@@ -46,6 +47,9 @@ namespace TeruTeruServer.Cli
             services.AddSingleton<LogicProxy>(logicProxy);
             services.AddSingleton<ILogicService>(sp => sp.GetRequiredService<LogicProxy>());
 
+            // Protocol Router 등록 (기존 RpcStub을 대체)
+            services.AddSingleton<IProtocolRouter, ProtocolRouter>();
+
             // 메인 서버를 IMessageSender로 등록하여 순환 참조 해결
             services.AddSingleton<IMessageSender>(sp => sp.GetRequiredService<MainServer>());
             
@@ -53,7 +57,7 @@ namespace TeruTeruServer.Cli
             {
                 var logic = sp.GetRequiredService<ILogicService>();
                 var session = sp.GetRequiredService<ISessionManager>();
-                return new MainServer(config, logic, session);
+                return new MainServer(config, logic, session); // RoutingMiddleware에서 주입받지 않으므로 생성자 단순화 가능
             });
         }
     }
