@@ -8,9 +8,9 @@ namespace TeruTeruServer.ManageLogic.Util
     /// <summary>
     /// AES 알고리즘을 사용하여 문자열 암호화 및 복호화를 수행하는 클래스입니다.
     /// </summary>
-    public class Encrypt
+    public class AESEncrypt : baseEncrypt
     {
-        public static string EncryptStringAES(string inputText, string password)
+        public override string EncryptString(string inputText, string password)
         {
             using (Aes aesAlg = Aes.Create())
             {
@@ -42,7 +42,7 @@ namespace TeruTeruServer.ManageLogic.Util
             }
         }
 
-        public static string DecryptStringAES(string inputText, string password)
+        public override string DecryptString(string inputText, string password)
         {
             using (Aes aesAlg = Aes.Create())
             {
@@ -53,7 +53,7 @@ namespace TeruTeruServer.ManageLogic.Util
                 aesAlg.IV = iv;
 
                 // PBKDF2를 사용하여 키를 생성 (암호화 시와 동일한 salt 보장)
-                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); 
+                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV);
                 aesAlg.Key = keyGenerator.GetBytes(aesAlg.KeySize / 8);
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
