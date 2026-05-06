@@ -12,7 +12,7 @@ namespace TeruTeruServer.Runtime.Pipeline
 {
     public class AuthMiddleware : IPacketMiddleware
     {
-        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; 
+        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026";
         private readonly ISessionManager _sessionManager;
 
         public AuthMiddleware(ISessionManager sessionManager)
@@ -54,7 +54,7 @@ namespace TeruTeruServer.Runtime.Pipeline
                 if (tokenLength > 0)
                 {
                     if (buffer.Length < 6 + tokenLength) throw new Exception("Invalid token length in header.");
-                    
+
                     string token = Encoding.UTF8.GetString(buffer, 6, tokenLength);
                     ValidateToken(token);
 
@@ -99,7 +99,7 @@ namespace TeruTeruServer.Runtime.Pipeline
             try
             {
                 var buffer = context.RawData;
-                string json = Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
+                string json = buffer.ExtractJsonPayload();
                 var request = System.Text.Json.JsonSerializer.Deserialize<ReconnectRequest>(json);
 
                 if (request != null && _sessionManager.Players.TryGetValue(request.HostID, out var session))
@@ -112,7 +112,7 @@ namespace TeruTeruServer.Runtime.Pipeline
                         session.UpdateLastSeen();
 
                         TeruTeruLogger.LogInfo($"플레이어 {request.HostID} 재접속 성공.");
-                        
+
                         var response = new ReconnectResponse { Success = true, Message = "Reconnected" };
                         SendJsonResponse(context.ClientSocket, ProtocolSelect.ReconnectProtocol, response);
                     }

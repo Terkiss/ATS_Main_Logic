@@ -22,7 +22,7 @@ namespace TeruTeruServer.Runtime
     {
         private readonly ISessionManager _sessionManager;
         private readonly ILogicService _serverLogic;
-        
+
         // 동시 접속 가능한 최대 연결 수
         private int _maxConnection;
 
@@ -85,7 +85,7 @@ namespace TeruTeruServer.Runtime
             _pipeline = new PacketPipeline();
             _pipeline.Use(new ValidationMiddleware());
             _pipeline.Use(new DecryptionMiddleware());
-            _pipeline.Use(new AuthMiddleware(_sessionManager)); 
+            _pipeline.Use(new AuthMiddleware(_sessionManager));
             _pipeline.Use(new RoutingMiddleware(_serverLogic));
         }
 
@@ -164,7 +164,7 @@ namespace TeruTeruServer.Runtime
                 HandleAcceptedSocket(e);
             }
             else
-            { 
+            {
                 TeruTeruLogger.LogError("수락(Accept) 실패: " + e.SocketError.ToString());
             }
 
@@ -200,7 +200,7 @@ namespace TeruTeruServer.Runtime
         }
 
         private SocketAsyncEventArgs CreateReceiveArgs(Socket socket)
-        { 
+        {
             var args = new SocketAsyncEventArgs();
             args.Completed += new EventHandler<SocketAsyncEventArgs>(ReceiveCompleted);
             args.SetBuffer(new byte[_receiveBufferSize], 0, _receiveBufferSize);
@@ -210,29 +210,36 @@ namespace TeruTeruServer.Runtime
 
         private async void ReceiveCompleted(object? sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0 && e.AcceptSocket != null)
+            try
             {
-                byte[] data = new byte[e.BytesTransferred];
-                if (e.Buffer != null)
+                if (e.SocketError == SocketError.Success && e.BytesTransferred > 0 && e.AcceptSocket != null)
                 {
-                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                    
-                    var context = new PacketContext(e.AcceptSocket, data);
-                    if (_pipeline != null)
+                    byte[] data = new byte[e.BytesTransferred];
+                    if (e.Buffer != null)
                     {
-                        await _pipeline.ExecuteAsync(context);
+                        Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+
+                        var context = new PacketContext(e.AcceptSocket, data);
+                        if (_pipeline != null)
+                        {
+                            await _pipeline.ExecuteAsync(context);
+                        }
                     }
+
+                    try
+                    {
+                        e.AcceptSocket.ReceiveAsync(e);
+                    }
+                    catch (ObjectDisposedException) { }
                 }
-                
-                try
+                else if (e.SocketError == SocketError.ConnectionReset || e.BytesTransferred == 0)
                 {
-                    e.AcceptSocket.ReceiveAsync(e);
+                    HandleConnectionReset(e);
                 }
-                catch (ObjectDisposedException) { }
             }
-            else if (e.SocketError == SocketError.ConnectionReset || e.BytesTransferred == 0)
+            catch (Exception ex)
             {
-                HandleConnectionReset(e);
+                TeruTeruLogger.LogError($"ReceiveCompleted 예외 발생: {ex.Message}");
             }
         }
 
@@ -254,29 +261,43 @@ namespace TeruTeruServer.Runtime
 
         public async void SendData(Socket socket, byte[] data)
         {
-            if (!await TrySend(socket, data))
+            try
             {
-                Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
-                try { socket?.Close(); } catch { }
-
-                if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
+                if (!await TrySend(socket, data))
                 {
-                    _sessionManager.MarkAsGrace(hostID);
+                    Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
+                    try { socket?.Close(); } catch { }
+
+                    if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
+                    {
+                        _sessionManager.MarkAsGrace(hostID);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"SendData 예외 발생: {ex.Message}");
             }
         }
 
         public async void SendData(int hostID, byte[] data)
         {
-            if (_sessionManager.Players.TryGetValue(hostID, out var session))
+            try
             {
-                if (session.State == TeruTeruServer.SDK.Enums.SessionState.Connected && session.ClientSocket != null)
+                if (_sessionManager.Players.TryGetValue(hostID, out var session))
                 {
-                    if (!await TrySend(session.ClientSocket, data))
+                    if (session.State == TeruTeruServer.SDK.Enums.SessionState.Connected && session.ClientSocket != null)
                     {
-                        _sessionManager.MarkAsGrace(hostID);
+                        if (!await TrySend(session.ClientSocket, data))
+                        {
+                            _sessionManager.MarkAsGrace(hostID);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"SendData 예외 발생: {ex.Message}");
             }
         }
 
@@ -412,7 +433,7 @@ namespace TeruTeruServer.Runtime
             udpArgs.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
             udpArgs.SetBuffer(new byte[_receiveBufferSize], 0, _receiveBufferSize);
             udpArgs.Completed += OnUdpReceiveFromCompleted;
-            
+
             try
             {
                 if (!_serverSocket.ReceiveFromAsync(udpArgs))
@@ -429,7 +450,7 @@ namespace TeruTeruServer.Runtime
             {
                 HandleNewUdpPacket(e);
             }
-            
+
             e.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
             try
             {
@@ -445,48 +466,63 @@ namespace TeruTeruServer.Runtime
 
         private async void HandleNewUdpPacket(SocketAsyncEventArgs e)
         {
-            EndPoint? remoteEP = e.RemoteEndPoint;
-            if (remoteEP == null) return;
-
-            if (_udpSessions.TryGetValue(remoteEP, out Socket? sessionSocket) && sessionSocket != null && e.Buffer != null)
+            try
             {
-                byte[] data = new byte[e.BytesTransferred];
-                if (e.Buffer != null)
-                {
-                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                    var context = new PacketContext(sessionSocket, data);
-                    if (_pipeline != null)
-                    {
-                        await _pipeline.ExecuteAsync(context);
-                    }
-                }
-            }
-            else
-            {
-                Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                clientSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _port));
-                clientSocket.Connect(remoteEP);
+                EndPoint? remoteEP = e.RemoteEndPoint;
+                if (remoteEP == null) return;
 
-                if (_udpSessions.TryAdd(remoteEP, clientSocket))
+                if (_udpSessions.TryGetValue(remoteEP, out Socket? sessionSocket) && sessionSocket != null && e.Buffer != null)
                 {
-                    var receiveArgs = CreateReceiveArgs(clientSocket);
-                    byte[] firstPacketData = new byte[e.BytesTransferred];
+                    byte[] data = new byte[e.BytesTransferred];
                     if (e.Buffer != null)
                     {
-                        Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
+                        Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
+                        var context = new PacketContext(sessionSocket, data);
+                        if (_pipeline != null)
+                        {
+                            await _pipeline.ExecuteAsync(context);
+                        }
                     }
-                    var context = new PacketContext(clientSocket, firstPacketData);
-                    if (_pipeline != null)
-                    {
-                        await _pipeline.ExecuteAsync(context);
-                    }
-                    clientSocket.ReceiveAsync(receiveArgs);
                 }
                 else
                 {
-                    clientSocket.Close();
+                    Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                    try
+                    {
+                        clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                        clientSocket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _port));
+                        clientSocket.Connect(remoteEP);
+
+                        if (_udpSessions.TryAdd(remoteEP, clientSocket))
+                        {
+                            var receiveArgs = CreateReceiveArgs(clientSocket);
+                            byte[] firstPacketData = new byte[e.BytesTransferred];
+                            if (e.Buffer != null)
+                            {
+                                Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
+                            }
+                            var context = new PacketContext(clientSocket, firstPacketData);
+                            if (_pipeline != null)
+                            {
+                                await _pipeline.ExecuteAsync(context);
+                            }
+                            clientSocket.ReceiveAsync(receiveArgs);
+                        }
+                        else
+                        {
+                            clientSocket.Close();
+                        }
+                    }
+                    catch (SocketException ex)
+                    {
+                        clientSocket.Close();
+                        TeruTeruLogger.LogError($"UDP 소켓 생성/연결 실패: {ex.Message}");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"HandleNewUdpPacket 예외 발생: {ex.Message}");
             }
         }
     }

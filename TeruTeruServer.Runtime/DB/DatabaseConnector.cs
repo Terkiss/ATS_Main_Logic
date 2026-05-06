@@ -1,5 +1,5 @@
 using TeruTeruServer.SDK.Interfaces;
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,11 +14,11 @@ namespace TeruTeruServer.Runtime.DB
     {
         public static DatabaseHelper database = null;
         string bindUri = "Server={0};Port=3306;Database={1};Uid={2};Pwd={3}";
-        
+
         public DatabaseConnector(string ip, string useDatabase, string id, string pwd)
         {
             string uriAddress = string.Format(bindUri, ip, useDatabase, id, pwd);
-           
+
             if (database == null)
             {
                 database = new DatabaseHelper(uriAddress);

@@ -46,7 +46,7 @@ namespace TeruTeruServer.Logic.Default.P2P
                 {
                     // 새로 들어온 유저
                     int joiner = data.JoinerHostId;
-                    
+
                     // 기존 멤버들에게 시그널링 (HolePunchRequest 트리거)
                     foreach (var memberId in group.GetMemberIds())
                     {

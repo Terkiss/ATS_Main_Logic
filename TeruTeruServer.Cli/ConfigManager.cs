@@ -16,7 +16,7 @@ namespace TeruTeruServer.Cli
             {
                 string exeDir = AppDomain.CurrentDomain.BaseDirectory;
                 string fallbackPath = Path.Combine(exeDir, filePath);
-                
+
                 if (File.Exists(fallbackPath))
                 {
                     filePath = fallbackPath;

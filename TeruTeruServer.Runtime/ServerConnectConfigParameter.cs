@@ -1,5 +1,5 @@
 using TeruTeruServer.SDK.Interfaces;
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -100,7 +100,7 @@ namespace TeruTeruServer.Runtime
         public override string ToString()
         {
             string answer = "";
-            answer += $"ip={IP}\n"; 
+            answer += $"ip={IP}\n";
             answer += $"guid={Guid}\n";
             answer += $"port={Port}\n";
             answer += $"max_connection={MaxConnection}\n";

@@ -23,7 +23,7 @@ namespace TeruTeruServer.Logic.Default.Tests
             _mockDbService = new Mock<IDatabaseService>();
             _mockSessionManager = new Mock<ISessionManager>();
             _mockProtocolRouter = new Mock<IProtocolRouter>();
-            
+
             _logicPlugin = new LogicPlugin(
                 _mockMessageSender.Object,
                 _mockDbService.Object,
@@ -48,8 +48,8 @@ namespace TeruTeruServer.Logic.Default.Tests
 
             // Assert
             _mockMessageSender.Verify(x => x.SendData(
-                It.IsAny<Socket>(), 
-                It.Is<byte[]>(data => data[0] == (byte)SendType.Json && data[1] == (byte)ProtocolSelect.LoginProtocol)), 
+                It.IsAny<Socket>(),
+                It.Is<byte[]>(data => data[0] == (byte)SendType.Json && data[1] == (byte)ProtocolSelect.LoginProtocol)),
                 Times.Once);
         }
 
@@ -69,8 +69,8 @@ namespace TeruTeruServer.Logic.Default.Tests
 
             // Assert
             _mockMessageSender.Verify(x => x.SendData(
-                It.IsAny<Socket>(), 
-                It.Is<byte[]>(data => data[0] == (byte)SendType.Json && data[1] == (byte)ProtocolSelect.ConnectProtocol)), 
+                It.IsAny<Socket>(),
+                It.Is<byte[]>(data => data[0] == (byte)SendType.Json && data[1] == (byte)ProtocolSelect.ConnectProtocol)),
                 Times.Once);
         }
 

@@ -13,7 +13,7 @@ namespace R19Management
     {
         private string uri;
         public DataBaseConnectHelper()
-        { 
+        {
         }
 
         public DataBaseConnectHelper(string connectionStr)
@@ -170,7 +170,7 @@ namespace R19Management
                     sqlBuilder.Append($"INSERT INTO {tableName} (");
                     sqlBuilder.Append(string.Join(", ", fieldNames));
                     sqlBuilder.Append(") VALUES (");
-                    
+
                     List<MySqlParameter> parameters = new List<MySqlParameter>();
                     for (int i = 0; i < field.Length; i++)
                     {

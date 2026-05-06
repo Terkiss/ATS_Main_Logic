@@ -99,7 +99,7 @@ namespace TeruTeruServer.SDK.Protocol
         {
             if (buffer.Length < 2) return null;
             // 미들웨어에서 이미 인증을 거친 안전한 패킷만 이리로 옵니다.
-            return null; 
+            return null;
         }
     }
 

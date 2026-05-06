@@ -5,7 +5,7 @@ using System.Text;
 using OpenCvSharp;
 
 namespace TeruTeruServer.SDK.Util
-{ 
+{
     /// <summary>
     /// 공통적으로 사용되는 유틸리티 기능을 제공하는 정적 클래스입니다.
     /// AI 분석 및 이미지 처리를 위한 헬퍼 메서드를 포함합니다.
@@ -20,7 +20,7 @@ namespace TeruTeruServer.SDK.Util
         /// </summary>
         public static string GenerateUniqueId()
         {
-            byte[] data = RandomNumberGenerator.GetBytes(24); 
+            byte[] data = RandomNumberGenerator.GetBytes(24);
             const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             StringBuilder result = new StringBuilder(30);
             foreach (byte b in data)

@@ -19,7 +19,7 @@ namespace TeruTeruServer.SDK.Tests
         public void P2PGroup_ShouldAssignCorrectGroupId()
         {
             var group = new P2PGroup(100);
-            
+
             // GroupId should be 1 since we reset the ID generator
             Assert.Equal(1, group.GroupId);
             Assert.Equal(100, group.OwnerId);

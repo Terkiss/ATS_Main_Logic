@@ -93,7 +93,7 @@ namespace TeruTeruServer.Runtime
 
                     var instance = (ILogicService)Activator.CreateInstance(logicType, parameters);
                     _proxy.UpdateLogic(instance);
-                    
+
                     Console.WriteLine("[PluginManager] Logic plugin hot-reloaded successfully.");
                 }
             }

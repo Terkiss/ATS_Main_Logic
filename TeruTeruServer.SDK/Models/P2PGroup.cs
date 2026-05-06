@@ -7,7 +7,7 @@ namespace TeruTeruServer.SDK.Models
     {
         public int GroupId { get; private set; }
         public int OwnerId { get; private set; }
-        
+
         // ConcurrentBag to handle multi-threaded Add/Remove safely
         private ConcurrentDictionary<int, byte> _members = new ConcurrentDictionary<int, byte>();
 

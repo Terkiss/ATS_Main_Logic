@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
+using System.Linq;
 using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Enums;
 
@@ -15,20 +14,18 @@ namespace TeruTeruServer.SDK.Util
     {
         public static object HostIDGeneratorLock = new object();
 
-        private static Dictionary<int, ClientSession> _hosts = new Dictionary<int, ClientSession>();
-        private static Dictionary<string, int> _gameID2HostID = new Dictionary<string, int>();
+        private static ConcurrentDictionary<int, ClientSession> _hosts = new ConcurrentDictionary<int, ClientSession>();
+        private static ConcurrentDictionary<string, int> _gameID2HostID = new ConcurrentDictionary<string, int>();
 
         private static ConcurrentQueue<SendImageData> _imageWorkPreOrderQueue = new ConcurrentQueue<SendImageData>();
         private static ConcurrentQueue<YoloDetectResult> _imageWorkCompleteQueue = new ConcurrentQueue<YoloDetectResult>();
-        
+
         /// <summary>
         /// 서버 자신을 지칭하는 예약된 고정 Host ID
         /// </summary>
         public const int SERVER_HOST_ID = 0;
 
         private static int _currentHostID = 1;
-
-
 
         /// <summary>
         /// 새로운 고유 호스트 ID를 생성합니다.
@@ -44,102 +41,60 @@ namespace TeruTeruServer.SDK.Util
             }
         }
 
-        public static Object HostsLock = new Object();
-        public static object GameID2HostIDLock = new object();
-
         public static List<ClientSession> GetClientSessions()
         {
-            lock (HostsLock)
-            {
-                return new List<ClientSession>(_hosts.Values);
-            }
+            return _hosts.Values.ToList();
         }
 
-
-        public static Dictionary<int, ClientSession> AddHostToDictionary(int hostID, ClientSession host)
+        public static void AddHostToDictionary(int hostID, ClientSession host)
         {
-            lock (HostsLock)
-            {
-                _hosts.Add(hostID, host);
-            }
-            return _hosts;
+            _hosts.TryAdd(hostID, host);
         }
 
         public static void RemoveHostFromDictionary(int hostID)
         {
-            lock (HostsLock)
-            {
-                _hosts.Remove(hostID);
-            }
+            _hosts.TryRemove(hostID, out _);
         }
 
         public static void AddGameIDToDictionary(string gameID, int hostID)
         {
-            lock (GameID2HostIDLock)
-            {
-                if (!_gameID2HostID.ContainsKey(gameID))
-                {
-                    _gameID2HostID.Add(gameID, hostID);
-                }
-            }
+            _gameID2HostID.TryAdd(gameID, hostID);
         }
 
         public static void RemoveGameIDFromDictionary(string gameID)
         {
-            lock (GameID2HostIDLock)
-            {
-                if (_gameID2HostID.ContainsKey(gameID))
-                {
-                    _gameID2HostID.Remove(gameID);
-                }
-            }
+            _gameID2HostID.TryRemove(gameID, out _);
         }
 
         public static void RemoveGameIDFromDictionary(int hostID)
         {
-            lock (GameID2HostIDLock)
+            var keyToRemove = _gameID2HostID.FirstOrDefault(x => x.Value == hostID).Key;
+            
+            if (!string.IsNullOrEmpty(keyToRemove))
             {
-                string key = string.Empty;
-                foreach (var item in _gameID2HostID)
-                {
-                    if (item.Value == hostID)
-                    {
-                        key = item.Key;
-                        break;
-                    }
-                }
-                if (!string.IsNullOrEmpty(key))
-                {
-                    _gameID2HostID.Remove(key);
-                }
-                _hosts.Remove(hostID);
+                _gameID2HostID.TryRemove(keyToRemove, out _);
             }
+
+            _hosts.TryRemove(hostID, out _);
         }
 
-
-        public static ClientSession FindClientSession(int hostID)
+        public static ClientSession? FindClientSession(int hostID)
         {
-            lock (HostsLock)
+            if (_hosts.TryGetValue(hostID, out var session))
             {
-                if (_hosts.ContainsKey(hostID)) {
-                    return _hosts[hostID];
-                }
-                return null;
+                return session;
             }
+            return null;
         }
 
-        public static ClientSession FindClientSession(string gameID)
+        public static ClientSession? FindClientSession(string gameID)
         {
-            lock (GameID2HostIDLock)
+            if (_gameID2HostID.TryGetValue(gameID, out int hostID))
             {
-                if (_gameID2HostID.ContainsKey(gameID))
-                {
-                    return FindClientSession(_gameID2HostID[gameID]);
-                }
-                return null;
+                return FindClientSession(hostID);
             }
+            return null;
         }
-
 
         public static void AddImageWork_PreOrder_Queue(SendImageData imageData)
         {
@@ -151,9 +106,9 @@ namespace TeruTeruServer.SDK.Util
             _imageWorkCompleteQueue.Enqueue(imageData);
         }
 
-        public static SendImageData GetImageWork_PreOrder_Queue()
+        public static SendImageData? GetImageWork_PreOrder_Queue()
         {
-            if (_imageWorkPreOrderQueue.TryDequeue(out SendImageData imageData))
+            if (_imageWorkPreOrderQueue.TryDequeue(out SendImageData? imageData))
             {
                 return imageData;
             }
@@ -166,10 +121,10 @@ namespace TeruTeruServer.SDK.Util
             data = imageData;
             return check;
         }
-   
-        public static YoloDetectResult GetImageWork_Complete_Queue()
+
+        public static YoloDetectResult? GetImageWork_Complete_Queue()
         {
-            if (_imageWorkCompleteQueue.TryDequeue(out YoloDetectResult imageData))
+            if (_imageWorkCompleteQueue.TryDequeue(out YoloDetectResult? imageData))
             {
                 return imageData;
             }
@@ -192,7 +147,6 @@ namespace TeruTeruServer.SDK.Util
         {
             return _imageWorkCompleteQueue.Count;
         }
-
     }
 }
 

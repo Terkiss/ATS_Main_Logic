@@ -19,7 +19,7 @@ namespace TeruTeruServer.Runtime.Pipeline
             }
 
             // 추가적인 구조 검증 로직이 들어갈 자리
-            
+
             await next();
         }
     }
@@ -33,7 +33,7 @@ namespace TeruTeruServer.Runtime.Pipeline
         {
             // TODO: 패킷 헤더 등을 확인하여 암호화 여부 판단 및 복호화 수행
             // context.RawData = Encrypt.DecryptStringAES(...);
-            
+
             await next();
         }
     }

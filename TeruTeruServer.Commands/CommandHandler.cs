@@ -1,5 +1,5 @@
 using TeruTeruServer.SDK.Interfaces;
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +19,7 @@ namespace TeruTeruServer.Commands
             _commands["exit"] = new ExitCommand();
             _commands["Queue_Count"] = new QueueCountCommand();
             // 필요한 경우 커맨드 생성 시 인터페이스 전달
-            _commands["2"] = new ImageDumpCommand(); 
+            _commands["2"] = new ImageDumpCommand();
             _commands["Worker_Start"] = new WorkerStartCommand();
         }
 

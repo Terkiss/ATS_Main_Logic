@@ -105,7 +105,7 @@ namespace TeruTeruServer.Runtime.Rpc
                     var resultProperty = task.GetType().GetProperty("Result");
                     return resultProperty != null ? JsonSerializer.Serialize(resultProperty.GetValue(task)) : "{\"status\": \"ok\"}";
                 }
-                
+
                 return result != null ? JsonSerializer.Serialize(result) : "{\"status\": \"ok\"}";
             }
             catch (Exception ex)

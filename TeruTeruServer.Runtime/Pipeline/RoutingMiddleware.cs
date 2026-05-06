@@ -35,10 +35,8 @@ namespace TeruTeruServer.Runtime.Pipeline
             }
             else if (sendType == SendType.Json)
             {
-                byte[] data = new byte[buffer.Length - 2];
-                Array.Copy(buffer, 2, data, 0, buffer.Length - 2);
-                string json = System.Text.Encoding.UTF8.GetString(data);
-                
+                string json = buffer.ExtractJsonPayload();
+
                 // 엔진은 단순히 로직에 던져주기만 함 (라우팅 책임은 로직에 있음)
                 _serverLogic.ProcessJsonProtocol(json, protocolType, context.ClientSocket);
             }

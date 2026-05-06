@@ -26,7 +26,7 @@ namespace TeruTeruServer.SDK.Tests
         {
             var session = new ClientSession(2, null, "gameID_2");
             var oldTime = session.LastSeenUtc;
-            
+
             System.Threading.Thread.Sleep(10);
             session.UpdateLastSeen();
 

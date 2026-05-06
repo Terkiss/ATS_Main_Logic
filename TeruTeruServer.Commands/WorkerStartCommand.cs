@@ -1,5 +1,5 @@
 using TeruTeruServer.SDK.Interfaces;
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +28,7 @@ namespace TeruTeruServer.Commands
         {
             if (_isRunning)
             {
-                return true; 
+                return true;
             }
             Thread workerThread = new Thread(() =>
             {

@@ -12,7 +12,7 @@ namespace TeruTeruServer.SDK.Util
     public class TeruTeruLogger
     {
         public TeruTeruLogger Instance { get; } = new TeruTeruLogger();
-        
+
         // 로깅 기능을 수행하는 내부 로거 인스턴스
         public static Logger LoggerInstance = new Logger();
 

@@ -47,7 +47,7 @@ namespace TeruTeruServer.SDK.Tests
         [Fact]
         public void First_GetHostID_ShouldBe_One()
         {
-            
+
             int firstId = ServerMemory.GetHostID;
             Assert.Equal(1, firstId);
         }

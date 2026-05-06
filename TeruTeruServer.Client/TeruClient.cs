@@ -53,7 +53,7 @@ namespace TeruTeruServer.Client
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 await _socket.ConnectAsync(_serverIp, _serverPort);
                 _isConnected = true;
-                
+
                 _ = Task.Run(ReceiveLoop);
                 Log($"Connected to server at {_serverIp}:{_serverPort}");
                 return true;
@@ -74,12 +74,12 @@ namespace TeruTeruServer.Client
 
             var loginData = new LoginProtocol { UserId = userId, Password = password };
             var response = await RequestAsync<LoginProtocol>(ProtocolSelect.LoginProtocol, loginData);
-            
+
             if (response != null && response.IsSuccess && !string.IsNullOrEmpty(response.AuthToken))
             {
                 _jwtToken = response.AuthToken;
                 Log("Login successful. Token acquired.");
-                
+
                 // 로그인 성공 시 UDP 시작 및 STUN 전송
                 _p2pManager.Start(_serverIp, _serverPort);
                 return true;
@@ -95,7 +95,7 @@ namespace TeruTeruServer.Client
         public async Task<T?> RequestAsync<T>(ProtocolSelect protocol, object data) where T : class
         {
             var tcs = new TaskCompletionSource<T?>();
-            
+
             // 임시 핸들러 등록
             void Handler(byte[] body)
             {
@@ -125,7 +125,7 @@ namespace TeruTeruServer.Client
             {
                 return await tcs.Task;
             }
-            
+
             UnregisterHandler(protocol);
             Log($"Request timeout: {protocol}");
             return null;

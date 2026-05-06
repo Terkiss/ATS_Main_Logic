@@ -145,12 +145,12 @@ namespace TeruTeruServer.Client
                     {
                         byte[] data = new byte[result.ReceivedBytes];
                         Buffer.BlockCopy(buffer, 0, data, 0, result.ReceivedBytes);
-                        
+
                         // "PING" 패킷 무시
                         if (result.ReceivedBytes == 4 && Encoding.UTF8.GetString(data) == "PING") continue;
 
                         // TODO: 필요시 IP/Port를 통해 PeerID를 매핑하여 OnPeerDataReceived 호출
-                        _onPeerDataReceived?.Invoke(0, data); 
+                        _onPeerDataReceived?.Invoke(0, data);
                     }
                 }
             }
