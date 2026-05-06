@@ -12,9 +12,18 @@ namespace TeruTeruServer.Runtime
     /// </summary>
     public class ServerConnectConfigParameter
     {
-        public string IP { get; set; } // 서버 IP 주소
-        public int Port { get; set; } // 서버 포트 번호
-        public int MaxConnection { get; set; } // 최대 연결 수
+        public string IP { get; set; } = "127.0.0.1"; // 서버 IP 주소
+        public int Port { get; set; } = 3000; // 서버 포트 번호
+        public int MaxConnection { get; set; } = 1000; // 최대 연결 수
+
+        public ServerConnectConfigParameter()
+        {
+            IsTcp = true;
+            IsUdp = false;
+            SendBufferSize = 8192;
+            ReceiveBufferSize = 8192;
+            Guid = System.Guid.NewGuid().ToString();
+        }
 
         public enum NetworkType
         {

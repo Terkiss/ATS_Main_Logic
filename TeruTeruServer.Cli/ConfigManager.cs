@@ -14,8 +14,18 @@ namespace TeruTeruServer.Cli
         {
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"[Config] {filePath} not found. Using default settings.");
-                return new ServerConnectConfigParameter();
+                string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+                string fallbackPath = Path.Combine(exeDir, filePath);
+                
+                if (File.Exists(fallbackPath))
+                {
+                    filePath = fallbackPath;
+                }
+                else
+                {
+                    Console.WriteLine($"[Config] {filePath} not found. Using default settings.");
+                    return new ServerConnectConfigParameter();
+                }
             }
 
             var config = new ServerConnectConfigParameter();

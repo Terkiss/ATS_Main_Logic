@@ -23,6 +23,7 @@
 - 📦 **`TeruTeruServer.Runtime`**: 서버의 '심장'입니다! 소켓 통신과 세션 관리를 담당하는 `MainServer.cs`와 플러그인을 동적으로 교체해 주는 `PluginManager.cs`가 위치해 있어요.
 - 📦 **`TeruTeruServer.Cli`**: 서버의 '얼굴'이자 진입점입니다. 서버를 호스팅하고, 터미널(CUI)에서 명령어를 입력받거나 실시간 로그(`ConfigManager.cs`)를 보여주는 `Program.cs`가 있습니다.
 - 📦 **`TeruTeruServer.Commands`**: 서버 운영 중 터미널에 입력하는 관리자 명령어(Command)들의 처리 로직이 모듈화되어 있습니다.
+- 📦 **`TeruTeruServer.Client`**: 클라이언트 개발자를 위한 고수준 SDK입니다. 서버와 통신(`TeruClient.cs`), JWT 로그인, RPC 호출 및 P2P 통신 관리 등 클라이언트 측 필수 기능이 구현되어 있어요.
 - 📦 **`TeruTeruServer.Logic.Default` (🔥 매우 중요!)**: **여러분이 주로 작업하실 공간**입니다! 유저 로그인, 게임 로직, AI 분석 요청 등 실제 비즈니스 로직이 구현되는 핫로딩 대상 플러그인 프로젝트에요.
 
 ## 🚦 5. 시작하기 (Getting Started)

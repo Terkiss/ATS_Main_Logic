@@ -17,8 +17,8 @@
 
   <!-- 빌드 후 서버의 plugins 폴더로 자동 복사 (Hot Reloading 지원용) -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(SolutionDir)TeruTeruServer.Cli\plugins&quot; mkdir &quot;$(SolutionDir)TeruTeruServer.Cli\plugins&quot;" />
-    <Exec Command="copy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;$(SolutionDir)TeruTeruServer.Cli\plugins\&quot;" />
+    <MakeDir Directories="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
   </Target>
 
 </Project>
