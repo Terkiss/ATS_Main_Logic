@@ -23,6 +23,9 @@ namespace TeruTeruServer.Logic.Default
         private readonly ISessionManager _sessionManager;
         private readonly IProtocolRouter _router;
         private readonly RpcProxy _rpcProxy;
+        private readonly TeruTeruServer.Logic.Default.P2P.P2PSignalingHandler _p2pSignalingHandler;
+        private readonly TeruTeruServer.Logic.Default.P2P.P2PRelayHandler _p2pRelayHandler;
+        private readonly TeruTeruServer.Logic.Default.P2P.P2PGroupHandler _p2pGroupHandler;
         
         private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026"; 
 
@@ -36,6 +39,10 @@ namespace TeruTeruServer.Logic.Default
 
             // 중요: 라우터에 자기 자신을 등록하여 어트리뷰트 분석 활성화
             _router.Initialize(this);
+            
+            _p2pSignalingHandler = new TeruTeruServer.Logic.Default.P2P.P2PSignalingHandler(_sessionManager);
+            _p2pRelayHandler = new TeruTeruServer.Logic.Default.P2P.P2PRelayHandler(_sessionManager);
+            _p2pGroupHandler = new TeruTeruServer.Logic.Default.P2P.P2PGroupHandler(_sessionManager);
         }
 
         public void ProcessDirectProtocol(byte[] buffer, Socket socket)
@@ -45,9 +52,25 @@ namespace TeruTeruServer.Logic.Default
             var sendType = (SendType)buffer[0];
             var protocolType = (ProtocolSelect)buffer[1];
 
-            if (sendType == SendType.Direct && protocolType == ProtocolSelect.ImageDumpCommand)
+            if (sendType == SendType.Json)
             {
-                ProcessImageData(buffer, socket);
+                string json = Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
+                HandleJsonProtocol(json, protocolType, socket);
+            }
+            else if (sendType == SendType.Direct)
+            {
+                if (protocolType == ProtocolSelect.ImageDumpCommand)
+                {
+                    ProcessImageData(buffer, socket);
+                }
+                else if (protocolType == ProtocolSelect.P2PRelayProtocol)
+                {
+                    _p2pRelayHandler.HandleRelayData(buffer);
+                }
+                else if (protocolType == ProtocolSelect.GroupRelayProtocol)
+                {
+                    _p2pGroupHandler.HandleGroupRelay(buffer);
+                }
             }
         }
 
@@ -60,7 +83,47 @@ namespace TeruTeruServer.Logic.Default
             // Tip: RPC 응답은 라우터 내부에서 처리하거나 여기서 공통 처리 가능
         }
 
-        // --- [수동 연결 (Enum 기반)] ---
+        private void HandleJsonProtocol(string json, ProtocolSelect protocol, Socket socket)
+        {
+            switch (protocol)
+            {
+                case ProtocolSelect.ConnectProtocol:
+                    if (json != null) ConProtocol(socket, JsonSerializer.Deserialize<ConnectProtocol>(json)!);
+                    break;
+                case ProtocolSelect.LoginProtocol:
+                    if (json != null) HandleLogin(socket, JsonSerializer.Deserialize<LoginProtocol>(json)!);
+                    break;
+                case ProtocolSelect.UdpRegisterProtocol:
+                    // Extract byte buffer again since handler takes rawData, but we can reconstruct or change handler.
+                    // Actually, we should just let handlers take string json, or reconstruct rawData.
+                    // For simplicity, we can reconstruct the dummy buffer or just change the handler signature.
+                    // I will change the handler signature later if needed. For now, since HandleJsonProtocol is called from ProcessDirectProtocol,
+                    // we can't easily get rawData. Wait, we can. Let's just create a dummy buffer for json.
+                    byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+                    byte[] buffer = new byte[jsonBytes.Length + 2];
+                    Array.Copy(jsonBytes, 0, buffer, 2, jsonBytes.Length);
+                    _p2pSignalingHandler.HandleUdpRegister(buffer, socket);
+                    break;
+                case ProtocolSelect.HolePunchRequest:
+                    // TargetHostID in json
+                    byte[] hjsonBytes = Encoding.UTF8.GetBytes(json);
+                    byte[] hbuffer = new byte[hjsonBytes.Length + 2];
+                    Array.Copy(hjsonBytes, 0, hbuffer, 2, hjsonBytes.Length);
+                    
+                    // We need requesterHostID. Let's find it from sessionManager
+                    if (_sessionManager.TryGetHostIdBySocket(socket, out int requesterHostID))
+                    {
+                        _p2pSignalingHandler.HandleHolePunchRequest(hbuffer, requesterHostID);
+                    }
+                    break;
+                case ProtocolSelect.JoinGroupProtocol:
+                    byte[] gjsonBytes = Encoding.UTF8.GetBytes(json);
+                    byte[] gbuffer = new byte[gjsonBytes.Length + 2];
+                    Array.Copy(gjsonBytes, 0, gbuffer, 2, gjsonBytes.Length);
+                    _p2pGroupHandler.HandleJoinGroup(gbuffer);
+                    break;
+            }
+        }
 
         [Protocol(ProtocolSelect.LoginProtocol)]
         public void HandleLogin(Socket socket, LoginProtocol loginData)

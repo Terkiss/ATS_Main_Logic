@@ -1,4 +1,4 @@
-﻿using TeruTeruServer.SDK.Protocol;
+using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,16 +25,36 @@ namespace TeruTeruServer.SDK.Util
         public string ClientName { get; set; } // 클라이언트 이름
         public string AuthToken { get; set; } // 인증 토큰 (Phase 2 추가)
 
+        public DateTime LastSeenUtc { get; set; }
+        public SessionState State { get; set; }
+        public string ReconnectToken { get; set; }
+        public P2PStatus P2PState { get; set; }
+        public System.Net.EndPoint? UdpEndPoint { get; set; } // UDP 공인 IP/Port 정보
+
         public ClientSession(int hostID, Socket clientSocket, string gameID)
         {
             HostID = hostID;
             GameID = gameID;
 
             this.ClientSocket = clientSocket;
+            this.LastSeenUtc = DateTime.UtcNow;
+            this.State = SessionState.Connected;
+            this.P2PState = P2PStatus.Signaling;
+            this.ReconnectToken = Guid.NewGuid().ToString("N");
+
             Clear();
 
-            ServerMemory.AddHostToDictionary(hostID, this);
-            ServerMemory.AddGameIDToDictionary(gameID, hostID);
+            if (hostID != ServerMemory.SERVER_HOST_ID)
+            {
+                ServerMemory.AddHostToDictionary(hostID, this);
+                if (!string.IsNullOrEmpty(gameID))
+                    ServerMemory.AddGameIDToDictionary(gameID, hostID);
+            }
+        }
+
+        public void UpdateLastSeen()
+        {
+            LastSeenUtc = DateTime.UtcNow;
         }
 
         public void Clear()

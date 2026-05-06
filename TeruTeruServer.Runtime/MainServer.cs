@@ -85,8 +85,8 @@ namespace TeruTeruServer.Runtime
             _pipeline = new PacketPipeline();
             _pipeline.Use(new ValidationMiddleware());
             _pipeline.Use(new DecryptionMiddleware());
-            _pipeline.Use(new AuthMiddleware()); 
-            _pipeline.Use(new RoutingMiddleware(_serverLogic)); // 엔진은 걍 로직에 던지기만 함
+            _pipeline.Use(new AuthMiddleware(_sessionManager)); 
+            _pipeline.Use(new RoutingMiddleware(_serverLogic));
         }
 
         public void StartServer()
@@ -242,8 +242,8 @@ namespace TeruTeruServer.Runtime
             {
                 if (e.AcceptSocket != null && _sessionManager.TryGetHostIdBySocket(e.AcceptSocket, out int playerId))
                 {
-                    Console.WriteLine("플레이어 " + playerId + "와의 연결 끊김");
-                    HandleDisconnectedSocket(playerId, e.AcceptSocket);
+                    Console.WriteLine("플레이어 " + playerId + "와의 연결 끊김. Grace 모드로 전환.");
+                    _sessionManager.MarkAsGrace(playerId);
                 }
             }
             catch (Exception ex)
@@ -257,22 +257,25 @@ namespace TeruTeruServer.Runtime
             if (!await TrySend(socket, data))
             {
                 Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
-                socket.Close();
+                try { socket?.Close(); } catch { }
 
                 if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
                 {
-                    HandleDisconnectedSocket(hostID, socket);
+                    _sessionManager.MarkAsGrace(hostID);
                 }
             }
         }
 
         public async void SendData(int hostID, byte[] data)
         {
-            if (_sessionManager.Players.TryGetValue(hostID, out var socket))
+            if (_sessionManager.Players.TryGetValue(hostID, out var session))
             {
-                if (!await TrySend(socket, data))
+                if (session.State == TeruTeruServer.SDK.Enums.SessionState.Connected && session.ClientSocket != null)
                 {
-                    HandleDisconnectedSocket(hostID, socket);
+                    if (!await TrySend(session.ClientSocket, data))
+                    {
+                        _sessionManager.MarkAsGrace(hostID);
+                    }
                 }
             }
         }
@@ -311,11 +314,23 @@ namespace TeruTeruServer.Runtime
 
         public void SocketCheck()
         {
+            var now = DateTime.UtcNow;
             foreach (var player in _sessionManager.Players)
             {
-                if (!IsConnected(player.Value))
+                var session = player.Value;
+                if (session.State == TeruTeruServer.SDK.Enums.SessionState.Connected)
                 {
-                    HandleDisconnectedSocket(player.Key, player.Value);
+                    if (!IsConnected(session.ClientSocket))
+                    {
+                        _sessionManager.MarkAsGrace(player.Key);
+                    }
+                }
+                else if (session.State == TeruTeruServer.SDK.Enums.SessionState.Grace)
+                {
+                    if ((now - session.LastSeenUtc).TotalSeconds > 30) // Grace timeout 30s
+                    {
+                        HandleDisconnectedSession(player.Key, session);
+                    }
                 }
             }
         }
@@ -329,20 +344,20 @@ namespace TeruTeruServer.Runtime
             return socket != null && socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
         }
 
-        public void HandleDisconnectedSocket(int hostID, Socket socket)
+        public void HandleDisconnectedSession(int hostID, TeruTeruServer.SDK.Util.ClientSession session)
         {
-            if (_sessionManager.TryRemovePlayer(hostID, out _))
+            if (_sessionManager.EvictSession(hostID, out _))
             {
-                TeruTeruLogger.LogInfo($"플레이어 {hostID} 연결 종료 처리 중...");
+                TeruTeruLogger.LogInfo($"플레이어 {hostID} 최종 연결 종료 처리 중...");
 
-                if (_isUdp && socket.RemoteEndPoint != null)
+                if (_isUdp && session.ClientSocket?.RemoteEndPoint != null)
                 {
-                    _udpSessions.TryRemove(socket.RemoteEndPoint, out _);
+                    _udpSessions.TryRemove(session.ClientSocket.RemoteEndPoint, out _);
                 }
 
                 try
                 {
-                    socket.Close();
+                    session.ClientSocket?.Close();
                 }
                 catch (Exception ex)
                 {
@@ -350,6 +365,17 @@ namespace TeruTeruServer.Runtime
                 }
 
                 ServerMemory.RemoveGameIDFromDictionary(hostID);
+
+                byte[] tempArray = new byte[2];
+                tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
+                tempArray[1] = (byte)hostID;
+                RpcStub rpcStub = new RpcStub(this, _sessionManager);
+                var result = rpcStub.HandleRequest(session.ClientSocket, tempArray);
+
+                if (result == null)
+                {
+                    TeruTeruLogger.LogInfo("플레이어 " + hostID + " 퇴장 알림 전송 완료");
+                }
             }
         }
 
@@ -397,20 +423,11 @@ namespace TeruTeruServer.Runtime
             catch (ObjectDisposedException) { }
         }
 
-        private async void OnUdpReceiveFromCompleted(object? sender, SocketAsyncEventArgs e)
+        private void OnUdpReceiveFromCompleted(object? sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
-                byte[] data = new byte[e.BytesTransferred];
-                if (e.Buffer != null)
-                {
-                    Array.Copy(e.Buffer, e.Offset, data, 0, e.BytesTransferred);
-                    var context = new PacketContext(e.AcceptSocket!, data);
-                    if (_pipeline != null)
-                    {
-                        await _pipeline.ExecuteAsync(context);
-                    }
-                }
+                HandleNewUdpPacket(e);
             }
             
             e.RemoteEndPoint = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
@@ -431,7 +448,7 @@ namespace TeruTeruServer.Runtime
             EndPoint? remoteEP = e.RemoteEndPoint;
             if (remoteEP == null) return;
 
-            if (_udpSessions.TryGetValue(remoteEP, out Socket? sessionSocket))
+            if (_udpSessions.TryGetValue(remoteEP, out Socket? sessionSocket) && sessionSocket != null && e.Buffer != null)
             {
                 byte[] data = new byte[e.BytesTransferred];
                 if (e.Buffer != null)
@@ -458,13 +475,13 @@ namespace TeruTeruServer.Runtime
                     if (e.Buffer != null)
                     {
                         Array.Copy(e.Buffer, e.Offset, firstPacketData, 0, e.BytesTransferred);
-                        var context = new PacketContext(clientSocket, firstPacketData);
-                        if (_pipeline != null)
-                        {
-                            await _pipeline.ExecuteAsync(context);
-                        }
-                        clientSocket.ReceiveAsync(receiveArgs);
                     }
+                    var context = new PacketContext(clientSocket, firstPacketData);
+                    if (_pipeline != null)
+                    {
+                        await _pipeline.ExecuteAsync(context);
+                    }
+                    clientSocket.ReceiveAsync(receiveArgs);
                 }
                 else
                 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -20,7 +20,13 @@ namespace TeruTeruServer.SDK.Util
 
         private static ConcurrentQueue<SendImageData> _imageWorkPreOrderQueue = new ConcurrentQueue<SendImageData>();
         private static ConcurrentQueue<YoloDetectResult> _imageWorkCompleteQueue = new ConcurrentQueue<YoloDetectResult>();
-        private static int _currentHostID = 0;
+        
+        /// <summary>
+        /// 서버 자신을 지칭하는 예약된 고정 Host ID
+        /// </summary>
+        public const int SERVER_HOST_ID = 0;
+
+        private static int _currentHostID = 1;
 
 
 

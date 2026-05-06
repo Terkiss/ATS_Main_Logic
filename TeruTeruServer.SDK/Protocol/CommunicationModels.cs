@@ -15,6 +15,18 @@ namespace TeruTeruServer.SDK.Protocol
         public DateTime ConnectTime { get; set; }
     }
 
+    public class ReconnectRequest
+    {
+        public int HostID { get; set; }
+        public string ReconnectToken { get; set; } = string.Empty;
+    }
+
+    public class ReconnectResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+
     /// <summary>
     /// 서버에서 클라이언트로 특정 명령을 전달하는 프록시 클래스입니다.
     /// </summary>
@@ -50,9 +62,12 @@ namespace TeruTeruServer.SDK.Protocol
         /// </summary>
         public void BroadcastDetectResult(YoloDetectResult result)
         {
-            foreach (var socket in _sessionManager.Players.Values)
+            foreach (var session in _sessionManager.Players.Values)
             {
-                SendJsonResponse(socket, ProtocolSelect.QueueCountCommand, result);
+                if (session.ClientSocket != null && session.State == SessionState.Connected)
+                {
+                    SendJsonResponse(session.ClientSocket, ProtocolSelect.QueueCountCommand, result);
+                }
             }
         }
 
