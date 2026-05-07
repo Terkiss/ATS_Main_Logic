@@ -39,7 +39,7 @@ namespace TeruTeruServer.Logic.Default.P2P
             try
             {
                 var buffer = rawData;
-                string json = System.Text.Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
+                string json = buffer.ExtractJsonPayload();
                 var data = System.Text.Json.JsonSerializer.Deserialize<UdpRegisterData>(json);
 
                 if (data != null && _sessionManager.Players.TryGetValue(data.HostID, out var session))
@@ -60,7 +60,7 @@ namespace TeruTeruServer.Logic.Default.P2P
             try
             {
                 var buffer = rawData;
-                string json = System.Text.Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
+                string json = buffer.ExtractJsonPayload();
                 var data = System.Text.Json.JsonSerializer.Deserialize<HolePunchRequestData>(json);
 
                 if (data != null)
@@ -103,10 +103,11 @@ namespace TeruTeruServer.Logic.Default.P2P
             {
                 string json = System.Text.Json.JsonSerializer.Serialize(data);
                 byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-                byte[] packet = new byte[body.Length + 2];
+                byte[] packet = new byte[body.Length + 6];
                 packet[0] = (byte)SendType.Json;
                 packet[1] = (byte)protocol;
-                Array.Copy(body, 0, packet, 2, body.Length);
+                // SequenceNumber (2-5) remains 0 for signaling
+                Array.Copy(body, 0, packet, 6, body.Length);
                 socket.Send(packet);
             }
             catch { }

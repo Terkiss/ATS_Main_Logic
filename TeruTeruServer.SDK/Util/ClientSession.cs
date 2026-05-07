@@ -31,6 +31,17 @@ namespace TeruTeruServer.SDK.Util
         public P2PStatus P2PState { get; set; }
         public System.Net.EndPoint? UdpEndPoint { get; set; } // UDP 공인 IP/Port 정보
 
+        // 보안 기능 연동 필드 (Milestone 2)
+        public int CurrentSecondPacketCount { get; set; }
+        public DateTime LastPacketTime { get; set; }
+        public uint LastSequenceNumber { get; set; }
+        public bool IsAuthenticated { get; set; }
+
+        // P2P 품질 측정 필드 (Milestone 3)
+        public long RttMs { get; set; }
+        public double PacketLossRate { get; set; }
+        public DateTime LastPingUtc { get; set; }
+
         public ClientSession(int hostID, Socket clientSocket, string gameID)
         {
             HostID = hostID;

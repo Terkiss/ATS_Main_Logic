@@ -1,6 +1,7 @@
 using System;
 using TeruTeruServer.SDK.Models;
 using TeruTeruServer.SDK.Util;
+using TeruTeruServer.SDK.Enums;
 using Xunit;
 using System.Reflection;
 
@@ -44,6 +45,40 @@ namespace TeruTeruServer.SDK.Tests
             members = group.GetMemberIds();
             Assert.DoesNotContain(201, members);
             Assert.Equal(2, members.Length);
+        }
+
+        [Fact]
+        public void P2PGroup_MemberEvents_ShouldFire()
+        {
+            var group = new P2PGroup(300);
+            int joinedHostId = 0;
+            int leftHostId = 0;
+
+            group.OnMemberJoined += (id) => joinedHostId = id;
+            group.OnMemberLeft += (id) => leftHostId = id;
+
+            group.AddMember(301);
+            Assert.Equal(301, joinedHostId);
+
+            group.RemoveMember(301);
+            Assert.Equal(301, leftHostId);
+        }
+
+        [Fact]
+        public void P2PGroup_StatusEvent_ShouldFire()
+        {
+            var group = new P2PGroup(400);
+            int statusHostId = 0;
+            P2PStatus statusValue = P2PStatus.Signaling;
+
+            group.OnMemberStatusChanged += (id, status) => {
+                statusHostId = id;
+                statusValue = status;
+            };
+
+            group.UpdateMemberStatus(400, P2PStatus.Direct);
+            Assert.Equal(400, statusHostId);
+            Assert.Equal(P2PStatus.Direct, statusValue);
         }
     }
 }

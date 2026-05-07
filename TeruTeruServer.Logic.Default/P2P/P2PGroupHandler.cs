@@ -20,6 +20,7 @@ namespace TeruTeruServer.Logic.Default.P2P
     {
         private readonly ISessionManager _sessionManager;
         private readonly ConcurrentDictionary<int, P2PGroup> _groups = new ConcurrentDictionary<int, P2PGroup>();
+        private readonly RelayQoSController _qosController = new RelayQoSController();
 
         public P2PGroupHandler(ISessionManager sessionManager)
         {
@@ -39,7 +40,7 @@ namespace TeruTeruServer.Logic.Default.P2P
             try
             {
                 var buffer = rawData;
-                string json = System.Text.Encoding.UTF8.GetString(buffer, 2, buffer.Length - 2);
+                string json = buffer.ExtractJsonPayload();
                 var data = System.Text.Json.JsonSerializer.Deserialize<GroupJoinData>(json);
 
                 if (data != null && _groups.TryGetValue(data.GroupId, out var group))
@@ -73,6 +74,11 @@ namespace TeruTeruServer.Logic.Default.P2P
                     }
 
                     group.AddMember(joiner);
+                    if (_sessionManager.Players.TryGetValue(joiner, out var jSession))
+                    {
+                        jSession.P2PState = P2PStatus.Signaling;
+                        group.UpdateMemberStatus(joiner, P2PStatus.Signaling);
+                    }
                     TeruTeruLogger.LogInfo($"플레이어 {joiner}가 그룹 {group.GroupId}에 입장했습니다.");
                 }
             }
@@ -89,18 +95,27 @@ namespace TeruTeruServer.Logic.Default.P2P
                 var buffer = rawData;
                 if (buffer.Length < 6) return;
 
-                int targetCount = BitConverter.ToInt32(buffer, 2);
-                if (buffer.Length < 6 + (targetCount * 4)) return;
+                int targetCount = BitConverter.ToInt32(buffer, 6);
+                if (buffer.Length < 10 + (targetCount * 4)) return;
 
-                int dataOffset = 6 + (targetCount * 4);
-                byte[] relayData = new byte[buffer.Length - dataOffset + 2];
+                int dataOffset = 10 + (targetCount * 4);
+                byte[] relayData = new byte[buffer.Length - dataOffset + 6];
                 relayData[0] = (byte)SendType.Direct;
                 relayData[1] = (byte)ProtocolSelect.P2PRelayProtocol;
-                Array.Copy(buffer, dataOffset, relayData, 2, buffer.Length - dataOffset);
+                // SequenceNumber (2-5) remains 0
+                Array.Copy(buffer, dataOffset, relayData, 6, buffer.Length - dataOffset);
 
                 for (int i = 0; i < targetCount; i++)
                 {
-                    int targetId = BitConverter.ToInt32(buffer, 6 + (i * 4));
+                    int targetId = BitConverter.ToInt32(buffer, 10 + (i * 4));
+                    
+                    // QoS Check
+                    if (!_qosController.CheckAllow(targetId, relayData.Length))
+                    {
+                        TeruTeruLogger.LogWarning($"Relay QoS Blocked: Host {targetId} bandwidth limit exceeded.");
+                        continue;
+                    }
+
                     if (_sessionManager.Players.TryGetValue(targetId, out var session) && session.ClientSocket != null)
                     {
                         session.ClientSocket.SendAsync(new ReadOnlyMemory<byte>(relayData), SocketFlags.None);
@@ -120,10 +135,11 @@ namespace TeruTeruServer.Logic.Default.P2P
             {
                 string json = System.Text.Json.JsonSerializer.Serialize(data);
                 byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-                byte[] packet = new byte[body.Length + 2];
+                byte[] packet = new byte[body.Length + 6];
                 packet[0] = (byte)SendType.Json;
                 packet[1] = (byte)protocol;
-                Array.Copy(body, 0, packet, 2, body.Length);
+                // SequenceNumber (2-5) remains 0
+                Array.Copy(body, 0, packet, 6, body.Length);
                 socket.Send(packet);
             }
             catch { }

@@ -28,56 +28,56 @@ namespace TeruTeruServer.Runtime.Pipeline
             var sendType = (SendType)buffer[0];
             var protocolType = buffer[1];
 
-            // 1. 인증 면제 프로토콜 체크 (연결 및 로그인)
+            // 1. SendType.Json은 세션 인증 상태만 확인하고 헤더에 토큰이 없으므로 다음으로 넘김
             if (sendType == SendType.Json)
             {
-                if (protocolType == (byte)ProtocolSelect.ConnectProtocol || protocolType == (byte)ProtocolSelect.LoginProtocol)
+                if (protocolType == (byte)ProtocolSelect.ReconnectProtocol)
+                {
+                    HandleReconnect(context);
+                    return;
+                }
+                await next();
+                return;
+            }
+
+            // 2. 패킷 헤더에서 토큰 추출 시도 (Direct 패킷 전용)
+            // 구조: [SendType(1)][ProtocolType(1)][SequenceNumber(4)][TokenLength(4)][Token(N)][Data(M)]
+            try
+            {
+                if (buffer.Length < 10) 
                 {
                     await next();
                     return;
                 }
-                else if (protocolType == (byte)ProtocolSelect.ReconnectProtocol)
+
+                int tokenLength = BitConverter.ToInt32(buffer, 6);
+                if (tokenLength > 0 && buffer.Length >= 10 + tokenLength)
                 {
-                    // 재접속 로직 처리
-                    HandleReconnect(context);
-                    return; // 재접속은 인증 파이프라인의 다음 단계로 넘기지 않음
-                }
-            }
-
-            // 2. 패킷 헤더에서 토큰 추출 시도
-            // 구조: [SendType(1)][ProtocolType(1)][TokenLength(4)][Token(N)][Data(M)]
-            try
-            {
-                if (buffer.Length < 6) throw new Exception("Packet too short for auth header.");
-
-                int tokenLength = BitConverter.ToInt32(buffer, 2);
-                if (tokenLength > 0)
-                {
-                    if (buffer.Length < 6 + tokenLength) throw new Exception("Invalid token length in header.");
-
-                    string token = Encoding.UTF8.GetString(buffer, 6, tokenLength);
+                    string token = Encoding.UTF8.GetString(buffer, 10, tokenLength);
                     ValidateToken(token);
 
-                    // 검증 성공 시, 실제 데이터만 남기도록 RawData 재설정 (다음 미들웨어 편의성)
-                    byte[] actualData = new byte[buffer.Length - (6 + tokenLength) + 2];
+                    if (context.Session != null)
+                    {
+                        context.Session.IsAuthenticated = true;
+                    }
+
+                    // 검증 성공 시, 실제 데이터만 남기도록 RawData 재설정
+                    byte[] actualData = new byte[buffer.Length - (10 + tokenLength) + 6];
                     actualData[0] = buffer[0]; // SendType
                     actualData[1] = buffer[1]; // ProtocolType
-                    Array.Copy(buffer, 6 + tokenLength, actualData, 2, buffer.Length - (6 + tokenLength));
+                    // Sequence Number 복사
+                    Array.Copy(buffer, 2, actualData, 2, 4);
+                    // Payload 복사
+                    Array.Copy(buffer, 10 + tokenLength, actualData, 6, buffer.Length - (10 + tokenLength));
                     context.RawData = actualData;
-
-                    await next();
-                }
-                else
-                {
-                    throw new Exception("Auth token missing.");
                 }
             }
             catch (Exception ex)
             {
-                TeruTeruLogger.LogError($"[Auth Failed] {ex.Message} - Remote: {context.ClientSocket.RemoteEndPoint}");
-                context.ClientSocket.Close(); // 즉각 차단
-                context.IsProcessed = true;
+                TeruTeruLogger.LogWarning($"[Auth Parse Error] {ex.Message} - Remote: {context.ClientSocket.RemoteEndPoint}");
             }
+
+            await next();
         }
 
         private void ValidateToken(string token)
@@ -141,10 +141,10 @@ namespace TeruTeruServer.Runtime.Pipeline
             {
                 string json = System.Text.Json.JsonSerializer.Serialize(data);
                 byte[] body = Encoding.UTF8.GetBytes(json);
-                byte[] packet = new byte[body.Length + 2];
+                byte[] packet = new byte[body.Length + 6];
                 packet[0] = (byte)SendType.Json;
                 packet[1] = (byte)protocol;
-                Array.Copy(body, 0, packet, 2, body.Length);
+                Array.Copy(body, 0, packet, 6, body.Length);
                 socket.Send(packet);
             }
             catch { }

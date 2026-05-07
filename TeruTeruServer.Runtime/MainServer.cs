@@ -84,7 +84,9 @@ namespace TeruTeruServer.Runtime
             // 파이프라인 초기화 및 미들웨어 등록
             _pipeline = new PacketPipeline();
             _pipeline.Use(new ValidationMiddleware());
-            _pipeline.Use(new DecryptionMiddleware());
+            _pipeline.Use(new RateLimitMiddleware(50));
+            _pipeline.Use(new ReplayAttackMiddleware());
+            _pipeline.Use(new DecryptionMiddleware(new SeedCryptoService()));
             _pipeline.Use(new AuthMiddleware(_sessionManager));
             _pipeline.Use(new RoutingMiddleware(_serverLogic));
         }

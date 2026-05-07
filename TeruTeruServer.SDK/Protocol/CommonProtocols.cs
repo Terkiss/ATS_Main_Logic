@@ -18,11 +18,29 @@ namespace TeruTeruServer.SDK.Protocol
         public string UserId { get; set; }
         public string Password { get; set; }
         public string AuthToken { get; set; }
+        public string RefreshToken { get; set; }
         public bool IsSuccess { get; set; }
 
         public LoginProtocol()
         {
             ProtocolSelector = ProtocolSelect.LoginProtocol;
+        }
+    }
+
+    public class TokenRefreshProtocol : BaseProtocol
+    {
+        public override ProtocolSelect ProtocolSelector { get; set; } = ProtocolSelect.TokenRefreshProtocol;
+        public override int Command { get; set; }
+        public override int HostId { get; set; }
+
+        public string RefreshToken { get; set; }
+        public string NewAuthToken { get; set; }
+        public string NewRefreshToken { get; set; }
+        public bool IsSuccess { get; set; }
+
+        public TokenRefreshProtocol()
+        {
+            ProtocolSelector = ProtocolSelect.TokenRefreshProtocol;
         }
     }
 

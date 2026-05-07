@@ -15,8 +15,14 @@ namespace TeruTeruServer.Runtime.Rpc
     public class ProtocolRouter : IProtocolRouter
     {
         private ILogicService? _logicService;
+        private readonly ISessionManager _sessionManager;
         private readonly Dictionary<string, MethodInfo> _rpcMethods = new();
         private readonly Dictionary<ProtocolSelect, MethodInfo> _manualMethods = new();
+
+        public ProtocolRouter(ISessionManager sessionManager)
+        {
+            _sessionManager = sessionManager;
+        }
 
         public void Initialize(ILogicService logicService)
         {
@@ -72,6 +78,18 @@ namespace TeruTeruServer.Runtime.Rpc
             {
                 TeruTeruLogger.LogWarning($"No handler found for protocol: {protocol}");
                 return "{\"error\": \"Handler not found\"}";
+            }
+
+            var requiresAuth = methodToInvoke.GetCustomAttribute<RequiresAuthAttribute>();
+            if (requiresAuth != null)
+            {
+                if (!_sessionManager.TryGetHostIdBySocket(socket, out int hostId) ||
+                    !_sessionManager.Players.TryGetValue(hostId, out var session) ||
+                    !session.IsAuthenticated)
+                {
+                    TeruTeruLogger.LogWarning($"Unauthorized access to {methodToInvoke.Name} by {socket.RemoteEndPoint}");
+                    return "{\"error\": \"Unauthorized\"}";
+                }
             }
 
             return await InvokeMethodAsync(methodToInvoke, actualJson, socket);

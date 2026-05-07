@@ -23,6 +23,7 @@ namespace TeruTeruServer.Client
         private readonly ConcurrentDictionary<ProtocolSelect, Action<byte[]>> _handlers = new();
         private readonly ClientProtocolRouter _router;
         private readonly P2PManager _p2pManager;
+        private uint _sequenceNumber = 1;
 
         public event Action<string>? OnLog;
         public event Action? OnDisconnected;
@@ -35,7 +36,7 @@ namespace TeruTeruServer.Client
             _serverIp = ip;
             _serverPort = port;
             _router = new ClientProtocolRouter(Log);
-            _p2pManager = new P2PManager(this, Log);
+            _p2pManager = new P2PManager(this, false, Log);
         }
 
         public void RegisterLogic(object logicInstance)
@@ -141,11 +142,13 @@ namespace TeruTeruServer.Client
             string json = JsonSerializer.Serialize(data);
             byte[] body = Encoding.UTF8.GetBytes(json);
 
-            // [SendType(1)][ProtocolType(1)][Body(N)]
-            byte[] packet = new byte[body.Length + 2];
+            // [SendType(1)][ProtocolType(1)][SequenceNumber(4)][Body(N)]
+            byte[] packet = new byte[body.Length + 6];
+            byte[] seqBytes = BitConverter.GetBytes(_sequenceNumber++);
             packet[0] = (byte)SendType.Json;
             packet[1] = (byte)protocol;
-            Buffer.BlockCopy(body, 0, packet, 2, body.Length);
+            Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
+            Buffer.BlockCopy(body, 0, packet, 6, body.Length);
 
             await _socket!.SendAsync(packet, SocketFlags.None);
         }
@@ -180,15 +183,17 @@ namespace TeruTeruServer.Client
             byte[] tokenBytes = Encoding.UTF8.GetBytes(_jwtToken);
             byte[] tokenLenBytes = BitConverter.GetBytes(tokenBytes.Length);
 
-            // 구조: [SendType(1)][ProtocolType(1)][TokenLen(4)][Token(N)][Body(M)]
-            int totalLen = 2 + 4 + tokenBytes.Length + data.Length;
+            // 구조: [SendType(1)][ProtocolType(1)][SequenceNumber(4)][TokenLen(4)][Token(N)][Body(M)]
+            int totalLen = 2 + 4 + 4 + tokenBytes.Length + data.Length;
             byte[] packet = new byte[totalLen];
+            byte[] seqBytes = BitConverter.GetBytes(_sequenceNumber++);
 
             packet[0] = (byte)SendType.Direct;
             packet[1] = (byte)protocol;
-            Buffer.BlockCopy(tokenLenBytes, 0, packet, 2, 4);
-            Buffer.BlockCopy(tokenBytes, 0, packet, 6, tokenBytes.Length);
-            Buffer.BlockCopy(data, 0, packet, 6 + tokenBytes.Length, data.Length);
+            Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
+            Buffer.BlockCopy(tokenLenBytes, 0, packet, 6, 4);
+            Buffer.BlockCopy(tokenBytes, 0, packet, 10, tokenBytes.Length);
+            Buffer.BlockCopy(data, 0, packet, 10 + tokenBytes.Length, data.Length);
 
             await _socket!.SendAsync(packet, SocketFlags.None);
         }
@@ -230,13 +235,14 @@ namespace TeruTeruServer.Client
 
         private void ProcessPacket(byte[] buffer, int length)
         {
-            if (length < 2) return;
+            if (length < 6) return;
 
             var sendType = (SendType)buffer[0];
             var protocol = (ProtocolSelect)buffer[1];
+            // 2~5는 SequenceNumber (수신 시 무시)
 
-            byte[] body = new byte[length - 2];
-            Buffer.BlockCopy(buffer, 2, body, 0, length - 2);
+            byte[] body = new byte[length - 6];
+            Buffer.BlockCopy(buffer, 6, body, 0, length - 6);
 
             if (sendType == SendType.Json)
             {

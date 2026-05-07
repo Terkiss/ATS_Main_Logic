@@ -10,12 +10,15 @@ namespace TeruTeruServer.SDK.Enums
     {
         ConnectProtocol = 1,
         LoginProtocol = 2,
+        TokenRefreshProtocol = 21,
         ReconnectProtocol = 3,
         UdpRegisterProtocol = 4,
         HolePunchRequest = 5,
         P2PRelayProtocol = 6,
         GroupRelayProtocol = 7,
         JoinGroupProtocol = 8,
+        P2PPingProtocol = 9,      // P2P 연결 품질 측정용 (M3)
+        RelayFallbackProtocol = 10, // 릴레이 모드 자동 전환 알림 (M3)
         RpcProtocol = 100,       // 범용 RPC 프로토콜 추가
         QueueCountCommand = 101, // 큐 카운트 요청 (Phase 3 기능 대비)
         ImageDumpCommand = 102   // 이미지 덤프 요청 (Phase 3 기능 대비)

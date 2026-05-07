@@ -129,10 +129,28 @@ namespace TeruTeruServer.Logic.Default
         [Protocol(ProtocolSelect.LoginProtocol)]
         public void HandleLogin(Socket socket, LoginProtocol loginData)
         {
-            string token = GenerateJwtToken(loginData.UserId);
+            string token = GenerateJwtToken(loginData.UserId, out string refreshToken);
             loginData.IsSuccess = true;
             loginData.AuthToken = token;
+            loginData.RefreshToken = refreshToken;
             _rpcProxy.SendJsonResponse(socket, ProtocolSelect.LoginProtocol, loginData);
+        }
+
+        [Protocol(ProtocolSelect.TokenRefreshProtocol)]
+        public void HandleTokenRefresh(Socket socket, TokenRefreshProtocol refreshData)
+        {
+            if (ValidateRefreshToken(refreshData.RefreshToken, out string userId))
+            {
+                string newToken = GenerateJwtToken(userId, out string newRefreshToken);
+                refreshData.IsSuccess = true;
+                refreshData.NewAuthToken = newToken;
+                refreshData.NewRefreshToken = newRefreshToken;
+            }
+            else
+            {
+                refreshData.IsSuccess = false;
+            }
+            _rpcProxy.SendJsonResponse(socket, ProtocolSelect.TokenRefreshProtocol, refreshData);
         }
 
         [Protocol(ProtocolSelect.ConnectProtocol)]
@@ -144,6 +162,7 @@ namespace TeruTeruServer.Logic.Default
 
         // --- [자동 연결 (RPC 방식)] ---
 
+        [RequiresAuth]
         [Rpc("Echo")]
         public async Task<string> HandleEcho(Socket socket, string message)
         {
@@ -179,18 +198,63 @@ namespace TeruTeruServer.Logic.Default
             _rpcProxy.RequestObjectDetect(sendImgData);
         }
 
-        private string GenerateJwtToken(string userId)
+        private string GenerateJwtToken(string userId, out string refreshToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(SecretKey);
+            
+            // Access Token (2 hours)
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", userId) }),
+                Subject = new ClaimsIdentity(new[] { new Claim("id", userId), new Claim("type", "access") }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
+            
+            // Refresh Token (7 days)
+            var refreshDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("id", userId), new Claim("type", "refresh") }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var rToken = tokenHandler.CreateToken(refreshDescriptor);
+            refreshToken = tokenHandler.WriteToken(rToken);
+
             return tokenHandler.WriteToken(token);
+        }
+
+        private bool ValidateRefreshToken(string token, out string userId)
+        {
+            userId = string.Empty;
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(SecretKey);
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var typeClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "type");
+                
+                if (typeClaim != null && typeClaim.Value == "refresh")
+                {
+                    userId = jwtToken.Claims.First(x => x.Type == "id").Value;
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

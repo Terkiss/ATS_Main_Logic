@@ -23,7 +23,7 @@ namespace TeruTeruServer.Logic.Default.P2P
                 var buffer = rawData;
                 if (buffer.Length < 6) return;
 
-                int targetHostId = BitConverter.ToInt32(buffer, 2);
+                int targetHostId = BitConverter.ToInt32(buffer, 6);
 
                 if (_sessionManager.Players.TryGetValue(targetHostId, out var targetSession))
                 {

@@ -49,10 +49,11 @@ namespace TeruTeruServer.SDK.Protocol
         {
             string json = JsonSerializer.Serialize(data);
             byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-            byte[] packet = new byte[body.Length + 2];
+            byte[] packet = new byte[body.Length + 6]; // Header: SendType(1) + Protocol(1) + Sequence(4)
             packet[0] = (byte)SendType.Json;
             packet[1] = (byte)protocol;
-            Array.Copy(body, 0, packet, 2, body.Length);
+            // 2~5는 SequenceNumber. 서버 응답은 0으로 채움.
+            Array.Copy(body, 0, packet, 6, body.Length);
 
             _messageSender.SendData(socket, packet);
         }
