@@ -47,15 +47,21 @@ dotnet run --project TeruTeruServer.Cli
 2. 해당 프로젝트만 빌드합니다: `dotnet build TeruTeruServer.Logic.Default`
 3. 서버 엔진이 켜져 있는 상태에서 자동으로 `plugins` 폴더에 반영되어 로직이 갱신됩니다.
 
-## 📖 추가 문서 (Documentation)
+## 📖 문서 가이드 (Documentation)
 
-새로 합류하신 분들이나 AI 에이전트를 위한 친절한 맞춤형 가이드들이 준비되어 있습니다!
+프로젝트의 상세 설계와 사용법은 `Documents/` 디렉토리에 체계적으로 정리되어 있습니다.
 
-- [**초보자용 개발자 가이드**](./Document/guide/developer-guide.md) ✨
-- [**클라이언트 SDK 가이드**](./Document/Client_SDK_Guide.md)
-- [**아키텍처 지시서**](./Document/Phase2_Architecture_Directive.md)
-- [**에이전트 페르소나 및 프롬프트**](./Document/Prompt)
-- [**개발 작업 로그**](./Document/Development_Task_Log.md)
+### 📘 핵심 문서 (Core)
+- [**AI 전용 기술 문서 (Full Context)**](./alternate_AI_doc.md) 🤖: 100만 토큰 AI 에이전트를 위한 상세 명세
+- [**개발자 퀵스타트**](./Documents/UserGuide/Developer_Quickstart.md) ✨: 서버 설치 및 명령어 사용법
+- [**클라이언트 SDK 가이드**](./Documents/Technical/Client_SDK_Guide.md): 클라이언트 연동 및 P2P 활용법
+- [**프로토콜 명세서**](./Documents/Technical/Protocol_Spec.md): 네트워크 패킷 및 데이터 모델 정의
+
+### 📂 상세 문서 구조
+- [**Technical/**](./Documents/Technical): 아키텍처, API 레퍼런스 등 심화 기술 문서
+- [**UserGuide/**](./Documents/UserGuide): 설치 및 트러블슈팅 가이드
+- [**Archive/**](./Documents/Archive): 과거 구현 계획 및 단계별 지시서 기록
+- [**Internal/**](./Documents/Internal): 에이전트 프롬프트 및 프로젝트별 세부 가이드 (Internal Only)
 
 ---
 © 2026 TeruTeru Server Team. All rights reserved.
