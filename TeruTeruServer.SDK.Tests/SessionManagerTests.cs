@@ -7,6 +7,7 @@ using Xunit;
 
 namespace TeruTeruServer.SDK.Tests
 {
+    [Collection("ServerMemoryCollection")]
     public class SessionManagerTests
     {
         [Fact]

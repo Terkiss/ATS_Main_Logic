@@ -21,6 +21,7 @@ namespace TeruTeruServer.Commands
             // 필요한 경우 커맨드 생성 시 인터페이스 전달
             _commands["2"] = new ImageDumpCommand();
             _commands["Worker_Start"] = new WorkerStartCommand();
+            _commands["health"] = new HealthCommand(sessionManager);
         }
 
         public bool Handle(string input)

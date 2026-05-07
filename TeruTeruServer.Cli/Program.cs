@@ -13,6 +13,17 @@ namespace TeruTeruServer.Cli
     {
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                string dumpDir = "Logs";
+                if (!Directory.Exists(dumpDir)) Directory.CreateDirectory(dumpDir);
+                
+                string dumpFile = Path.Combine(dumpDir, $"crashdump_{DateTime.Now:yyyyMMdd_HHmmss}.log");
+                Exception ex = (Exception)e.ExceptionObject;
+                File.WriteAllText(dumpFile, "Crash Dump\n=================\n" + ex.ToString());
+                TeruTeruLogger.LogError($"Fatal Exception: {ex.Message}. Dump saved to {dumpFile}");
+            };
+
             var config = ConfigManager.LoadConfig("config.txt");
             if (config != null)
             {

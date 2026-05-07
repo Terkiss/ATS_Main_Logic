@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace TeruTeruServer.SDK.Tests
 {
+    [Collection("ServerMemoryCollection")]
     public class ServerMemoryTests : IDisposable
     {
         public ServerMemoryTests()

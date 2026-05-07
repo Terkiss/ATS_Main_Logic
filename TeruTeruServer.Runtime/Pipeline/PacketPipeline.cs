@@ -19,6 +19,7 @@ namespace TeruTeruServer.Runtime.Pipeline
 
         public async Task ExecuteAsync(PacketContext context)
         {
+            TeruTeruServer.SDK.Util.ServerMetrics.IncrementPacketCount();
             int index = 0;
 
             Func<Task> next = null;
@@ -27,7 +28,16 @@ namespace TeruTeruServer.Runtime.Pipeline
                 if (index < _middlewares.Count)
                 {
                     var middleware = _middlewares[index++];
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    
                     await middleware.InvokeAsync(context, next);
+                    
+                    sw.Stop();
+                    if (sw.ElapsedMilliseconds > 50)
+                    {
+                        string hostId = context.Session != null ? context.Session.HostID.ToString() : "Unknown";
+                        TeruTeruServer.SDK.Util.TeruTeruLogger.LogWarning($"[Profile] Middleware {middleware.GetType().Name} took {sw.ElapsedMilliseconds}ms for HostID {hostId}");
+                    }
                 }
             };
 

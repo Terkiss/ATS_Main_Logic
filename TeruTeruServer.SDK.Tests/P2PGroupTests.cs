@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace TeruTeruServer.SDK.Tests
 {
+    [Collection("ServerMemoryCollection")]
     public class P2PGroupTests
     {
         public P2PGroupTests()

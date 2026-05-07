@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace TeruTeruServer.SDK.Util
 {
@@ -13,69 +10,52 @@ namespace TeruTeruServer.SDK.Util
     {
         public TeruTeruLogger Instance { get; } = new TeruTeruLogger();
 
-        // 로깅 기능을 수행하는 내부 로거 인스턴스
-        public static Logger LoggerInstance = new Logger();
+        private static readonly Serilog.ILogger _mainLogger;
+        private static readonly Serilog.ILogger _hardwareLogger;
 
+        static TeruTeruLogger()
+        {
+            string logDirectory = "Logs";
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
 
+            _mainLogger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy/MM/dd/HH/mm/ss}][CLASS = {ClassName}][{Level:u3}]: {Message:lj}\n{Exception}")
+                .WriteTo.File(new CompactJsonFormatter(), Path.Combine(logDirectory, "log-.json"), rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            _hardwareLogger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(new CompactJsonFormatter(), Path.Combine(logDirectory, "hardware-.json"), rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+        }
 
         public static void LogInfo(string logMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][INFO]: {logMessage} \n";
-
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(log);
-            Console.ResetColor();
-
-            LoggerInstance.SetLogMessage(LogLevel.INFO, log);
+            _mainLogger.ForContext("ClassName", className).ForContext("LineNumber", lineNumber).Information(logMessage);
         }
 
         public static void LogAttention(string logMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][ATTENTION]: {logMessage} \n";
-
-
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.WriteLine(log);
-            Console.ResetColor();
-
-            LoggerInstance.SetLogMessage(LogLevel.ATTENTION, log);
+            _mainLogger.ForContext("ClassName", className).ForContext("LineNumber", lineNumber).Warning("[ATTENTION] " + logMessage);
         }
 
         public static void LogError(string errorMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][ERROR]: {errorMessage}\n";
-            log += $"라인 번호: {lineNumber}\n";
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(log);
-            Console.ResetColor();
-
-            LoggerInstance.SetLogMessage(LogLevel.ERROR, log);
-
+            _mainLogger.ForContext("ClassName", className).ForContext("LineNumber", lineNumber).Error(errorMessage + " (라인 번호: " + lineNumber + ")");
         }
 
         public static void LogWarning(string warningMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][WARNING]: {warningMessage}\n";
-            log += $"라인 번호: {lineNumber}\n";
-
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(log);
-            Console.ResetColor();
-
-            LoggerInstance.SetLogMessage(LogLevel.WARNING, log);
+            _mainLogger.ForContext("ClassName", className).ForContext("LineNumber", lineNumber).Warning(warningMessage + " (라인 번호: " + lineNumber + ")");
         }
-
 
         public static void LogInvisible(string logMessage, [CallerMemberName] string className = "", [CallerLineNumber] int lineNumber = 0)
         {
-            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd/HH/mm/ss")}][CLASS = {className}][INVISIBLE]: {logMessage}\n";
-            log += $"라인 번호: {lineNumber}\n";
-
-            // 하드웨어 관련 로그는 별도로 저장
-            LoggerInstance.SetLogMessage(LogLevel.HARDWARE, log);
+            _hardwareLogger.ForContext("ClassName", className).ForContext("LineNumber", lineNumber).Information(logMessage + " (라인 번호: " + lineNumber + ")");
         }
     }
 
@@ -86,72 +66,5 @@ namespace TeruTeruServer.SDK.Util
         ERROR,
         WARNING,
         HARDWARE
-    }
-
-    public class Logger
-    {
-        private string _logDirectory;
-        private string _logFileName;
-        private string _hardwareLogFileName;
-        private Queue<(int, string)> _logQueue = new Queue<(int, string)>();
-
-
-
-        public Logger()
-        {
-            _logDirectory = "Logs";
-
-            if (!Directory.Exists(_logDirectory))
-            {
-                Directory.CreateDirectory(_logDirectory);
-            }
-
-            _logFileName = $"{DateTime.Now:yyyyMMdd}.log";
-            _hardwareLogFileName = $"{DateTime.Now:yyyyMMdd}_hardware.log";
-
-            Thread logMainLoop = new Thread(new ThreadStart(LogMainLoop));
-            logMainLoop.IsBackground = true;
-            logMainLoop.Start();
-        }
-
-
-        public void Log(string logMessage)
-        {
-            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}: {logMessage}";
-            File.AppendAllText(Path.Combine(_logDirectory, _logFileName), logEntry + Environment.NewLine);
-        }
-        public void LogHardware(string logMessage)
-        {
-            string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}: {logMessage}";
-            File.AppendAllText(Path.Combine(_logDirectory, _hardwareLogFileName), logEntry + Environment.NewLine);
-        }
-        public void SetLogMessage(LogLevel logLevel, string logMessage)
-        {
-            _logQueue.Enqueue(((int)logLevel, logMessage));
-        }
-
-        // 로그 메인 루프는 1분에 한번 주기로 파일에 저장 한다.
-        private void LogMainLoop()
-        {
-            while (true)
-            {
-                Thread.Sleep(60000);
-
-                while (_logQueue.Count > 0)
-                {
-                    var log = _logQueue.Dequeue();
-
-                    if ((LogLevel)log.Item1 == LogLevel.HARDWARE)
-                    {
-                        LogHardware(log.Item2);
-                    }
-                    else
-                    {
-                        Log(log.Item2);
-                    }
-                }
-            }
-        }
-
     }
 }

@@ -11,6 +11,10 @@
     <PackageReference Include="MySql.Data" Version="9.6.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260330" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260330" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="TorchSharp" Version="0.106.0" />
   </ItemGroup>
 

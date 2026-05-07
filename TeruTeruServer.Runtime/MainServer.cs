@@ -335,6 +335,7 @@ namespace TeruTeruServer.Runtime
 
         public void SocketCheck()
         {
+            TeruTeruServer.SDK.Util.ServerMetrics.UpdateTps();
             var now = DateTime.UtcNow;
             foreach (var player in _sessionManager.Players)
             {
