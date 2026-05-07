@@ -1,22 +1,31 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 3 — P2P Engine Maturity
+## 현재 마일스톤: Milestone 4 — Plugin Ecosystem & Hot-reload
 
-- [x] **1. Symmetric NAT 자동 감지 및 릴레이 전환**
-  - [x] NAT 유형 판별 및 P2PRelayHandler 자동 전환 로직
-  - [x] Hole Punching 실패 타임아웃 처리
+- [x] **1. 무중단 플러그인 교체 (Hot-reload 완성)**
+  - [x] 이전 `AssemblyLoadContext` 언로드 처리
+  - [x] `WeakReference` 기반 언로드 확인
+  - [x] `FileSystemWatcher` debounce 처리
 
-- [x] **2. 릴레이 QoS 제어**
-  - [x] `GroupRelayProtocol` 대역폭 상한 및 우선순위 적용
+- [x] **2. 플러그인 간 의존성 관리**
+  - [x] `IPluginDependency` 인터페이스 도입
+  - [x] 다중 DLL 로드 및 의존성 순서 자동 해결
+  - [x] 순환 참조 감지
 
-- [x] **3. P2P 연결 품질 측정**
-  - [x] RTT 핑, 패킷 손실률을 `ClientSession`에 주기적으로 갱신
+- [x] **3. 어트리뷰트 자동 문서화**
+  - [x] 리플렉션 기반 `[Protocol]`, `[Rpc]`, `[RequiresAuth]` 어트리뷰트 스캔
+  - [x] `PluginMetadata` 모델 구현 및 조회 API 노출
 
-- [x] **4. P2PGroup 멤버 이벤트 훅**
-  - [x] `OnJoin`, `OnLeave`, `OnRelaySwitch` 이벤트를 Logic Plugin에 노출
+- [x] **4. 플러그인 샌드박스 (오류 격리)**
+  - [x] `LogicProxy` 위임 호출 예외 방어
+  - [x] 연속 예외 시 자동 비활성화 및 경고 로그
+  - [x] 비활성화 상태 조회 인터페이스
 
-- [x] **5. UDP 패킷 순서 보장 옵션**
-  - [x] Sequence Number 레이어 기반 선택적 순서 보장 모드 제공
+- [x] **5. SDK NuGet 패키징**
+  - [x] `.csproj` NuGet 메타데이터 추가
+  - [x] `dotnet pack` 검증
+  - [x] XML 문서 주석 자동 포함
 
 ## 남은 리스크 및 이슈
-- Symmetric NAT 환경에서 UDP 릴레이 전환 시 서버의 트래픽 부하 최적화 방안이 필요할 수 있습니다.
+- `AssemblyLoadContext.Unload()` 후 실제 메모리 해제는 GC 타이밍에 의존하므로, 빈번한 핫리로드 시 메모리 누수 모니터링이 필요합니다.
+- .NET 8 (SDK 타겟)에서 collectible AssemblyLoadContext의 제약사항을 사전 조사해야 합니다.

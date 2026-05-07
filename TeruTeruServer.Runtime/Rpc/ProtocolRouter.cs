@@ -18,6 +18,9 @@ namespace TeruTeruServer.Runtime.Rpc
         private readonly ISessionManager _sessionManager;
         private readonly Dictionary<string, MethodInfo> _rpcMethods = new();
         private readonly Dictionary<ProtocolSelect, MethodInfo> _manualMethods = new();
+        private readonly List<ProtocolEndpointInfo> _endpoints = new();
+
+        public IReadOnlyList<ProtocolEndpointInfo> GetRegisteredEndpoints() => _endpoints.AsReadOnly();
 
         public ProtocolRouter(ISessionManager sessionManager)
         {
@@ -29,16 +32,26 @@ namespace TeruTeruServer.Runtime.Rpc
             _logicService = logicService;
             _rpcMethods.Clear();
             _manualMethods.Clear();
+            _endpoints.Clear();
 
             var methods = _logicService.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
             foreach (var method in methods)
             {
+                var requiresAuth = method.GetCustomAttribute<RequiresAuthAttribute>() != null;
+
                 // [Rpc] 어트리뷰트 분석 (문자열 기반 자동 연결)
                 var rpcAttr = method.GetCustomAttribute<RpcAttribute>();
                 if (rpcAttr != null)
                 {
                     string rpcName = rpcAttr.Name ?? method.Name;
                     _rpcMethods[rpcName] = method;
+                    _endpoints.Add(new ProtocolEndpointInfo 
+                    { 
+                        MethodName = method.Name, 
+                        ProtocolOrRpcName = rpcName, 
+                        BindingType = "Rpc",
+                        RequiresAuth = requiresAuth
+                    });
                     TeruTeruLogger.LogInfo($"[RPC-AUTO] {rpcName} -> {method.Name}");
                 }
 
@@ -47,6 +60,13 @@ namespace TeruTeruServer.Runtime.Rpc
                 if (protoAttr != null)
                 {
                     _manualMethods[protoAttr.Protocol] = method;
+                    _endpoints.Add(new ProtocolEndpointInfo 
+                    { 
+                        MethodName = method.Name, 
+                        ProtocolOrRpcName = protoAttr.Protocol.ToString(), 
+                        BindingType = "Protocol",
+                        RequiresAuth = requiresAuth
+                    });
                     TeruTeruLogger.LogInfo($"[PROTO-MANUAL] {protoAttr.Protocol} -> {method.Name}");
                 }
             }

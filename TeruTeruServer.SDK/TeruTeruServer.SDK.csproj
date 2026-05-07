@@ -4,6 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>TeruTeruServer.SDK</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Terkiss</Authors>
+    <Description>TeruTeruServer Plugin Development SDK</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
