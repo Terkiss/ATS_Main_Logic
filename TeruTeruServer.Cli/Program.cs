@@ -37,6 +37,17 @@ namespace TeruTeruServer.Cli
                 var pluginManager = new PluginManager("plugins", proxy, serviceProvider);
                 pluginManager.StartMonitoring();
 
+                // 클러스터 노드 자기 자신 등록
+                var clusterRegistry = serviceProvider.GetRequiredService<IClusterRegistry>();
+                clusterRegistry.RegisterNode(new TeruTeruServer.SDK.Clustering.ClusterNodeInfo
+                {
+                    NodeId = config.Guid ?? Guid.NewGuid().ToString("N"),
+                    Address = "localhost",
+                    Port = config.Port,
+                    Status = "Active",
+                    LastHeartbeat = DateTime.UtcNow
+                });
+
                 Console.WriteLine("=== TeruTeruServer AI Engine Runtime Started ===");
 
                 var mainServer = serviceProvider.GetRequiredService<MainServer>();
@@ -46,7 +57,10 @@ namespace TeruTeruServer.Cli
 
         private static void ConfigureServices(IServiceCollection services, ServerConnectConfigParameter config)
         {
+            services.AddSingleton<ISessionStore, TeruTeruServer.SDK.Clustering.InMemorySessionStore>();
             services.AddSingleton<ISessionManager, SessionManager>();
+            services.AddSingleton<IEventBus, TeruTeruServer.SDK.Clustering.LocalEventBus>();
+            services.AddSingleton<IClusterRegistry, TeruTeruServer.SDK.Clustering.LocalClusterRegistry>();
 
             // DB 서비스 등록
             string dbUri = "Server=localhost;Port=3306;Database=unity3d;Uid=root;Pwd=password";
@@ -56,7 +70,15 @@ namespace TeruTeruServer.Cli
             // [Plugin Architecture] 로직 프록시를 ILogicService로 등록
             var logicProxy = new LogicProxy();
             services.AddSingleton<LogicProxy>(logicProxy);
-            services.AddSingleton<ILogicService>(sp => sp.GetRequiredService<LogicProxy>());
+            services.AddSingleton<ILogicService>(sp => 
+            {
+                var sender = sp.GetRequiredService<IMessageSender>();
+                var db = sp.GetRequiredService<IDatabaseService>();
+                var session = sp.GetRequiredService<ISessionManager>();
+                var router = sp.GetRequiredService<IProtocolRouter>();
+                var bus = sp.GetRequiredService<IEventBus>();
+                return new TeruTeruServer.Logic.Default.LogicPlugin(sender, db, session, router, bus);
+            });
 
             // Protocol Router 등록 (기존 RpcStub을 대체)
             services.AddSingleton<IProtocolRouter, ProtocolRouter>();
@@ -68,7 +90,8 @@ namespace TeruTeruServer.Cli
             {
                 var logic = sp.GetRequiredService<ILogicService>();
                 var session = sp.GetRequiredService<ISessionManager>();
-                return new MainServer(config, logic, session); // RoutingMiddleware에서 주입받지 않으므로 생성자 단순화 가능
+                var store = sp.GetRequiredService<ISessionStore>();
+                return new MainServer(config, logic, session, store); // RoutingMiddleware에서 주입받지 않으므로 생성자 단순화 가능
             });
         }
     }

@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TeruTeruServer.SDK\TeruTeruServer.SDK.csproj" />
     <ProjectReference Include="..\TeruTeruServer.Runtime\TeruTeruServer.Runtime.csproj" />
+    <ProjectReference Include="..\TeruTeruServer.Logic.Default\TeruTeruServer.Logic.Default.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -35,9 +35,12 @@ Gemini 3.1 Pro는 1차 검증관이다.
 
 아래 순서로 기준을 삼는다.
 
-1. `Documents/구현계획.md`
-2. `IMPLEMENTATION_PROGRESS.md`
-3. 현재 `git status`, staged diff, 실제 파일 내용
+1. `Documents/Internal/M{N}_Worker_Directive.md` — 현재 마일스톤의 작업자 지시문
+2. `Documents/구현계획.md`
+3. `IMPLEMENTATION_PROGRESS.md`
+4. 현재 `git status`, staged diff, 실제 파일 내용
+
+> **지시문이 존재하면 지시문이 최우선이다.** 지시문에는 변경 대상 파일의 정확한 줄 번호, 알려진 결함, ★ 특별 주의사항, 변경 허용/금지 범위, 검증 절차, 보고 형식이 모두 포함되어 있다.
 
 이전 보고서보다 현재 저장소 상태를 우선한다.
 이전 보고와 실제 repo 상태가 다르면 repo 상태가 맞다.
@@ -47,8 +50,10 @@ Gemini 3.1 Pro는 1차 검증관이다.
 반드시 해야 할 것:
 
 - `Documents/구현계획.md`에서 현재 마일스톤을 읽는다
+- `Documents/Internal/M{N}_Worker_Directive.md`가 있으면 반드시 읽고 지시를 따른다
+- 지시문의 ★ 특별 주의사항을 작업 시작 전에 먼저 해결한다
 - 변경 전에 repo 상태를 확인한다
-- 범위를 지정된 K/D 마일스톤에 맞춘다
+- 범위를 지정된 마일스톤에 맞춘다
 - 동작이 바뀌면 테스트를 추가하거나 보강한다
 - 성공 보고 전에 공식 release gate를 실행한다
 - 필요한 새 파일이 tracked 상태인지 확인한다
@@ -66,11 +71,17 @@ Gemini 3.1 Pro는 1차 검증관이다.
 
 ## 공식 검증 기준
 
-공식 gate는 아래 하나뿐이다.
+공식 gate는 아래 하나뿐이다. 현재 OS에 맞는 명령을 사용한다.
 
-```bash
-.\scripts\verify-release.sh
 ```
+# macOS / Linux
+./scripts/verify-release.sh
+
+# Windows
+.\scripts\verify-release.ps1
+```
+
+지시문에 추가 검증이 명시되어 있으면(예: `dotnet pack`) 함께 실행한다.
 
 아래는 공식 완료 기준으로 대체할 수 없다.
 
@@ -88,10 +99,11 @@ Gemini 3.1 Pro는 1차 검증관이다.
 1. 구현 결과가 코드 또는 필요한 tracked 문서에 존재한다
 2. 필요한 새 파일이 tracked 상태다
 3. 마일스톤 범위에 맞는 변경이 staged 또는 working diff에 실제로 존재한다
-4. `.\scripts\verify-release.ps1`가 통과했다
-5. `IMPLEMENTATION_PROGRESS.md`가 검증 결과와 일치한다
-6. 다음 마일스톤 포인터가 오해를 만들지 않는다
-7. 해결되지 않은 P1 차단 이슈가 없다
+4. release gate가 통과했다 (macOS: `verify-release.sh` / Windows: `verify-release.ps1`)
+5. 지시문에 명시된 추가 검증이 있으면 그것도 통과했다
+6. `IMPLEMENTATION_PROGRESS.md`가 검증 결과와 일치한다
+7. 다음 마일스톤 포인터가 오해를 만들지 않는다
+8. 해결되지 않은 P1 차단 이슈가 없다
 
 조건이 하나라도 충족되지 않으면 아래 중 하나를 사용한다.
 
@@ -103,16 +115,12 @@ Gemini 3.1 Pro는 1차 검증관이다.
 
 너는 전략가가 아니라 작업자다.
 
-예를 들어 배정된 작업이 `K008 D02 Memory Ops`라면 아래 범위에 집중한다.
+예를 들어 배정된 작업이 Milestone 5라면 `Documents/Internal/M5_Worker_Directive.md`를 읽고 그 안의 작업 항목에 집중한다.
 
-- D02 memory schema
-- migration safety
-- retrieval fallback
-- cleanup 및 retention safety
-- 해당 범위의 regression coverage
-
-마일스톤을 닫는 데 꼭 필요하지 않은 다른 도메인 확장은 피한다.
-관련 문제를 발견하더라도 필수 범위가 아니면 구현 확장 대신 `remaining risk`로 보고한다.
+- 지시문의 "변경 허용 범위" 섹션을 엄격히 준수한다
+- 지시문의 "금지" 항목을 절대 위반하지 않는다
+- 마일스톤을 닫는 데 꼭 필요하지 않은 다른 도메인 확장은 피한다
+- 관련 문제를 발견하더라도 필수 범위가 아니면 구현 확장 대신 `remaining risk`로 보고한다
 
 ## 보고 방식
 

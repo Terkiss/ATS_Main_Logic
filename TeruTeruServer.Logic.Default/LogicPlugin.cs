@@ -26,15 +26,17 @@ namespace TeruTeruServer.Logic.Default
         private readonly TeruTeruServer.Logic.Default.P2P.P2PSignalingHandler _p2pSignalingHandler;
         private readonly TeruTeruServer.Logic.Default.P2P.P2PRelayHandler _p2pRelayHandler;
         private readonly TeruTeruServer.Logic.Default.P2P.P2PGroupHandler _p2pGroupHandler;
+        private readonly IEventBus _eventBus;
 
         private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026";
 
-        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router)
+        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router, IEventBus eventBus)
         {
             _messageSender = messageSender;
             _dbService = dbService;
             _sessionManager = sessionManager;
             _router = router;
+            _eventBus = eventBus;
             _rpcProxy = new RpcProxy(_messageSender, _sessionManager);
 
             // 중요: 라우터에 자기 자신을 등록하여 어트리뷰트 분석 활성화
@@ -42,7 +44,7 @@ namespace TeruTeruServer.Logic.Default
 
             _p2pSignalingHandler = new TeruTeruServer.Logic.Default.P2P.P2PSignalingHandler(_sessionManager);
             _p2pRelayHandler = new TeruTeruServer.Logic.Default.P2P.P2PRelayHandler(_sessionManager);
-            _p2pGroupHandler = new TeruTeruServer.Logic.Default.P2P.P2PGroupHandler(_sessionManager);
+            _p2pGroupHandler = new TeruTeruServer.Logic.Default.P2P.P2PGroupHandler(_sessionManager, _eventBus);
         }
 
         public void ProcessDirectProtocol(byte[] buffer, Socket socket)

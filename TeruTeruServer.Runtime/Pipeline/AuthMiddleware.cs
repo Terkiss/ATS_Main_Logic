@@ -14,10 +14,12 @@ namespace TeruTeruServer.Runtime.Pipeline
     {
         private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026";
         private readonly ISessionManager _sessionManager;
+        private readonly ISessionStore _sessionStore;
 
-        public AuthMiddleware(ISessionManager sessionManager)
+        public AuthMiddleware(ISessionManager sessionManager, ISessionStore sessionStore)
         {
             _sessionManager = sessionManager;
+            _sessionStore = sessionStore;
         }
 
         public async Task InvokeAsync(PacketContext context, Func<Task> next)
@@ -101,10 +103,21 @@ namespace TeruTeruServer.Runtime.Pipeline
                 var buffer = context.RawData;
                 string json = buffer.ExtractJsonPayload();
                 var request = System.Text.Json.JsonSerializer.Deserialize<ReconnectRequest>(json);
+                ClientSession? session = null;
 
-                if (request != null && _sessionManager.Players.TryGetValue(request.HostID, out var session))
+                if (request != null)
                 {
-                    if (session.ReconnectToken == request.ReconnectToken && session.State == SessionState.Grace)
+                    // 1. 로컬에서 먼저 검색
+                    if (!_sessionManager.Players.TryGetValue(request.HostID, out session))
+                    {
+                        // 2. 실패 시 전체 저장소(ISessionStore)에서 ReconnectToken으로 검색 (분산 환경 대비)
+                        session = _sessionStore.FindByReconnectToken(request.ReconnectToken);
+                    }
+                }
+
+                if (session != null)
+                {
+                    if (session.ReconnectToken == request!.ReconnectToken && session.State == SessionState.Grace)
                     {
                         // 소켓 덮어씌우기 및 상태 복원
                         session.ClientSocket = context.ClientSocket;

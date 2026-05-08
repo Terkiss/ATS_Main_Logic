@@ -19,12 +19,14 @@ namespace TeruTeruServer.Logic.Default.P2P
     public class P2PGroupHandler
     {
         private readonly ISessionManager _sessionManager;
+        private readonly IEventBus _eventBus;
         private readonly ConcurrentDictionary<int, P2PGroup> _groups = new ConcurrentDictionary<int, P2PGroup>();
         private readonly RelayQoSController _qosController = new RelayQoSController();
 
-        public P2PGroupHandler(ISessionManager sessionManager)
+        public P2PGroupHandler(ISessionManager sessionManager, IEventBus eventBus)
         {
             _sessionManager = sessionManager;
+            _eventBus = eventBus;
         }
 
         public P2PGroup CreateGroup(int ownerHostId)
@@ -79,6 +81,8 @@ namespace TeruTeruServer.Logic.Default.P2P
                         jSession.P2PState = P2PStatus.Signaling;
                         group.UpdateMemberStatus(joiner, P2PStatus.Signaling);
                     }
+                    
+                    _eventBus.Publish("p2p.group.join", new { GroupId = group.GroupId, HostId = joiner });
                     TeruTeruLogger.LogInfo($"플레이어 {joiner}가 그룹 {group.GroupId}에 입장했습니다.");
                 }
             }

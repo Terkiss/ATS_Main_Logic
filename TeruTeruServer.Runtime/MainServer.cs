@@ -21,6 +21,7 @@ namespace TeruTeruServer.Runtime
     public class MainServer : IMessageSender
     {
         private readonly ISessionManager _sessionManager;
+        private readonly ISessionStore _sessionStore;
         private readonly ILogicService _serverLogic;
 
         // 동시 접속 가능한 최대 연결 수
@@ -61,9 +62,10 @@ namespace TeruTeruServer.Runtime
             set => _receiveBufferSize = value;
         }
 
-        public MainServer(ServerConnectConfigParameter config, ILogicService logicService, ISessionManager sessionManager)
+        public MainServer(ServerConnectConfigParameter config, ILogicService logicService, ISessionManager sessionManager, ISessionStore sessionStore)
         {
             this._sessionManager = sessionManager;
+            this._sessionStore = sessionStore;
             this._serverLogic = logicService;
             this.Initialize(config.MaxConnection, config.Port, config.IsUdp, config.IsTcp);
             this._sendBufferSize = config.SendBufferSize;
@@ -87,7 +89,7 @@ namespace TeruTeruServer.Runtime
             _pipeline.Use(new RateLimitMiddleware(50));
             _pipeline.Use(new ReplayAttackMiddleware());
             _pipeline.Use(new DecryptionMiddleware(new SeedCryptoService()));
-            _pipeline.Use(new AuthMiddleware(_sessionManager));
+            _pipeline.Use(new AuthMiddleware(_sessionManager, _sessionStore));
             _pipeline.Use(new RoutingMiddleware(_serverLogic));
         }
 

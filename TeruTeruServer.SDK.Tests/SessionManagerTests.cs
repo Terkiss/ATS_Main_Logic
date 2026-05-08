@@ -10,10 +10,12 @@ namespace TeruTeruServer.SDK.Tests
     [Collection("ServerMemoryCollection")]
     public class SessionManagerTests
     {
+        private ISessionManager CreateManager() => new SessionManager(new TeruTeruServer.SDK.Clustering.InMemorySessionStore());
+
         [Fact]
         public void AddPlayer_ShouldStoreClientSession()
         {
-            var manager = new SessionManager();
+            var manager = CreateManager();
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(10, socket, "game10");
 
@@ -27,7 +29,7 @@ namespace TeruTeruServer.SDK.Tests
         [Fact]
         public void MarkAsGrace_ShouldChangeStateToGrace()
         {
-            var manager = new SessionManager();
+            var manager = CreateManager();
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(11, socket, "game11");
             manager.TryAddPlayer(11, session);
@@ -42,7 +44,7 @@ namespace TeruTeruServer.SDK.Tests
         [Fact]
         public void EvictSession_ShouldRemoveSessionCompletely()
         {
-            var manager = new SessionManager();
+            var manager = CreateManager();
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(12, socket, "game12");
             manager.TryAddPlayer(12, session);
@@ -57,7 +59,7 @@ namespace TeruTeruServer.SDK.Tests
         [Fact]
         public void TryGetHostIdBySocket_ShouldFindHostId()
         {
-            var manager = new SessionManager();
+            var manager = CreateManager();
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(13, socket, "game13");
             manager.TryAddPlayer(13, session);

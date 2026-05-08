@@ -16,9 +16,10 @@ namespace TeruTeruServer.Runtime.Tests
         {
             var mockLogic = new Mock<ILogicService>();
             var mockSessionManager = new Mock<ISessionManager>();
+            var mockSessionStore = new Mock<ISessionStore>();
             var config = new ServerConnectConfigParameter { Port = 12345, MaxConnection = 10, IsUdp = true, IsTcp = false, SendBufferSize = 1024, ReceiveBufferSize = 1024, Guid = "test" };
 
-            var exception = Record.Exception(() => new MainServer(config, mockLogic.Object, mockSessionManager.Object));
+            var exception = Record.Exception(() => new MainServer(config, mockLogic.Object, mockSessionManager.Object, mockSessionStore.Object));
 
             Assert.Null(exception);
         }
@@ -28,8 +29,9 @@ namespace TeruTeruServer.Runtime.Tests
         {
             var mockLogic = new Mock<ILogicService>();
             var mockSessionManager = new Mock<ISessionManager>();
+            var mockSessionStore = new Mock<ISessionStore>();
             var config = new ServerConnectConfigParameter { Port = 12345, MaxConnection = 10, IsUdp = false, IsTcp = true, SendBufferSize = 1024, ReceiveBufferSize = 1024, Guid = "test" };
-            var server = new MainServer(config, mockLogic.Object, mockSessionManager.Object);
+            var server = new MainServer(config, mockLogic.Object, mockSessionManager.Object, mockSessionStore.Object);
 
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(1, socket, "test");
@@ -52,8 +54,9 @@ namespace TeruTeruServer.Runtime.Tests
         {
             var mockLogic = new Mock<ILogicService>();
             var mockSessionManager = new Mock<ISessionManager>();
+            var mockSessionStore = new Mock<Mock<ISessionStore>>(); // Previous typo in thought, should be Mock<ISessionStore>
             var config = new ServerConnectConfigParameter { Port = 12345, MaxConnection = 10, IsUdp = false, IsTcp = true, SendBufferSize = 1024, ReceiveBufferSize = 1024, Guid = "test" };
-            var server = new MainServer(config, mockLogic.Object, mockSessionManager.Object);
+            var server = new MainServer(config, mockLogic.Object, mockSessionManager.Object, new Mock<ISessionStore>().Object);
 
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var session = new ClientSession(2, socket, "test");

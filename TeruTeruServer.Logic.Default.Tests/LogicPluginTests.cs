@@ -15,6 +15,7 @@ namespace TeruTeruServer.Logic.Default.Tests
         private readonly Mock<IDatabaseService> _mockDbService;
         private readonly Mock<ISessionManager> _mockSessionManager;
         private readonly Mock<IProtocolRouter> _mockProtocolRouter;
+        private readonly Mock<IEventBus> _mockEventBus;
         private readonly LogicPlugin _logicPlugin;
 
         public LogicPluginTests()
@@ -23,12 +24,14 @@ namespace TeruTeruServer.Logic.Default.Tests
             _mockDbService = new Mock<IDatabaseService>();
             _mockSessionManager = new Mock<ISessionManager>();
             _mockProtocolRouter = new Mock<IProtocolRouter>();
+            _mockEventBus = new Mock<IEventBus>();
 
             _logicPlugin = new LogicPlugin(
                 _mockMessageSender.Object,
                 _mockDbService.Object,
                 _mockSessionManager.Object,
-                _mockProtocolRouter.Object);
+                _mockProtocolRouter.Object,
+                _mockEventBus.Object);
         }
 
         [Fact]
