@@ -83,8 +83,19 @@ namespace TeruTeruServer.Logic.Default
                 // [플러그인 내부 라우팅] 엔진의 개입 없이 라우터가 어트리뷰트를 보고 분기 처리
                 string resultJson = await _router.RouteAsync(json, protocol, socket);
 
-                // 결과가 있는 경우 클라이언트에게 응답 (필요 시)
-                // Tip: RPC 응답은 라우터 내부에서 처리하거나 여기서 공통 처리 가능
+                // 결과가 있는 경우 클라이언트에게 응답
+                if (!string.IsNullOrEmpty(resultJson))
+                {
+                    // RPC 요청인 경우 동일한 RpcProtocol 타입으로 결과를 감싸서 보내거나 
+                    // 직접 JSON 결과를 보냄. (여기선 라우터가 이미 직렬화된 문자열을 반환함)
+                    byte[] body = Encoding.UTF8.GetBytes(resultJson);
+                    byte[] packet = new byte[body.Length + 6];
+                    packet[0] = (byte)SendType.Json;
+                    packet[1] = (byte)protocol;
+                    Array.Copy(body, 0, packet, 6, body.Length);
+                    
+                    _messageSender.SendData(socket, packet);
+                }
             }
             catch (Exception ex)
             {

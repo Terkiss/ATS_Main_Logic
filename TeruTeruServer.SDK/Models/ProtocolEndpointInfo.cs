@@ -1,4 +1,4 @@
-namespace TeruTeruServer.Runtime.Rpc
+namespace TeruTeruServer.SDK.Models
 {
     /// <summary>
     /// 플러그인에 등록된 엔드포인트(RPC 또는 Protocol) 정보를 담는 모델입니다.

@@ -8,6 +8,7 @@ using TeruTeruServer.SDK.Attributes;
 using TeruTeruServer.SDK.Enums;
 using TeruTeruServer.SDK.Interfaces;
 using TeruTeruServer.SDK.Protocol;
+using TeruTeruServer.SDK.Models;
 using TeruTeruServer.SDK.Util;
 
 namespace TeruTeruServer.Runtime.Rpc
