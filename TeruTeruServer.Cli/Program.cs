@@ -6,6 +6,7 @@ using TeruTeruServer.SDK.Util;
 using TeruTeruServer.Runtime.DB;
 using TeruTeruServer.Runtime;
 using TeruTeruServer.Runtime.Rpc;
+using TeruTeruServer.Runtime.GameEngine;
 
 namespace TeruTeruServer.Cli
 {
@@ -52,6 +53,10 @@ namespace TeruTeruServer.Cli
 
                 var mainServer = serviceProvider.GetRequiredService<MainServer>();
                 mainServer.StartServer();
+
+                // 틱 루프 시작
+                var gameLoop = serviceProvider.GetRequiredService<IGameLoop>();
+                gameLoop.Start();
             }
         }
 
@@ -93,6 +98,10 @@ namespace TeruTeruServer.Cli
                 var store = sp.GetRequiredService<ISessionStore>();
                 return new MainServer(config, logic, session, store); // RoutingMiddleware에서 주입받지 않으므로 생성자 단순화 가능
             });
+
+            // Game Engine Services
+            services.AddSingleton<IGameLoop>(sp => new GameLoop(tickRate: 20));
+            services.AddSingleton<IRoomBroadcaster, RoomBroadcaster>();
         }
     }
 }

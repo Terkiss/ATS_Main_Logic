@@ -1,29 +1,34 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 6 — Developer Experience & SDK Finalization
+## 현재 마일스톤: Milestone 7 — Real-time Tick & State Sync (Phase 2 시작)
 
-- [x] **1. SDK API 문서 자동 생성 기반 구축**
-  - [x] SDK/Runtime/Client 프로젝트 XML 문서 생성 활성화
-  - [x] `Documents/API/` 주요 공개 API 레퍼런스 마크다운 작성
-  - [x] 엔드포인트 자동 문서화 유틸리티
-  - [x] ProtocolEndpointInfo 모델 SDK 이동 및 순환 참조 해결
+- [x] **1. 서버 Tick Loop 구현**
+  - [x] `IGameLoop` 인터페이스 신설
+  - [x] `GameLoop` 구현체 (Stopwatch 기반 정밀 타이밍)
+  - [x] DI 등록 및 Program.cs 연동
+  - [x] Tick 콜백 시스템 (Logic Plugin 연동 가능 구조)
 
-- [x] **2. 클라이언트 SDK 템플릿 강화**
-  - [x] PacketBuilder 유틸리티 추가
-  - [x] 프로토콜 핸들러 템플릿 예제 정비
-  - [x] DummyClient 참조 예제 정비
+- [x] **2. 게임 상태 스냅샷 구조 설계**
+  - [x] `GameEntity` 모델
+  - [x] `WorldState` / `RoomState` 모델
+  - [x] 스냅샷 링 버퍼 (`SnapshotBuffer`)
 
-- [x] **3. 로컬 Mock 서버 모드**
-  - [x] `MockServer` 클래스 신설
-  - [x] DI 기반 미들웨어 파이프라인 구성
+- [x] **3. Delta Broadcast 구현**
+  - [x] `DeltaCalculator` (스냅샷 diff)
+  - [x] `StateSyncProtocol` 프로토콜 추가
+  - [x] Delta 패킷 직렬화 기반 구축
 
-- [x] **4. 통합 테스트 프레임워크**
-  - [x] `PacketSimulator` 클래스
-  - [x] 핵심 프로토콜 통합 테스트 (Login, RPC, Reconnect)
+- [x] **4. 브로드캐스트 최적화**
+  - [x] `IRoomBroadcaster` 인터페이스
+  - [x] ParticipantHostIds 기반 브로드캐스터 구현
+  - [x] IMessageSender 연동
 
-- [x] **5. 마이그레이션 가이드 문서화**
-  - [x] `Documents/Technical/Migration_Guide.md` 작성
+- [x] **5. 입력 큐 구조**
+  - [x] `InputQueue<T>` 클래스
+  - [x] `GameInputProtocol` 프로토콜 추가
+  - [x] Tick 처리 시 입력 큐 소비 기반 구축
 
 ## 남은 리스크 및 이슈
-- 이 마일스톤이 마지막이며, 완료 후 feature/phase2-architecture → main 병합 준비를 진행합니다.
-- Mock 서버는 소켓 레이어를 바이패스하므로 실제 네트워크 동작과 차이가 있을 수 있습니다.
+- GameLoop 스레드와 기존 IOCP 수신 스레드 간 동기화 주의 필요
+- ProtocolSelect enum에 신규 프로토콜 추가 시 기존 클라이언트와의 호환성 확인 필수
+- P2PGroup은 현재 논리 그룹 수준 → M9에서 Zone/Room 개념으로 확장 예정
