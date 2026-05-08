@@ -1,34 +1,30 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 7 — Real-time Tick & State Sync (Phase 2 시작)
+## 현재 마일스톤: Milestone 8 — Lag Compensation & Prediction
 
-- [x] **1. 서버 Tick Loop 구현**
-  - [x] `IGameLoop` 인터페이스 신설
-  - [x] `GameLoop` 구현체 (Stopwatch 기반 정밀 타이밍)
-  - [x] DI 등록 및 Program.cs 연동
-  - [x] Tick 콜백 시스템 (Logic Plugin 연동 가능 구조)
+- [x] **1. 서버 권위 모델 확립**
+  - [x] `ServerAuthorityValidator` 클래스
+  - [x] 입력 검증 → 상태 적용 파이프라인
 
-- [x] **2. 게임 상태 스냅샷 구조 설계**
-  - [x] `GameEntity` 모델
-  - [x] `WorldState` / `RoomState` 모델
-  - [x] 스냅샷 링 버퍼 (`SnapshotBuffer`)
+- [x] **2. 클라이언트 사이드 예측(CSP) 지원**
+  - [x] `AckSequence` 기반 응답 프로토콜
+  - [x] `StateAckProtocol` 프로토콜 추가
+  - [x] Reconciliation 데이터 구조
 
-- [x] **3. Delta Broadcast 구현**
-  - [x] `DeltaCalculator` (스냅샷 diff)
-  - [x] `StateSyncProtocol` 프로토콜 추가
-  - [x] Delta 패킷 직렬화 기반 구축
+- [x] **3. Lag Compensation (히트박스 되감기)**
+  - [x] `LagCompensator` 클래스
+  - [x] SnapshotBuffer 과거 상태 조회 기반 판정
+  - [x] HitValidation 결과 모델
 
-- [x] **4. 브로드캐스트 최적화**
-  - [x] `IRoomBroadcaster` 인터페이스
-  - [x] ParticipantHostIds 기반 브로드캐스터 구현
-  - [x] IMessageSender 연동
+- [x] **4. Entity Interpolation 가이드**
+  - [x] `Documents/Technical/Interpolation_Guide.md` 작성
 
-- [x] **5. 입력 큐 구조**
-  - [x] `InputQueue<T>` 클래스
-  - [x] `GameInputProtocol` 프로토콜 추가
-  - [x] Tick 처리 시 입력 큐 소비 기반 구축
+- [x] **5. RTT 측정 강화**
+  - [x] `RttTracker` 유틸리티
+  - [x] `RttPingProtocol` 프로토콜 추가
+  - [x] ClientSession.RttMs Rolling Average 갱신
 
 ## 남은 리스크 및 이슈
-- GameLoop 스레드와 기존 IOCP 수신 스레드 간 동기화 주의 필요
-- ProtocolSelect enum에 신규 프로토콜 추가 시 기존 클라이언트와의 호환성 확인 필수
-- P2PGroup은 현재 논리 그룹 수준 → M9에서 Zone/Room 개념으로 확장 예정
+- SnapshotBuffer 128프레임 용량이 RTT 200ms+ 환경에서 충분한지 검증 필요
+- LagCompensator의 되감기 범위 제한 정책 필요 (무한 되감기 방지)
+- ClientSession.RttMs 기존 필드 활용 시 기존 P2PPing 로직과 충돌 여부 확인

@@ -42,6 +42,15 @@ namespace TeruTeruServer.SDK.Util
         public double PacketLossRate { get; set; }
         public DateTime LastPingUtc { get; set; }
 
+        // Lag Compensation 연동 필드 (Milestone 8)
+        public TeruTeruServer.SDK.GameEngine.RttTracker RttHistory { get; set; } = new(10);
+
+        public void UpdateRtt(long currentRttMs)
+        {
+            RttMs = RttHistory.AddSample(currentRttMs);
+            LastPingUtc = DateTime.UtcNow;
+        }
+
         public ClientSession(int hostID, Socket clientSocket, string gameID)
         {
             HostID = hostID;

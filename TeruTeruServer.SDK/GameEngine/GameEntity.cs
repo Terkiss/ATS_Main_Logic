@@ -38,6 +38,11 @@ namespace TeruTeruServer.SDK.GameEngine
         public bool IsDirty { get; set; }
 
         /// <summary>
+        /// 히트 판정용 구체 콜라이더 반경
+        /// </summary>
+        public float HitboxRadius { get; set; } = 0.5f;
+
+        /// <summary>
         /// 데이터 깊은 복사 (스냅샷용)
         /// </summary>
         public GameEntity DeepClone()
@@ -53,7 +58,8 @@ namespace TeruTeruServer.SDK.GameEngine
                 VelocityX = this.VelocityX,
                 VelocityZ = this.VelocityZ,
                 State = this.State,
-                IsDirty = this.IsDirty
+                IsDirty = this.IsDirty,
+                HitboxRadius = this.HitboxRadius
             };
         }
     }
