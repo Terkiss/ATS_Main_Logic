@@ -27,6 +27,8 @@ namespace TeruTeruServer.SDK.Enums
         ZoneTransferProtocol = 26,  // Zone 이동 요청/응답 (M9)
         ZoneInfoProtocol = 27,      // Zone 정보 조회 (M9)
         SecurityEventProtocol = 28,    // 보안 이벤트 알림 (M10)
+        MatchmakingProtocol = 29,     // 매치메이킹 요청/응답 (M11)
+        SessionStateProtocol = 30,    // 세션 상태 변경 알림 (M11)
         RpcProtocol = 100,       // 범용 RPC 프로토콜 추가
         QueueCountCommand = 101, // 큐 카운트 요청 (Phase 3 기능 대비)
         ImageDumpCommand = 102   // 이미지 덤프 요청 (Phase 3 기능 대비)

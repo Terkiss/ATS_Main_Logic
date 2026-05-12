@@ -51,6 +51,7 @@ namespace TeruTeruServer.SDK.Util
         public DateTime LastViolationUtc { get; set; }
         public int InputCountThisTick { get; set; }
         public long LastInputTick { get; set; }
+        public int Mmr { get; set; } = 1000; // [M11] 기본 MMR 설정
 
         public void UpdateRtt(long currentRttMs)
         {

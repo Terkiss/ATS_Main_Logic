@@ -67,6 +67,10 @@ namespace TeruTeruServer.Cli
                     }
                 });
 
+                // [Milestone 11] MatchQueue 틱 핸들러 등록 (매 20 Tick = 1초마다)
+                var matchQueue = serviceProvider.GetRequiredService<MatchQueue>();
+                gameLoop.RegisterTickHandler(tick => { if (tick % 20 == 0) matchQueue.TryMatch(); });
+
                 gameLoop.Start();
             }
         }
@@ -115,6 +119,8 @@ namespace TeruTeruServer.Cli
             // Game Engine Services
             services.AddSingleton<IGameLoop>(sp => new GameLoop(tickRate: 20));
             services.AddSingleton<IRoomBroadcaster, RoomBroadcaster>();
+            services.AddSingleton<IGameSessionManager, GameSessionManager>(); // [M11]
+            services.AddSingleton<MatchQueue>(); // [M11]
             services.AddSingleton<IAoIFilter>(sp => new SpatialGrid(cellSize: 50f));
             services.AddSingleton<IZoneManager, ZoneManager>();
             services.AddSingleton<ZoneFactory>();
