@@ -56,6 +56,17 @@ namespace TeruTeruServer.Cli
 
                 // 틱 루프 시작
                 var gameLoop = serviceProvider.GetRequiredService<IGameLoop>();
+                var zoneFactory = serviceProvider.GetRequiredService<ZoneFactory>();
+                
+                // 30초(600틱)마다 빈 인스턴스 정리
+                gameLoop.RegisterTickHandler(tick =>
+                {
+                    if (tick % 600 == 0)
+                    {
+                        zoneFactory.CleanupEmptyInstances();
+                    }
+                });
+
                 gameLoop.Start();
             }
         }
@@ -102,6 +113,9 @@ namespace TeruTeruServer.Cli
             // Game Engine Services
             services.AddSingleton<IGameLoop>(sp => new GameLoop(tickRate: 20));
             services.AddSingleton<IRoomBroadcaster, RoomBroadcaster>();
+            services.AddSingleton<IAoIFilter>(sp => new SpatialGrid(cellSize: 50f));
+            services.AddSingleton<IZoneManager, ZoneManager>();
+            services.AddSingleton<ZoneFactory>();
         }
     }
 }

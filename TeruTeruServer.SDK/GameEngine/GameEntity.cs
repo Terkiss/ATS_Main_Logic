@@ -45,7 +45,7 @@ namespace TeruTeruServer.SDK.GameEngine
         /// <summary>
         /// 데이터 깊은 복사 (스냅샷용)
         /// </summary>
-        public GameEntity DeepClone()
+        public virtual GameEntity DeepClone()
         {
             return new GameEntity
             {
