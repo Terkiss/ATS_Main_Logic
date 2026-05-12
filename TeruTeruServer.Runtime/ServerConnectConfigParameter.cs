@@ -59,6 +59,7 @@ namespace TeruTeruServer.Runtime
             get;
             set;
         }
+        public string HmacKey { get; set; } = "TeruTeruServer_Default_HMAC_Key_2026";
 
         public void SetIP(string ip)
         {

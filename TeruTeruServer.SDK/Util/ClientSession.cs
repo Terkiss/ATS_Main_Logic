@@ -45,6 +45,13 @@ namespace TeruTeruServer.SDK.Util
         // Lag Compensation 연동 필드 (Milestone 8)
         public TeruTeruServer.SDK.GameEngine.RttTracker RttHistory { get; set; } = new(10);
 
+        // Anti-Cheat 필드 (Milestone 10)
+        public int ViolationCount { get; set; }
+        public int BanLevel { get; set; }  // 0=정상, 1=경고, 2=임시차단, 3=영구차단
+        public DateTime LastViolationUtc { get; set; }
+        public int InputCountThisTick { get; set; }
+        public long LastInputTick { get; set; }
+
         public void UpdateRtt(long currentRttMs)
         {
             RttMs = RttHistory.AddSample(currentRttMs);

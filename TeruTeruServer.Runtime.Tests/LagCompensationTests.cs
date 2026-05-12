@@ -29,8 +29,10 @@ namespace TeruTeruServer.Runtime.Tests
         {
             var mockLoop = new Mock<IGameLoop>();
             mockLoop.Setup(l => l.TickRate).Returns(20);
-            
-            var validator = new ServerAuthorityValidator(mockLoop.Object);
+            var mockSecurityLogger = new Mock<ISecurityEventLogger>();
+            var mockSessionManager = new Mock<ISessionManager>();
+            var sanctionManager = new SanctionManager(mockSecurityLogger.Object, mockSessionManager.Object);
+            var validator = new ServerAuthorityValidator(mockLoop.Object, mockSecurityLogger.Object, sanctionManager);
             var entity = new GameEntity { EntityId = 1, X = 0, Z = 0 };
             var input = new GameInput { MoveX = 10.0f, MoveZ = 10.0f }; // 과도한 속도
             

@@ -4,6 +4,7 @@ using TeruTeruServer.SDK.Enums;
 using TeruTeruServer.SDK.Util;
 using TeruTeruServer.Commands;
 using TeruTeruServer.Runtime.Pipeline;
+using TeruTeruServer.Runtime.GameEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -23,6 +24,9 @@ namespace TeruTeruServer.Runtime
         private readonly ISessionManager _sessionManager;
         private readonly ISessionStore _sessionStore;
         private readonly ILogicService _serverLogic;
+        private readonly ISecurityEventLogger _securityLogger;
+        private readonly SanctionManager _sanctionManager;
+        private readonly ServerConnectConfigParameter _config;
 
         // 동시 접속 가능한 최대 연결 수
         private int _maxConnection;
@@ -62,11 +66,15 @@ namespace TeruTeruServer.Runtime
             set => _receiveBufferSize = value;
         }
 
-        public MainServer(ServerConnectConfigParameter config, ILogicService logicService, ISessionManager sessionManager, ISessionStore sessionStore)
+        public MainServer(ServerConnectConfigParameter config, ILogicService logicService, ISessionManager sessionManager, ISessionStore sessionStore,
+            ISecurityEventLogger securityLogger, SanctionManager sanctionManager)
         {
+            this._config = config;
             this._sessionManager = sessionManager;
             this._sessionStore = sessionStore;
             this._serverLogic = logicService;
+            this._securityLogger = securityLogger;
+            this._sanctionManager = sanctionManager;
             this.Initialize(config.MaxConnection, config.Port, config.IsUdp, config.IsTcp);
             this._sendBufferSize = config.SendBufferSize;
             this._receiveBufferSize = config.ReceiveBufferSize;
@@ -83,11 +91,16 @@ namespace TeruTeruServer.Runtime
             _rpcProxy = new RpcProxy(this, _sessionManager);
             _commandHandler = new CommandHandler(this, _sessionManager);
 
-            // 파이프라인 초기화 및 미들웨어 등록
+            // 파이프라인 초기화 및 미들웨어 등록 (L378-387 지시사항 준수)
             _pipeline = new PacketPipeline();
-            _pipeline.Use(new ValidationMiddleware());
+            _pipeline.Use(new ValidationMiddleware(_sessionManager)); // SessionManager 주입 (M10 강화)
+            _pipeline.Use(new BanCheckMiddleware());                  // [NEW M10]
             _pipeline.Use(new RateLimitMiddleware(50));
             _pipeline.Use(new ReplayAttackMiddleware());
+            
+            byte[] hmacKey = Encoding.UTF8.GetBytes(_config.HmacKey);
+            _pipeline.Use(new HmacVerifyMiddleware(hmacKey, _sanctionManager)); // [NEW M10]
+            
             _pipeline.Use(new DecryptionMiddleware(new SeedCryptoService()));
             _pipeline.Use(new AuthMiddleware(_sessionManager, _sessionStore));
             _pipeline.Use(new RoutingMiddleware(_serverLogic));

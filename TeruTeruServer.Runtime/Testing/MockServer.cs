@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using TeruTeruServer.Runtime.Pipeline;
+using TeruTeruServer.Runtime.GameEngine;
 using TeruTeruServer.SDK.Interfaces;
 using TeruTeruServer.SDK.Enums;
 using TeruTeruServer.SDK.Util;
@@ -45,14 +46,21 @@ namespace TeruTeruServer.Runtime.Testing
             _mockSender = (MockMessageSender)_serviceProvider.GetRequiredService<IMessageSender>();
             _pipeline = new PacketPipeline();
 
-            // MainServer.InitializePipeline()의 순서를 정확히 복제
-            _pipeline.Use(new ValidationMiddleware());
-            _pipeline.Use(new RateLimitMiddleware(5000)); // 테스트 중 차단 방지를 위해 높게 설정
-            _pipeline.Use(new ReplayAttackMiddleware());
-            _pipeline.Use(new DecryptionMiddleware(new SeedCryptoService()));
-            
             var sessionManager = _serviceProvider.GetRequiredService<ISessionManager>();
             var sessionStore = _serviceProvider.GetRequiredService<ISessionStore>();
+            var sanctionManager = _serviceProvider.GetService<SanctionManager>()!;
+
+            // MainServer.InitializePipeline()의 순서를 정확히 복제 (L48)
+            _pipeline.Use(new ValidationMiddleware(sessionManager));
+            _pipeline.Use(new BanCheckMiddleware());
+            _pipeline.Use(new RateLimitMiddleware(5000)); // 테스트 중 차단 방지를 위해 높게 설정
+            _pipeline.Use(new ReplayAttackMiddleware());
+            
+            // HMAC 검증 추가 (M10)
+            byte[] hmacKey = System.Text.Encoding.UTF8.GetBytes("TeruTeruServer_Default_HMAC_Key_2026");
+            _pipeline.Use(new HmacVerifyMiddleware(hmacKey, sanctionManager));
+            
+            _pipeline.Use(new DecryptionMiddleware(new SeedCryptoService()));
             _pipeline.Use(new AuthMiddleware(sessionManager, sessionStore));
             
             var logicService = _serviceProvider.GetRequiredService<ILogicService>();

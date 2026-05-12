@@ -107,7 +107,9 @@ namespace TeruTeruServer.Cli
                 var logic = sp.GetRequiredService<ILogicService>();
                 var session = sp.GetRequiredService<ISessionManager>();
                 var store = sp.GetRequiredService<ISessionStore>();
-                return new MainServer(config, logic, session, store); // RoutingMiddleware에서 주입받지 않으므로 생성자 단순화 가능
+                var securityLogger = sp.GetRequiredService<ISecurityEventLogger>();
+                var sanctionManager = sp.GetRequiredService<SanctionManager>();
+                return new MainServer(config, logic, session, store, securityLogger, sanctionManager);
             });
 
             // Game Engine Services
@@ -116,6 +118,12 @@ namespace TeruTeruServer.Cli
             services.AddSingleton<IAoIFilter>(sp => new SpatialGrid(cellSize: 50f));
             services.AddSingleton<IZoneManager, ZoneManager>();
             services.AddSingleton<ZoneFactory>();
+
+            // [Milestone 10] Security Services (L388-393 지시사항 준수)
+            services.AddSingleton<ISecurityEventLogger, SecurityEventLogger>();
+            services.AddSingleton<SanctionManager>();
+            services.AddSingleton<InputFrequencyValidator>();
+            services.AddSingleton<ServerAuthorityValidator>();
         }
     }
 }

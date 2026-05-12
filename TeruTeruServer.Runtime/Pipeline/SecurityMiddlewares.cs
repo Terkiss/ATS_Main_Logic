@@ -6,10 +6,17 @@ using TeruTeruServer.SDK.Util;
 namespace TeruTeruServer.Runtime.Pipeline
 {
     /// <summary>
-    /// 수신된 패킷의 최소 길이나 형식을 검증하는 미들웨어입니다.
+    /// 수신된 패킷의 최소 길이나 형식을 검증하고 세션 정보를 컨텍스트에 설정하는 미들웨어입니다.
     /// </summary>
     public class ValidationMiddleware : IPacketMiddleware
     {
+        private readonly ISessionManager _sessionManager;
+
+        public ValidationMiddleware(ISessionManager sessionManager)
+        {
+            _sessionManager = sessionManager;
+        }
+
         public async Task InvokeAsync(PacketContext context, Func<Task> next)
         {
             if (context.RawData == null || context.RawData.Length < 1)
@@ -18,7 +25,14 @@ namespace TeruTeruServer.Runtime.Pipeline
                 return; // 처리 중단
             }
 
-            // 추가적인 구조 검증 로직이 들어갈 자리
+            // 세션 정보 자동 설정 (L49 주의사항 준수)
+            if (context.Session == null && _sessionManager.TryGetHostIdBySocket(context.ClientSocket, out int hostId))
+            {
+                if (_sessionManager.Players.TryGetValue(hostId, out var session))
+                {
+                    context.Session = session;
+                }
+            }
 
             await next();
         }
