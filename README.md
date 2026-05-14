@@ -1,58 +1,67 @@
-# TeruTeru Server
+# TeruTeru Server AI Engine (v2.0)
 
-고성능 비동기 IO(IOCP) 기반의 C# 서버 엔진입니다. 유니티 클라이언트와의 통신 및 객체 탐지(YOLO) 작업을 위한 중계 서버 역할을 수행합니다.
+**TeruTeru Server**는 고성능 비동기 IO(IOCP) 기반의 C# 서버 엔진이자, 딥러닝(YOLO) 분석을 위한 **AI 호스팅 플랫폼**입니다. 아키텍처 2.0 리팩토링을 통해 서버 로직의 독립성 확보, 핫로딩(Hot-Reloading) 기능, 그리고 **P2P 하이브리드 멀티캐스트 인프라**를 완성했습니다.
 
-## 🚀 주요 기능
+## 🚀 주요 특징 (Architecture 2.0)
 
-- **고성능 통신**: .NET의 `SocketAsyncEventArgs`를 사용한 비동기 IO 방식(IOCP 기반)으로 수천 명의 클라이언트 동시 접속을 효율적으로 처리합니다.
-- **멀티 프로토콜 지원**:
-  - **TCP**: 안정적인 데이터 전송을 위한 기본 프로토콜.
-  - **UDP**: `Connected UDP` 방식을 통해 세션 기반의 빠른 실시간 데이터 전송 지원.
-- **RPC(Remote Procedure Call) 시스템**:
-  - 구조체 직렬화를 통한 직접 프로토콜 및 JSON 기반 프로토콜을 모두 지원합니다.
-  - 클라이언트 간 객체 탐지 요청 및 결과 중계 기능을 제공합니다.
-- **보안 및 유틸리티**:
-  - **AES-CBC-256**: 강력한 문자열 암호화 및 복호화 기능을 내장하고 있습니다.
-  - **TeruTeruLogger**: 색상별 로그 출력 및 하드웨어 로그 별도 기록 기능을 갖춘 고성능 로깅 시스템.
-- **설정 관리**: 실행 시 `config.txt`를 통해 서버 모드(TCP/UDP), 포트, 최대 접속자 수 등을 동적으로 설정할 수 있습니다.
-
-## 🛠 기술 스택
-
-- **Language**: C# (.NET Core / Standard)
-- **Network**: System.Net.Sockets (IOCP)
-- **Serialization**: System.Runtime.InteropServices (Marshal), System.Text.Json
-- **Security**: System.Security.Cryptography
+- **강력한 계층 분리**: SDK, Runtime, Commands, Cli, Client의 정교한 분리를 통해 유지보수성과 확장성을 극대화했습니다.
+- **P2P 하이브리드 멀티캐스트**: 홀펀칭 기술을 활용하여 성공한 Peer간 직접 통신을 지원하고, 실패한 경우에만 서버가 릴레이하는 최적화된 하이브리드 그룹 통신(`P2PGroup`)을 지원합니다.
+- **미들웨어 파이프라인**: `Validation -> Decryption -> JWT Auth -> Routing`으로 이어지는 유연한 패킷 처리 파이프라인을 갖추고 있습니다.
+- **플러그인 핫로딩 (Hot-Reloading)**: 서버를 끄지 않고도 비즈니스 로직(DLL)을 즉시 교체 및 반영할 수 있는 동적 로딩 시스템을 지원합니다.
+- **AI-Ready SDK**: 서버 엔진 SDK에 `OpenCV`, `TorchSharp(PyTorch)`, `ML.NET`이 탑재되어 고성능 AI 로직 개발이 즉시 가능합니다.
+- **테스트 주도 개발(TDD) 환경**: 모든 핵심 로직에 대한 검증을 완료한 견고한 테스트 환경(`.Tests`)을 갖추고 있습니다.
 
 ## 📂 프로젝트 구조
 
-```text
-iocp/
-├── Command/         # 서버 콘솔 명령어 처리 로직
-├── ManageLogic/     # 서버 비즈니스 로직 및 프로토콜 핸들러
-│   ├── Protocol/    # RPC Stub, Proxy 및 데이터 구조체
-│   └── Util/        # 로깅, 암호화, 메모리 관리 유틸리티
-├── Document/        # 상세 기술 문서
-└── config.txt       # 서버 설정 파일
+| 프로젝트명 | 역할 | 비고 |
+| :--- | :--- | :--- |
+| **`TeruTeruServer.SDK`** | 코어 개발 도구 | 프로토콜, 인터페이스, AI 유틸리티, 공용 모델(P2P 등) 포함 |
+| **`TeruTeruServer.Runtime`** | 서버 코어 엔진 | 소켓(IOCP), 파이프라인, 플러그인 매니저, 세션 관리 |
+| **`TeruTeruServer.Commands`** | 서버 제어 커맨드 | 서버 운영에 필요한 모듈화된 명령어 처리기 |
+| **`TeruTeruServer.Cli`** | 인터랙티브 진입점 | 엔진 호스팅, CUI 입력 루프, 실시간 로그 모니터링 |
+| **`TeruTeruServer.Client`** | 클라이언트 SDK | 게임/클라이언트 앱에서 서버와 P2P로 직결하기 위한 고수준 API |
+| **`Logic.Default`** | 비즈니스 로직 플러그인 | **사용자 구현 공간.** 핫로딩 대상 프로젝트 |
+| **`*.Tests`** | 단위 테스트 | 프레임워크 건전성 및 로직 무결성을 검증하는 TDD 프로젝트 모음 |
+
+## 🛠 기술 스택
+
+- **Core**: .NET 9.0 / C#
+- **AI/CV**: OpenCvSharp4, TorchSharp, Microsoft.ML
+- **Network**: System.Net.Sockets (Async IO UDP/TCP), JWT Authentication, P2P Holepunching
+- **Architecture**: Dependency Injection, Plugin Architecture (AssemblyLoadContext), Middleware Pipeline
+
+## 🚦 시작하기 (Getting Started)
+
+### 1. 전체 솔루션 빌드
+```bash
+dotnet build
 ```
 
-## 📖 문서 (Documentation)
+### 2. 서버 실행 (Cli 프로젝트)
+```bash
+dotnet run --project TeruTeruServer.Cli
+```
 
-자세한 사용법과 코드 설명은 아래 문서를 참고하세요.
+### 3. 로직 개발 및 핫로딩 테스트
+1. `TeruTeruServer.Logic.Default` 프로젝트에서 로직을 수정합니다.
+2. 해당 프로젝트만 빌드합니다: `dotnet build TeruTeruServer.Logic.Default`
+3. 서버 엔진이 켜져 있는 상태에서 자동으로 `plugins` 폴더에 반영되어 로직이 갱신됩니다.
 
-- [**사용 설명서 (Usage Guide)**](./Document/Usage.md): 서버 실행 방법 및 클라이언트 연동 가이드
-- [**코드 기술 문서 (Code Documentation)**](./Document/CodeDocumentation.md): 클래스 설명 및 아키텍처 상세
+## 📖 문서 가이드 (Documentation)
 
-## 🚦 시작하기
+프로젝트의 상세 설계와 사용법은 `Documents/` 디렉토리에 체계적으로 정리되어 있습니다.
 
-1. **빌드**:
-   ```bash
-   dotnet build iocp.sln
-   ```
-2. **실행**:
-   ```bash
-   dotnet run --project iocp/TeruTeruServer.csproj
-   ```
-3. **설정**: 최초 실행 시 콘솔 프롬프트를 통해 IP, 포트, 프로토콜 방식을 입력하면 `config.txt`가 자동 생성됩니다.
+### 📘 핵심 문서 (Core)
+- [**AI 전용 기술 문서 (Full Context)**](./alternate_AI_doc.md) 🤖: 100만 토큰 AI 에이전트를 위한 상세 명세
+- [**개발자 퀵스타트**](./Documents/UserGuide/Developer_Quickstart.md) ✨: 서버 설치 및 명령어 사용법
+- [**클라이언트 SDK 가이드**](./Documents/Technical/Client_SDK_Guide.md): 클라이언트 연동 및 P2P 활용법
+- [**프로토콜 명세서**](./Documents/Technical/Protocol_Spec.md): 네트워크 패킷 및 데이터 모델 정의
+
+### 📂 상세 문서 구조
+- [**Technical/**](./Documents/Technical): 아키텍처, API 레퍼런스 등 심화 기술 문서
+- [**UserGuide/**](./Documents/UserGuide): 설치 및 트러블슈팅 가이드
+- [**Archive/**](./Documents/Archive): 과거 구현 계획 및 단계별 지시서 기록
+- [**Internal/**](./Documents/Internal): 에이전트 프롬프트 및 프로젝트별 세부 가이드 (Internal Only)
 
 ---
-
+© 2026 TeruTeru Server Team. All rights reserved.

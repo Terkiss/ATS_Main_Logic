@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TeruTeruServer.SDK\TeruTeruServer.SDK.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.17.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
+  </ItemGroup>
+
+  <!-- 빌드 후 서버의 plugins 폴더로 자동 복사 (Hot Reloading 지원용) -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <MakeDir Directories="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
+  </Target>
+
+</Project>

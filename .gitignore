@@ -1,7 +1,26 @@
-﻿################################################################################
-# 이 .gitignore 파일은 Microsoft(R) Visual Studio에서 자동으로 만들어졌습니다.
+################################################################################
+# .NET / Visual Studio 표준 .gitignore
 ################################################################################
 
+# 빌드 산출물 (Build outputs)
+[Bb]in/
+[Oo]bj/
+[Rr]elease/
+[Dd]ebug/
+
+# Visual Studio / VS Code 설정
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 프로젝트별 특정 무시 항목
+/Client/
 /.vs/iocp/FileContentIndex
-/Client
-/iocp/bin
+
+# 로그 및 임시 파일
+*.log
+*.tmp
+\n# Local Test Project\nDummyClient/
