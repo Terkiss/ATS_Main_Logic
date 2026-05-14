@@ -10,8 +10,8 @@
 ---
 
 ### Step 1: 준비물 챙기기 (필수 프로그램 설치)
-이 서버는 마이크로소프트의 최신 기술인 **.NET 8.0** 위에서 돌아갑니다.
-1.  [Microsoft .NET 다운로드 페이지](https://dotnet.microsoft.com/download/dotnet/8.0)에 접속합니다.
+이 서버는 마이크로소프트의 최신 기술인 **.NET 9.0** 위에서 돌아갑니다.
+1.  [Microsoft .NET 다운로드 페이지](https://dotnet.microsoft.com/download/dotnet/9.0)에 접속합니다.
 2.  내 컴퓨터 운영체제(Windows/Mac/Linux)에 맞는 **.NET SDK**를 다운로드하고 설치의 '다음' 버튼만 계속 누르시면 끝!
 
 ### Step 2: 코드 다운로드 및 빌드 (엔진 조립하기)

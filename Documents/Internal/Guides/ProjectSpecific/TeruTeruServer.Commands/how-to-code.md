@@ -1,49 +1,69 @@
-# 🛠️ 새로운 마법 주문 만들기 (코드 수정법)
+# 🛠️ 관제탑 명령어 세트 코드 수정법 (Commands)
 
-안녕하세요! 이곳에서는 까만 터미널 화면에 칠 수 있는 새로운 마법 주문을 직접 만들어 볼 거예요. 
-터미널에 `hello`라고 치면 예쁘게 인사해주는 마법을 만들어 볼까요? ✨
+안녕! 여기서는 우리 놀이공원을 관리하는 '새로운 버튼'을 어떻게 만드는지 배워볼 거야. ✨
 
-## 🧐 가장 중요한 코드 읽어보기
+## 📝 새로운 명령어(버튼) 추가하기
 
-놀이공원을 끄는 가장 기본적이고 무시무시한 마법, `TeruTeruServer.Commands/ExitCommand.cs` 파일을 열어보세요.
+서버에게 "안녕?"이라고 인사하면 서버도 "반가워!"라고 대답하는 명령어를 만들어보자.
+
+### 1단계: 새로운 버튼 클래스 만들기
+`TeruTeruServer.Commands` 폴더 안에 `HelloCommand.cs` 파일을 새로 만들고 아래 내용을 적어봐.
 
 ```csharp
-public class ExitCommand : ICommand
+using System;
+using TeruTeruServer.SDK.Interfaces;
+
+namespace TeruTeruServer.Commands
 {
-    public bool Execute(string[] args)
+    public class HelloCommand : ICommand
     {
-        return false; // 프로그램 종료
+        public bool Execute(string[] args)
+        {
+            Console.WriteLine("관제탑 마스코트: 안녕하세요! 오늘도 서버가 튼튼하네요! ✨");
+            return true;
+        }
     }
 }
 ```
-엄청 간단하죠?
-`ICommand`라는 기본 양식을 복사해서 가져온 다음, `Execute`라는 곳 안에 **"이 주문을 외우면 어떤 일이 일어날까?"** 를 적어주면 끝이에요!
-여기서는 `false`를 돌려줘서 "이제 놀이공원 문 닫아!" 라고 알려주고 있네요.
+
+### 2단계: 리모컨에 등록하기
+`TeruTeruServer.Commands/CommandHandler.cs` 파일을 열어서 24번째 줄 아래에 한 줄을 추가해봐.
+
+```csharp
+// 24번째 줄 아래에 추가!
+_commands["hello"] = new HelloCommand();
+```
+
+### 3단계: 무엇이 변했나요?
+이제 관제탑(CLI)에서 `hello`라고 입력하면 방금 만든 마스코트의 인사말이 출력될 거야!
 
 ---
 
-## 🪄 나만의 마법 부리기 (따라하기)
+## 📝 명령어에 정보 추가하기 (Health 커맨드)
 
-인사를 해주는 `HelloCommand`를 한 번 상상해 볼까요? (직접 파일을 만들어봐도 좋아요!)
+서버가 사용 중인 메모리 정보를 더 알기 쉽게 고쳐볼까?
 
-1. `TeruTeruServer.Commands` 폴더 안에 `HelloCommand.cs`라는 파일을 새로 만듭니다.
-2. 위에서 본 `ExitCommand`처럼 똑같이 코드를 적어주세요.
-3. 그리고 `Execute` 안쪽의 내용을 이렇게 바꿔볼게요!
-   ```csharp
-   public class HelloCommand : ICommand
-   {
-       public bool Execute(string[] args)
-       {
-           Console.WriteLine("💖 안녕하세요! 관리자님, 오늘도 화이팅! 💖");
-           return true; // 놀이공원 계속 운영!
-       }
-   }
-   ```
-4. 그리고 마법 주문서 관리자인 `CommandHandler.cs` 파일을 열어서 **"저기요! 이제 'hello'라고 치면 HelloCommand 마법이 나가게 해주세요!"** 라고 등록만 해주면 완성이에요! 
+### 1단계: 검진 버튼 열기
+`TeruTeruServer.Commands/HealthCommand.cs` 파일을 열어봐.
+
+### 2단계: 코드 수정하기
+29번째 줄을 보면 메모리 사용량을 출력하는 부분이 있어.
+
+```csharp
+// 29번째 줄
+Console.WriteLine($"Memory Used      : {memoryUsed} MB");
+// 이렇게 바꿔보자! ✨
+Console.WriteLine($"밥(Memory) 먹은 양 : {memoryUsed} MB (아주 배불러요!)");
+```
 
 ---
 
-## ⚠️ 주의사항
+## ✨ 멘토의 미션: "퇴장 인사말 남기기"
 
-명령어(주문 이름)를 등록할 때는 꼭 짧고 외우기 쉬운 영단어로 만들어주세요. 
-만약 주문 이름을 `please_open_the_door_very_gently` 처럼 길게 만들면... 나중에 바쁜 관리자 아저씨가 타자 치다가 손가락에 쥐가 날지도 몰라요! 🐭
+놀이공원 문을 닫을 때 손님들에게 마지막 인사를 건네볼까?
+
+1.  `TeruTeruServer.Commands/ExitCommand.cs` 파일을 찾아봐.
+2.  `Execute` 함수 안에서 `Environment.Exit(0);` 이 실행되기 직전에 한 줄을 추가해봐.
+3.  `Console.WriteLine("오늘도 즐거운 하루였어요! 내일 또 만나요! ✨👋");`
+
+이제 서버를 끌 때마다 따뜻한 인사말을 볼 수 있을 거야!

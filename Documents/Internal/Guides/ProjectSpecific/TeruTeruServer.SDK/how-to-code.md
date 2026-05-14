@@ -1,48 +1,45 @@
-# 🛠️ 이름표 만들기 마법 (코드 수정법)
+# 🛠️ 기초 공사 파트 코드 수정법 (SDK)
 
-안녕하세요! 이번에는 도구상자 방에서 가장 재밌는 **'이름표 만들기'** 마법을 부려볼 거예요.
-새로운 이름표를 만들어서 놀이공원에 우리만의 새로운 명령어를 추가해 볼까요? ✨
+안녕! 여기서는 우리 놀이공원의 '기본 규칙'을 어떻게 바꾸는지 배워볼 거야. ✨
 
-## 🧐 가장 중요한 코드 읽어보기
+## 📝 새로운 대화 주제(프로토콜) 추가하기
 
-우리가 살펴볼 파일은 이름표들이 가득 모여있는 `TeruTeruServer.SDK/Enums/ProtocolEnums.cs` 예요.
-이 파일을 열어서 **9번째 줄**을 한 번 볼까요?
+서버와 손님이 새로운 주제로 대화하고 싶을 때는 여기서 이름을 먼저 만들어줘야 해.
+
+### 1단계: 이름표 찾기
+`TeruTeruServer.SDK/Enums/ProtocolSelect.cs` 파일을 열어봐.
+
+### 2단계: 코드 수정하기
+파일의 적당한 위치(대략 50번째 줄 근처)에 아래처럼 코드를 추가해봐!
 
 ```csharp
-public enum ProtocolSelect : byte
+// [기존 코드들...]
+LoginProtocol = 1,
+ConnectProtocol = 2,
+// 여기에 추가! ✨
+GreetingMessage = 100, 
+```
+
+### 3단계: 무엇이 변했나요?
+이제 서버와 클라이언트 모두 `GreetingMessage`라는 이름을 쓸 수 있게 됐어. 이건 마치 우리 놀이공원 사전에 새로운 단어를 하나 등록한 것과 같아!
+
+---
+
+## ✨ 멘토의 미션: "나만의 인사말 만들기"
+
+우리 놀이공원에 오는 손님들에게 특별한 인사를 건네고 싶지 않니?
+
+1.  `ProtocolSelect.cs` 파일에 `WelcomeMessage = 2026,`을 추가해봐.
+2.  그리고 `TeruTeruServer.SDK/Protocol/` 폴더 안에 `WelcomeProtocol.cs`라는 파일을 만들어서 아래 내용을 적어봐.
+
+```csharp
+namespace TeruTeruServer.SDK.Protocol
 {
-    ConnectProtocol = 1,
-    LoginProtocol = 2,
-    QueueCountCommand = 101, // 큐 카운트 요청 (Phase 3 기능 대비)
-    ImageDumpCommand = 102   // 이미지 덤프 요청 (Phase 3 기능 대비)
+    public class WelcomeProtocol
+    {
+        public string Message { get; set; } = "우리 놀이공원에 온 걸 환영해! ✨";
+    }
 }
 ```
-여기서 `enum`이라는 것은 **"이제부터 여러 가지 옵션들에 이름표를 붙일 거야!"** 라는 주문이에요. 
-컴퓨터는 `ConnectProtocol`이라는 긴 글자 대신 숫자 `1`로 기억하게 되어서 훨씬 빠르고 똑똑하게 일할 수 있죠!
 
----
-
-## 🪄 나만의 마법 부리기 (따라하기)
-
-우리가 나중에 놀이공원 손님들에게 "안녕!" 하고 인사할 수 있는 새로운 이름표를 만들어봐요.
-
-1. `TeruTeruServer.SDK/Enums/ProtocolEnums.cs` 파일을 열어주세요.
-2. `ImageDumpCommand = 102` 라고 적혀있는 **14번째 줄** 맨 뒤에 쉼표(`,`)를 하나 꼭! 찍어주세요.
-   ```csharp
-   ImageDumpCommand = 102, // 쉼표 잊지 마세요!
-   ```
-3. 그리고 바로 아래 줄(15번째 줄)에 새로운 이름표를 이렇게 적어주세요.
-   ```csharp
-   SayHelloCommand = 103   // 인사하기 요청
-   ```
-4. 파일을 저장하면 끝! 
-   이제 놀이공원 관제탑에서 `SayHelloCommand`라는 멋진 이름표를 사용할 수 있게 되었어요! 🎉
-
----
-
-## ⚠️ 주의사항
-
-이름표를 만들 때 가장 조심해야 할 점이 있어요! 
-**이미 쓰고 있는 숫자(1, 2, 101, 102)를 다른 걸로 바꾸거나, 새로운 이름표에 똑같은 숫자를 주면 절대 안 돼요.**
-숫자가 겹치면 놀이기구가 "어? 1번이 범퍼카였나, 롤러코스터였나?" 하고 헷갈려서 고장이 나버린답니다! 😱 
-항상 겹치지 않는 새로운 숫자를 주세요.
+성공했다면 멘토에게 자랑해줘! 너는 이제 우리 놀이공원의 '규칙 설계자'가 된 거야! 🎩✨

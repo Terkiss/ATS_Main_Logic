@@ -8,9 +8,9 @@
 본 문서는 TeruTeru Server의 로컬 개발 환경 구축 및 빌드/실행 절차를 안내합니다.
 
 ## 1. 사전 요구 사항 (Prerequisites)
-*   **OS:** Windows 10/11, Linux (Ubuntu 20.04+ 권장)
-*   **Runtime:** `.NET 8.0 SDK` 또는 `.NET 9.0 SDK`
-*   **Database:** MySQL 8.0+ (기본 연결 설정 기준)
+*   **OS:** Windows 10/11, Linux (Ubuntu 22.04+ 권장), macOS 13+
+*   **Runtime:** `.NET 9.0 SDK` (필수)
+*   **Database:** MySQL 8.0+ (세션 스토어용), Redis (분산 세션 관리용, M12 옵션)
 
 ## 2. 빌드 스크립트 (Build Process)
 프로젝트는 솔루션 단위 빌드를 권장하며, 의존성 관계에 따라 자동으로 SDK -> Runtime -> Plugin 순서로 빌드됩니다.

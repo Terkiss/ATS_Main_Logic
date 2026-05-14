@@ -1,52 +1,47 @@
-# 🛠️ 관제탑에서 나만의 마법 부리기 (코드 수정법)
+# 🛠️ 엔진/심장 파트 코드 수정법 (Runtime)
 
-안녕하세요! 여기서는 관제탑의 메인 컴퓨터(`MainServer.cs`)를 열어서 직접 코드를 읽어보고 수정해 볼 거예요. 겁먹지 마세요, 제가 옆에서 도와줄게요! ✨
+안녕! 여기서는 우리 놀이공원의 '입구'와 '검문소'를 어떻게 고치는지 배워볼 거야. ✨
 
-## 🧐 가장 중요한 코드 읽어보기
+## 📝 서버 개장 메시지 바꾸기
 
-관제탑의 메인 컴퓨터 역할을 하는 파일은 `TeruTeruServer.Runtime/MainServer.cs` 예요. 이 파일을 열어서 가장 중요한 두 곳을 살펴볼게요.
+서버가 처음 켜질 때 나오는 메시지를 바꿔서 우리만의 개성을 뽐내보자!
 
-### 1. 보안 검색대 설치하기 (`Initialize` 함수)
-파일의 **77번째 줄** 쯤을 보면 `private void Initialize(...)` 라는 부분이 있어요.
+### 1단계: 입구 찾기
+`TeruTeruServer.Runtime/MainServer.cs` 파일을 열어봐.
+
+### 2단계: 코드 수정하기
+137번째 줄부터 148번째 줄 사이를 보면 글자 색깔을 바꾸거나 메시지를 출력하는 부분이 있어.
+
 ```csharp
-// 파이프라인 초기화 및 미들웨어 등록
-_pipeline = new PacketPipeline();
-_pipeline.Use(new ValidationMiddleware());
-_pipeline.Use(new DecryptionMiddleware());
-...
+// 137번째 줄 근처
+Console.WriteLine("Server Start"); // 이 문구를 바꿔보자!
+// 145번째 줄 근처
+Console.WriteLine("Server Configuration Complete!!!"); // 이것도 바꿔볼까? ✨
 ```
-이곳은 손님들이 보낸 쪽지를 검사하는 **'보안 검색대(파이프라인)'**를 설치하는 곳이에요. "쪽지 형식이 맞는지 검사해(Validation)!", "암호를 풀어(Decryption)!" 하고 순서대로 규칙을 정해주고 있죠.
 
-### 2. 관제탑 전원 켜기 (`TcpServerStart` 함수)
-파일의 **117번째 줄** 쯤에는 `private void TcpServerStart()` 라는 부분이 있어요.
-```csharp
-Console.WriteLine("Server Start");
-Console.WriteLine("Server Version : 0.00.2");
-```
-이곳은 관제탑의 전원을 켜고, 운영자 아저씨의 까만 화면(Console)에 "서버 켜졌습니다!" 하고 알려주는 부분이에요.
+### 3단계: 무엇이 변했나요?
+서버를 실행하면(관제탑 파트 가이드 참고) 내가 적은 메시지가 예쁜 색깔로 나올 거야!
 
 ---
 
-## 🪄 나만의 마법 부리기 (따라하기)
+## 🛡️ 보안 검색대 통과하기 (미들웨어)
 
-자, 이제 우리가 직접 마법(코드 수정)을 부려볼 시간이에요! 
-관제탑이 켜질 때 나오는 딱딱한 인사말을 우리만의 귀여운 인사말로 바꿔볼까요?
+손님이 들고 오는 데이터를 검사하는 규칙을 추가할 수 있어. 
 
-1. `TeruTeruServer.Runtime/MainServer.cs` 파일을 열어주세요.
-2. **123번째 줄** 근처로 가보세요.
-   ```csharp
-   Console.WriteLine("Server Start");
-   ```
-   이 코드가 보일 거예요.
-3. 이 문장을 아래처럼 지우고, 여러분이 원하는 환영 인사로 바꿔보세요!
-   ```csharp
-   Console.WriteLine("💖 우리들의 환상적인 놀이공원 오픈! 어서오세요! 💖");
-   ```
-4. 저장하고 서버를 다시 켜보면? 까만 화면에 여러분이 적은 예쁜 인사말이 뜰 거예요! 🎉
+### 1단계: 검색대 명단 확인
+`MainServer.cs` 파일의 96번째 줄 근처를 봐봐. `_pipeline.Use(...)`라고 적힌 줄들이 있지? 
+
+### 2단계: 순서 바꿔보기 (고급 마법!)
+보안 검색의 순서를 바꾸면 서버의 성격이 달라져. 하지만 순서를 잘못 바꾸면 손님들이 너무 오래 기다릴 수 있으니 주의해야 해!
 
 ---
 
-## ⚠️ 주의사항
+## ✨ 멘토의 미션: "서버 이름표 달아주기"
 
-관제탑은 놀이공원 전체를 관리하는 아주 중요한 곳이에요! 
-특히 `StartAcceptLoop`나 `HandleAcceptedSocket` 같은 이름이 붙은 곳들은 손님들을 맞이하는 **'입구 회전문'**과 같아서, 이곳의 코드를 잘못 만지면 회전문이 고장 나서 손님들이 아예 들어올 수 없게 되니 조심조심 눈으로만 구경해 주세요! 😉
+우리 서버가 몇 명까지 받을 수 있는지 화면에 더 친절하게 표시해볼까?
+
+1.  `MainServer.cs`의 140번째 줄을 찾아봐.
+2.  `Console.WriteLine("Server Max Connection : " + _maxConnection);` 아래에 한 줄을 더 추가해봐.
+3.  `Console.WriteLine("Enjoy your stay in our park! ✨");` 라고 적으면 성공!
+
+이제 우리 서버는 손님들에게 훨씬 더 친절해졌어! 💖

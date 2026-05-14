@@ -29,20 +29,18 @@
 ### 🔥 초간단 RPC 마법
 
 ```csharp
-// 1. [Rpc] 태그를 붙이고 내가 원하는 이름을 적습니다.
+// 1. [Rpc] 태그를 붙이고 클라이언트가 호출할 이름을 적습니다.
+[RequiresAuth] // 인증된 유저만 호출 가능하게 설정 (선택)
 [Rpc("SayHello")]
-public string ReplyToClient(Socket socket, string clientMessage)
+public async Task<string> ReplyToClient(Socket socket, string clientMessage)
 {
-    // 2. 원하는 로직을 씁니다.
-    Console.WriteLine($"유저가 보낸 메시지: {clientMessage}");
+    // 2. 원하는 비즈니스 로직을 자유롭게 작성합니다.
+    TeruTeruLogger.LogInfo($"유저 메시지 수신: {clientMessage}");
     
-    // 3. 리턴만 해주면 엔진이 알아서 클라이언트 폰/PC로 전송해 줍니다!
-    return $"서버도 안녕! 네가 보낸 메시지는 {clientMessage}야.";
+    // 3. 결과값을 리턴하면 엔진이 알아서 클라이언트에게 전송합니다.
+    return $"서버도 반녕! 네가 보낸 메시지 '{clientMessage}'를 잘 받았어.";
 }
 ```
 
 ### 💡 보너스 팁: 서버 끄지 않고 업데이트하기 (Hot-Reload)
-위 코드를 다 작성하셨나요? 서버 콘솔창을 끄지 마세요! 
-그냥 다른 터미널 창을 열고 `dotnet build TeruTeruServer.Logic.Default` 한 줄만 쳐보세요. 
-
-서버 창에 `[PluginManager] Logic plugin hot-reloaded successfully.` 라는 메시지가 뜨면서 방금 짠 코드가 서버에 즉시 적용됩니다! 이게 바로 진정한 서버 개발의 낭만이죠. 😎
+위 코드를 다 작성하셨나요? 서버 콘솔창을 끄지 마세요! 그냥 다른 터미널에서 `dotnet build TeruTeruServer.Logic.Default` 한 줄만 쳐보세요. 서버 창에 `[PluginManager] Logic plugin hot-reloaded successfully.` 라는 메시지가 뜨면서 방금 짠 코드가 서버에 즉시 적용됩니다! 이게 바로 **Architecture 2.0**의 힘입니다. 😎

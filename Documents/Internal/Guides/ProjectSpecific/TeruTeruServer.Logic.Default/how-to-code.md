@@ -1,51 +1,58 @@
-# 🛠️ 놀이기구 마법 부리기 (코드 수정법)
+# 🛠️ 게임 규칙 파트 코드 수정법 (Logic)
 
-안녕하세요! 이곳에서는 게임의 진짜 규칙을 정하는 `LogicPlugin.cs` 파일을 열어서 직접 코드를 수정해 볼 거예요. 
-우리 놀이공원에 손님이 찾아왔을 때, 관리자 아저씨의 화면에 예쁜 알림이 뜨도록 만들어 볼까요? ✨
+안녕! 여기서는 우리 놀이공원의 '꿀잼 규칙'들을 어떻게 직접 만드는지 배워볼 거야. ✨
 
-## 🧐 가장 중요한 코드 읽어보기
+## 📝 서버의 답변 메시지 수정하기 (Echo 서비스)
 
-운영 매뉴얼인 `TeruTeruServer.Logic.Default/LogicPlugin.cs` 파일을 열어보세요.
+손님이 보낸 말을 서버가 그대로 되돌려주는 '메아리(Echo)' 서비스를 더 재미있게 바꿔보자!
 
-### 1. 쪽지 확인하는 곳 (`HandleJsonProtocol` 함수)
-파일의 **58번째 줄** 쯤에 이렇게 생긴 코드가 있어요.
+### 1단계: 규칙서 열기
+`TeruTeruServer.Logic.Default/LogicPlugin.cs` 파일을 열어봐.
+
+### 2단계: 코드 수정하기
+180번째 줄 근처에 있는 `HandleEcho` 함수를 찾아봐.
+
 ```csharp
-private void HandleJsonProtocol(string json, ProtocolSelect protocol, Socket socket)
+[Rpc("Echo")]
+public async Task<string> HandleEcho(Socket socket, string message)
 {
-    switch (protocol)
-    {
-        case ProtocolSelect.ConnectProtocol:
-            ConProtocol(socket, JsonSerializer.Deserialize<ConnectProtocol>(json));
-            break;
-        case ProtocolSelect.LoginProtocol:
-            HandleLogin(socket, JsonSerializer.Deserialize<LoginProtocol>(json));
-            break;
-    }
+    TeruTeruLogger.LogInfo($"RPC Echo called with: {message}");
+    // 이 아래 줄을 바꿔보자! ✨
+    return $"[멘토] 네가 '{message}'라고 말했지? 나도 그렇게 생각해! 💖";
 }
 ```
-여기는 관제탑에서 넘겨준 쪽지(패킷)의 '이름표(protocol)'를 보고, **"아! 이건 연결해달라는 쪽지구나!", "이건 로그인해달라는 쪽지구나!"** 하고 구분해서 알맞은 담당자에게 넘겨주는 곳이에요.
 
-### 2. 로그인 처리하는 곳 (`HandleLogin` 함수)
-파일의 **71번째 줄** 쯤에는 `HandleLogin` 함수가 있어요.
-여기는 손님이 로그인 쪽지를 보냈을 때, 안전한 놀이공원 자유이용권(Token)을 발급해서 다시 돌려주는 중요한 곳이랍니다!
+### 3단계: 무엇이 변했나요?
+이제 클라이언트에서 'Echo'라는 기능을 호출하면 서버가 내가 적은 다정한 말투로 대답해줄 거야!
 
 ---
 
-## 🪄 나만의 마법 부리기 (따라하기)
+## 📝 새로운 규칙 추가하기 (마법의 어트리뷰트)
 
-손님이 로그인을 시도할 때마다, 운영자 화면에 "손님이 로그인했어요!" 라고 예쁘게 띄워볼까요?
+우리 서버는 `[Protocol(...)]`이나 `[Rpc(...)]` 같은 '마법의 이름표(어트리뷰트)'를 붙이면 자동으로 기능을 인식해.
 
-1. `TeruTeruServer.Logic.Default/LogicPlugin.cs` 파일을 열어주세요.
-2. **71번째 줄** 쯤에 있는 `private void HandleLogin(...)` 함수 안으로 들어가 보세요.
-3. 73번째 줄 `// [기존 로그인 로직]` 이라는 글자 바로 아래에, 이렇게 적어보세요!
-   ```csharp
-   Console.WriteLine($"🎉 우와! {loginData.UserId} 손님이 놀이공원에 놀러왔어요! 🎉");
-   ```
-4. 저장하고 서버를 켜보면, 누군가 로그인을 할 때마다 화면에 폭죽이 터지며 환영 인사가 뜰 거예요! 🎇
+### 1단계: 새로운 함수 만들기
+`LogicPlugin.cs` 파일 맨 아래쪽에 새로운 기능을 하나 추가해볼까?
+
+```csharp
+[Rpc("SayHello")]
+public async Task<string> SayHello(Socket socket)
+{
+    return "안녕! 나는 이 놀이공원의 마스코트야! ✨";
+}
+```
+
+### 2단계: 결과 확인
+이제 손님(DummyClient)이 "SayHello"라고 서버에게 요청하면, 서버는 방금 만든 인사말을 보내주게 돼!
 
 ---
 
-## ⚠️ 주의사항
+## ✨ 멘토의 미션: "서버의 비밀 정보 알려주기"
 
-이 파일 아래쪽에 있는 `GenerateJwtToken` 함수(**105번째 줄**)는 손님들에게 발급해주는 **'위조 방지 자유이용권(Token)'**을 만드는 아주 복잡하고 중요한 기계예요! 
-여기에 있는 비밀 키(`SecretKey`)나 발급 규칙을 잘못 만지면 모든 손님들이 놀이기구를 탈 수 없게 쫓겨나 버리니, 이 부분은 조심해서 눈으로만 구경해 주세요! 🤫
+우리 서버의 현재 상태를 알려주는 기능을 조금 더 멋지게 바꿔볼까?
+
+1.  `LogicPlugin.cs`의 186번째 줄에 있는 `GetServerInfo` 함수를 찾아봐.
+2.  거기 보면 `ServerName`, `Version` 같은 정보가 적혀 있지?
+3.  거기에 `"MentorMessage" = "오늘도 코딩 공부 화이팅! 🚀"` 이라는 항목을 하나 추가해봐.
+
+성공했다면 이제 서버 정보를 확인할 때마다 멘토의 응원 메시지도 함께 보일 거야!

@@ -5,11 +5,12 @@
 ## 🚀 주요 특징 (Architecture 2.0)
 
 - **강력한 계층 분리**: SDK, Runtime, Commands, Cli, Client의 정교한 분리를 통해 유지보수성과 확장성을 극대화했습니다.
-- **P2P 하이브리드 멀티캐스트**: 홀펀칭 기술을 활용하여 성공한 Peer간 직접 통신을 지원하고, 실패한 경우에만 서버가 릴레이하는 최적화된 하이브리드 그룹 통신(`P2PGroup`)을 지원합니다.
-- **미들웨어 파이프라인**: `Validation -> Decryption -> JWT Auth -> Routing`으로 이어지는 유연한 패킷 처리 파이프라인을 갖추고 있습니다.
-- **플러그인 핫로딩 (Hot-Reloading)**: 서버를 끄지 않고도 비즈니스 로직(DLL)을 즉시 교체 및 반영할 수 있는 동적 로딩 시스템을 지원합니다.
+- **P2P 하이브리드 인프라**: 홀펀칭 기술을 활용하여 Peer간 직접 통신을 지원하고, 실패 시 서버가 자동 릴레이하는 최적화된 하이브리드 그룹 통신을 완성했습니다.
+- **실시간 게임 엔진**: Tick Loop 기반의 상태 동기화(State Sync), 지연 보상(Lag Compensation), 그리고 예측 기반 네트워크 아키텍처를 지원합니다.
+- **멀티-월드 및 구역 관리**: 동적 인스턴스 생성 및 Zone 이동 기술을 통해 대규모 동시 접속 환경을 효율적으로 관리합니다.
+- **플러그인 핫로딩 (Hot-Reloading)**: 서버 가동 중에도 비즈니스 로직(DLL)을 즉시 교체 및 반영할 수 있는 무중단 배포 시스템을 제공합니다.
 - **AI-Ready SDK**: 서버 엔진 SDK에 `OpenCV`, `TorchSharp(PyTorch)`, `ML.NET`이 탑재되어 고성능 AI 로직 개발이 즉시 가능합니다.
-- **테스트 주도 개발(TDD) 환경**: 모든 핵심 로직에 대한 검증을 완료한 견고한 테스트 환경(`.Tests`)을 갖추고 있습니다.
+- **운영 자동화 및 보안**: 실시간 대시보드 모니터링, 클러스터링 관리, 그리고 JWT/HMAC 기반의 강력한 보안 미들웨어를 갖추고 있습니다.
 
 ## 📂 프로젝트 구조
 
@@ -52,16 +53,16 @@ dotnet run --project TeruTeruServer.Cli
 프로젝트의 상세 설계와 사용법은 `Documents/` 디렉토리에 체계적으로 정리되어 있습니다.
 
 ### 📘 핵심 문서 (Core)
+- [**학생용 맞춤 가이드 (Coding Mentor)**](./Documents/Internal/Guides/ProjectSpecific/공통가이드/README.md) ✨: 코딩 동생들을 위한 친절한 테마파크 안내서
+- [**개발자 온보딩 가이드**](./Documents/Internal/Guides/ProjectSpecific/developer-guide.md) 👨‍💻: 프로젝트 전체 구조 및 기술 세부 가이드
 - [**AI 전용 기술 문서 (Full Context)**](./alternate_AI_doc.md) 🤖: 100만 토큰 AI 에이전트를 위한 상세 명세
-- [**개발자 퀵스타트**](./Documents/UserGuide/Developer_Quickstart.md) ✨: 서버 설치 및 명령어 사용법
+- [**기술 세부 명세서**](./Documents/Technical/Protocol_Spec.md): 패킷 구조 및 프로토콜 규약
 - [**클라이언트 SDK 가이드**](./Documents/Technical/Client_SDK_Guide.md): 클라이언트 연동 및 P2P 활용법
-- [**프로토콜 명세서**](./Documents/Technical/Protocol_Spec.md): 네트워크 패킷 및 데이터 모델 정의
 
 ### 📂 상세 문서 구조
-- [**Technical/**](./Documents/Technical): 아키텍처, API 레퍼런스 등 심화 기술 문서
-- [**UserGuide/**](./Documents/UserGuide): 설치 및 트러블슈팅 가이드
-- [**Archive/**](./Documents/Archive): 과거 구현 계획 및 단계별 지시서 기록
-- [**Internal/**](./Documents/Internal): 에이전트 프롬프트 및 프로젝트별 세부 가이드 (Internal Only)
+- [**Technical/**](./Documents/Technical): 아키텍처, 데이터베이스, 보안 등 심화 기술 문서
+- [**UserGuide/**](./Documents/UserGuide): 설치, 사용법 및 트러블슈팅 가이드
+- [**Internal/**](./Documents/Internal): 에이전트 프롬프트 및 프로젝트별 세부 지시서
 
 ---
 © 2026 TeruTeru Server Team. All rights reserved.

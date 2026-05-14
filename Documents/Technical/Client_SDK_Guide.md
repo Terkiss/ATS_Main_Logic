@@ -73,4 +73,14 @@ P2P 통신(UDP 홀펀칭 및 시그널링)은 게임 및 실시간 데이터 송
 
 - **자동 UDP 소켓 생성**: `LoginAsync`가 성공하면, 내부에서 즉시 UDP 소켓을 바인딩하고 비동기 수신 루프를 시작합니다.
 - **자동 STUN (Server Binding)**: 서버로 `UdpRegisterProtocol` 패킷을 전송하여, 클라이언트의 외부 매핑 IP/Port(NAT 정보)를 서버의 메모리에 자동 등록합니다.
-- **자동 홀펀칭 (Hole Punching)**: 다른 클라이언트와 P2P가 필요할 때, 서버가 `HolePunchRequest` 시그널(대상 IP/Port 포함)을 보내면, SDK 내부에서 즉시 가짜 `PING` 패킷을 대상에게 쏴 NAT의 Inbound 포트를 강제 개방(Hole Punching)합니다. 개발자는 이 과정을 전혀 몰라도 됩니다.
+- **자동 홀펀칭 (Hole Punching)**: 다른 클라이언트와 P2P가 필요할 때, 서버가 `HolePunchRequest` 시그널을 보내면 SDK 내부에서 즉시 NAT 개방을 시도합니다.
+- **연결 품질 모니터링 (M3)**: `P2PPingProtocol`을 통해 피어 간의 RTT 및 패킷 손실률을 실시간으로 측정하며, 품질이 낮아지면 자동으로 릴레이 모드(`RelayFallbackProtocol`)로 전환을 검토합니다.
+
+---
+
+## 4. 매치메이킹 및 그룹 관리 (M11)
+
+SDK는 대규모 동시 접속 환경에서의 게임 세션 구성을 지원합니다.
+
+- **Matchmaking**: `MatchmakingProtocol`을 통해 자신의 조건(레이팅, 지역 등)을 서버에 전달하고 대기열에 진입합니다.
+- **Group Joining**: 서버가 매칭 성공 시 전달하는 `JoinGroupProtocol`을 수신하면, 내부적으로 해당 그룹에 속한 피어들과의 P2P 인프라가 자동으로 구축됩니다.

@@ -8,21 +8,25 @@
 이 문서는 서버 엔진과 클라이언트 간의 통신 규약 및 주요 인터페이스 명세를 다룹니다.
 
 ## 1. 패킷 구조 (Packet Structure)
-모든 네트워크 패킷은 다음 구조를 가집니다 (TCP 기준).
-`[전송 타입(1 byte)]` + `[프로토콜 타입(1 byte, Json 전송 시)]` + `[페이로드(Payload)]`
+모든 네트워크 패킷은 다음 구조를 가집니다.
+`[전송 타입(1 byte)]` + `[프로토콜 타입(1 byte)]` + `[시퀀스 번호(4 bytes)]` + `[페이로드(Payload)]`
 
 *   **SendType (1 byte)**: `0` = Direct (바이너리), `1` = Json
 *   **ProtocolSelect (1 byte)**: 아래 열거형 참조
+*   **SequenceNumber (4 bytes)**: 패킷의 순서를 보장하기 위한 무부호 정수(uint32)
 
 ## 2. 프로토콜 열거형 (`ProtocolSelect`)
+상세 프로토콜 목록은 [Protocol_Spec.md](./Protocol_Spec.md)를 참고하세요.
 ```csharp
 public enum ProtocolSelect : byte
 {
     ConnectProtocol = 1,
     LoginProtocol = 2,
-    RpcProtocol = 100,       // 범용 RPC 자동 매핑 프로토콜
-    QueueCountCommand = 101, // 큐 상태 확인
-    ImageDumpCommand = 102   // AI 이미지 전송
+    UdpRegisterProtocol = 4,
+    HolePunchRequest = 5,
+    StateSyncProtocol = 20,
+    RpcProtocol = 100,
+    // ... 상세 목록 생략
 }
 ```
 
