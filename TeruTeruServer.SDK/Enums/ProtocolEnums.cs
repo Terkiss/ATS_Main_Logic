@@ -29,6 +29,8 @@ namespace TeruTeruServer.SDK.Enums
         SecurityEventProtocol = 28,    // 보안 이벤트 알림 (M10)
         MatchmakingProtocol = 29,     // 매치메이킹 요청/응답 (M11)
         SessionStateProtocol = 30,    // 세션 상태 변경 알림 (M11)
+        ClusterInfoProtocol = 31,      // 클러스터 상태 조회 (M12)
+        DashboardProtocol = 32,        // 대시보드 데이터 요청 (M12)
         RpcProtocol = 100,       // 범용 RPC 프로토콜 추가
         QueueCountCommand = 101, // 큐 카운트 요청 (Phase 3 기능 대비)
         ImageDumpCommand = 102   // 이미지 덤프 요청 (Phase 3 기능 대비)

@@ -60,6 +60,9 @@ namespace TeruTeruServer.Runtime
             set;
         }
         public string HmacKey { get; set; } = "TeruTeruServer_Default_HMAC_Key_2026";
+        public string ClusterMode { get; set; } = "Local";   // "Local" | "Redis" (M12)
+        public string RedisConnectionString { get; set; } = "localhost:6379"; // (M12)
+        public string NodeId { get; set; } = "";              // 명시적 NodeId (비어있으면 Guid 사용) (M12)
 
         public void SetIP(string ip)
         {

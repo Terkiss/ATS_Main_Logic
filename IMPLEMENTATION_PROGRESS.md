@@ -1,6 +1,26 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 12 — Live Operations & Scalability
+## 현재 마일스톤: Phase 2 — Game Server Edition (Completed)
+ 
+- [x] **Milestone 12 — Live Operations & Scalability (Completed)**
+  - [x] **1. 게임 서버 클러스터링 및 라우팅**
+    - [x] ClusterNodeInfo 부하 메트릭 필드 확장
+    - [x] ClusterRouter (부하 기반 노드 선택) 구현
+    - [x] NodeHealthMonitor (장애 감지) 구현
+  - [x] **2. ISessionStore Redis 백엔드 구현 (시뮬레이션)**
+    - [x] RedisSessionStore 구현 (로컬 캐시 + Redis 구조)
+    - [x] RedisClusterRegistry / RedisEventBus 구현
+    - [x] ClusterMode 기반 DI 전환 로직
+  - [x] **3. 무중단 배포 (Rolling Update) 파이프라인**
+    - [x] RollingUpdateCoordinator 구현
+    - [x] 노드 Draining 상태 관리 로직
+  - [x] **4. 동접 급증 대응 (Auto Scaling) 연동**
+    - [x] AutoScaleMonitor 구현 (임계치 기반 결정)
+    - [x] 스케일링 이벤트 발행 (IEventBus)
+  - [x] **5. 실시간 운영 대시보드 (메트릭 수집)**
+    - [x] ServerMetrics 메트릭 필드 확장 (CCU, Zone 수 등)
+    - [x] ClusterDashboard 및 스냅샷 구현
+    - [x] 주기적 메트릭 갱신 Tick 핸들러 등록
  
 - [x] **Milestone 11 — Game Session & Matchmaking (Completed)**
   - [x] **1. 매치메이킹 큐 시스템**

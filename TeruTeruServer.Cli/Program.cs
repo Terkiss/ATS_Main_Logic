@@ -7,6 +7,7 @@ using TeruTeruServer.Runtime.DB;
 using TeruTeruServer.Runtime;
 using TeruTeruServer.Runtime.Rpc;
 using TeruTeruServer.Runtime.GameEngine;
+using TeruTeruServer.Runtime.Clustering;
 
 namespace TeruTeruServer.Cli
 {
@@ -40,13 +41,18 @@ namespace TeruTeruServer.Cli
 
                 // 클러스터 노드 자기 자신 등록
                 var clusterRegistry = serviceProvider.GetRequiredService<IClusterRegistry>();
+                string nodeId = string.IsNullOrEmpty(config.NodeId) ? (config.Guid ?? Guid.NewGuid().ToString("N")) : config.NodeId;
                 clusterRegistry.RegisterNode(new TeruTeruServer.SDK.Clustering.ClusterNodeInfo
                 {
-                    NodeId = config.Guid ?? Guid.NewGuid().ToString("N"),
+                    NodeId = nodeId,
                     Address = "localhost",
                     Port = config.Port,
                     Status = "Active",
-                    LastHeartbeat = DateTime.UtcNow
+                    LastHeartbeat = DateTime.UtcNow,
+                    CurrentConnections = 0,
+                    ActiveZoneCount = 0,
+                    ActiveSessionCount = 0,
+                    CpuUsagePercent = 0
                 });
 
                 Console.WriteLine("=== TeruTeruServer AI Engine Runtime Started ===");
@@ -71,16 +77,55 @@ namespace TeruTeruServer.Cli
                 var matchQueue = serviceProvider.GetRequiredService<MatchQueue>();
                 gameLoop.RegisterTickHandler(tick => { if (tick % 20 == 0) matchQueue.TryMatch(); });
 
+                // [Milestone 12] Clustering 틱 핸들러 등록
+                var healthMonitor = serviceProvider.GetRequiredService<NodeHealthMonitor>();
+                var autoScaleMonitor = serviceProvider.GetRequiredService<AutoScaleMonitor>();
+                var sessionManager = serviceProvider.GetRequiredService<ISessionManager>();
+                var gameSessionManager = serviceProvider.GetRequiredService<IGameSessionManager>();
+
+                gameLoop.RegisterTickHandler(tick =>
+                {
+                    if (tick % 200 == 0) // 10초마다
+                    {
+                        // 메트릭 갱신
+                        ServerMetrics.UpdateCcu(sessionManager.Players.Count);
+                        ServerMetrics.UpdateSessionCount(gameSessionManager.GetActiveSessions().Count);
+                        ServerMetrics.UpdateTps();
+
+                        // 하트비트 갱신
+                        clusterRegistry.UpdateHeartbeat(nodeId);
+                        
+                        // 헬스 체크
+                        healthMonitor.CheckHealth();
+                    }
+
+                    if (tick % 1200 == 0) // 60초마다
+                    {
+                        // 오토 스케일링 판단
+                        autoScaleMonitor.CheckAndNotify();
+                    }
+                });
+
                 gameLoop.Start();
             }
         }
 
         private static void ConfigureServices(IServiceCollection services, ServerConnectConfigParameter config)
         {
-            services.AddSingleton<ISessionStore, TeruTeruServer.SDK.Clustering.InMemorySessionStore>();
+            if (config.ClusterMode == "Redis")
+            {
+                services.AddSingleton<ISessionStore>(sp => new RedisSessionStore(config.RedisConnectionString));
+                services.AddSingleton<IClusterRegistry>(sp => new RedisClusterRegistry(config.RedisConnectionString));
+                services.AddSingleton<IEventBus>(sp => new RedisEventBus(config.RedisConnectionString));
+            }
+            else
+            {
+                services.AddSingleton<ISessionStore, TeruTeruServer.SDK.Clustering.InMemorySessionStore>();
+                services.AddSingleton<IEventBus, TeruTeruServer.SDK.Clustering.LocalEventBus>();
+                services.AddSingleton<IClusterRegistry, TeruTeruServer.SDK.Clustering.LocalClusterRegistry>();
+            }
+            
             services.AddSingleton<ISessionManager, SessionManager>();
-            services.AddSingleton<IEventBus, TeruTeruServer.SDK.Clustering.LocalEventBus>();
-            services.AddSingleton<IClusterRegistry, TeruTeruServer.SDK.Clustering.LocalClusterRegistry>();
 
             // DB 서비스 등록
             string dbUri = "Server=localhost;Port=3306;Database=unity3d;Uid=root;Pwd=password";
@@ -125,11 +170,17 @@ namespace TeruTeruServer.Cli
             services.AddSingleton<IZoneManager, ZoneManager>();
             services.AddSingleton<ZoneFactory>();
 
-            // [Milestone 10] Security Services (L388-393 지시사항 준수)
             services.AddSingleton<ISecurityEventLogger, SecurityEventLogger>();
             services.AddSingleton<SanctionManager>();
             services.AddSingleton<InputFrequencyValidator>();
             services.AddSingleton<ServerAuthorityValidator>();
+
+            // [Milestone 12] Clustering Services
+            services.AddSingleton<ClusterRouter>();
+            services.AddSingleton<NodeHealthMonitor>();
+            services.AddSingleton<RollingUpdateCoordinator>();
+            services.AddSingleton<AutoScaleMonitor>();
+            services.AddSingleton<ClusterDashboard>();
         }
     }
 }

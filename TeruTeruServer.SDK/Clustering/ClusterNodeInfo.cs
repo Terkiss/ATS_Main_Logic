@@ -31,5 +31,25 @@ namespace TeruTeruServer.SDK.Clustering
         /// 마지막 하트비트 시각입니다.
         /// </summary>
         public DateTime LastHeartbeat { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// 현재 동접 수입니다. (M12)
+        /// </summary>
+        public int CurrentConnections { get; set; }
+
+        /// <summary>
+        /// 활성 존 수입니다. (M12)
+        /// </summary>
+        public int ActiveZoneCount { get; set; }
+
+        /// <summary>
+        /// 활성 게임 세션 수입니다. (M12)
+        /// </summary>
+        public int ActiveSessionCount { get; set; }
+
+        /// <summary>
+        /// CPU 사용률 (0-100)입니다. (M12)
+        /// </summary>
+        public double CpuUsagePercent { get; set; }
     }
 }
