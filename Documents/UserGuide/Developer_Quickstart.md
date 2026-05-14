@@ -78,6 +78,7 @@ await client.InvokeRpcAsync("MyNewFeature", new { Message = "Hello World!" });
 ## 5. 핵심 개발 규칙
 - **6바이트 헤더**: 모든 패킷은 `[Type(1)][Protocol(1)][Seq(4)]` 헤더를 가집니다. 직접 패킷을 구성할 때는 `PacketUtility`를 활용하세요.
 - **비동기 처리**: 네트워크와 DB 작업은 반드시 `async/await`를 사용하여 서버의 성능을 유지하세요.
-- **보안**: 민감한 데이터는 `AuthMiddleware`를 통해 JWT 검증을 거치도록 설계하세요.
+- **보안 파이프라인**: 서버는 패킷 수신 시 **8단계 미들웨어**(Validation, BanCheck, RateLimit, ReplayAttack, HmacVerify, Decryption, Auth, Routing)를 거칩니다. 특히 HMAC 변조가 감지되면 세션이 즉시 차단되므로 유의하세요.
+- **인증**: 민감한 데이터는 `AuthMiddleware`를 통해 JWT 검증을 거치도록 설계하세요.
 
 👉 더 자세한 내용은 [Architecture 가이드](../Technical/Architecture.md)를 참고하세요!
