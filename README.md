@@ -1,16 +1,19 @@
 # TeruTeru Server AI Engine (v2.0)
 
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download)
+[![C#](https://img.shields.io/badge/C%23-13.0-239120?logo=csharp)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **TeruTeru Server**는 고성능 비동기 IO(IOCP) 기반의 C# 서버 엔진이자, 딥러닝(YOLO) 분석을 위한 **AI 호스팅 플랫폼**입니다. 아키텍처 2.0 리팩토링을 통해 서버 로직의 독립성 확보, 핫로딩(Hot-Reloading) 기능, 그리고 **P2P 하이브리드 멀티캐스트 인프라**를 완성했습니다.
 
-## 🚀 주요 특징 (Architecture 2.0)
+## 🚀 주요 특징 (Key Features)
 
-- **강력한 계층 분리**: SDK, Runtime, Commands, Cli, Client의 정교한 분리를 통해 유지보수성과 확장성을 극대화했습니다.
-- **P2P 하이브리드 인프라**: 홀펀칭 기술을 활용하여 Peer간 직접 통신을 지원하고, 실패 시 서버가 자동 릴레이하는 최적화된 하이브리드 그룹 통신을 완성했습니다.
-- **실시간 게임 엔진**: Tick Loop 기반의 상태 동기화(State Sync), 지연 보상(Lag Compensation), 그리고 예측 기반 네트워크 아키텍처를 지원합니다.
-- **멀티-월드 및 구역 관리**: 동적 인스턴스 생성 및 Zone 이동 기술을 통해 대규모 동시 접속 환경을 효율적으로 관리합니다.
-- **플러그인 핫로딩 (Hot-Reloading)**: 서버 가동 중에도 비즈니스 로직(DLL)을 즉시 교체 및 반영할 수 있는 무중단 배포 시스템을 제공합니다.
-- **AI-Ready SDK**: 서버 엔진 SDK에 `OpenCV`, `TorchSharp(PyTorch)`, `ML.NET`이 탑재되어 고성능 AI 로직 개발이 즉시 가능합니다.
-- **운영 자동화 및 보안**: 실시간 대시보드 모니터링, 클러스터링 관리, 그리고 JWT/HMAC 기반의 강력한 보안 미들웨어를 갖추고 있습니다.
+- **🏛️ 강력한 4계층 분리**: SDK, Runtime, Commands, Client의 정교한 계층 분리로 유지보수성과 확장성을 극대화했습니다.
+- **🌐 P2P 하이브리드 인프라**: 홀펀칭 기술을 활용한 Peer간 직접 통신을 지원하며, 실패 시 서버가 자동 릴레이로 전환되는 하이브리드 그룹 통신을 완성했습니다.
+- **🎮 실시간 게임 엔진**: Tick Loop 기반의 상태 동기화(State Sync), 지연 보상(Lag Compensation), 그리고 예측 기반 네트워크 아키텍처를 탑재했습니다.
+- **📂 플러그인 핫로딩 (Hot-Reloading)**: `AssemblyLoadContext`를 통해 서버 가동 중에도 비즈니스 로직(DLL)을 즉시 교체 및 반영할 수 있습니다.
+- **🛡️ 8단계 보안 파이프라인**: `Validation -> BanCheck -> RateLimit -> ReplayAttack -> HmacVerify -> Decryption -> Auth -> Routing`으로 이어지는 철통 보안 시스템을 갖추고 있습니다.
+- **🧠 AI-Ready SDK**: 서버 엔진 SDK에 `OpenCV`, `TorchSharp(PyTorch)`, `ML.NET`이 내장되어 실시간 AI 분석 로직 개발이 즉시 가능합니다.
 
 ## 📂 프로젝트 구조
 
