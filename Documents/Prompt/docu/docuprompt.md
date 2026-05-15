@@ -4,11 +4,11 @@
 
 # Task
 현재 프로젝트의 구조를 분석해서, 각 서브 프로젝트(또는 주요 모듈/폴더)별로 개별 가이드 문서를 작성해줘.
-- **저장 경로**: `Document/guide/` 아래에 각 파트별 폴더를 생성해.
+- **저장 경로**: `Documents/Internal/Guides/ProjectSpecific` 아래에 각 파트별 폴더를 생성해.
 - **구조 예시**: 
-  - `Document/guide/공통가이드/README.md` (전체 소개)
-  - `Document/guide/[서브프로젝트명]/README.md` (해당 파트 설명)
-  - `Document/guide/[서브프로젝트명]/how-to-code.md` (코드 수정법)
+  - `Documents/Internal/Guides/ProjectSpecific/공통가이드/README.md` (전체 소개)
+  - `Documents/Internal/Guides/ProjectSpecific/[서브프로젝트명]/README.md` (해당 파트 설명)
+  - `Documents/Internal/Guides/ProjectSpecific/[서브프로젝트명]/how-to-code.md` (코드 수정법)
 
 # Writing Style (중요!)
 1. **중/고등학생 눈높이**: "컴포넌트의 생명주기"라고 하지 말고, "이 화면이 태어나서 사라질 때까지의 순서"처럼 풀어서 설명해줘.

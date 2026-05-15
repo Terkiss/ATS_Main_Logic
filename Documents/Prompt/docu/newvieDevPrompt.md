@@ -4,7 +4,7 @@
 
 # Task
 현재 프로젝트의 전체적인 구조와 핵심 로직을 분석해서, 개발자들이 읽기 편한 가이드 문서를 작성해줘. 
-문서는 마크다운(.md) 형식으로 작성하고, 경로는 `Document/guide/` 아래에 저장해줘. (파일명은 `README.md` 또는 `developer-guide.md`로 해줘.)
+문서는 마크다운(.md) 형식으로 작성하고, 경로는 `Documents/Internal/Guides/Legacy` 아래에 저장해줘. (파일명은 `README.md` 또는 `developer-guide.md`로 해줘.)
 
 # Tone & Style
 - 말투: "~해요", "~입니다"와 같이 친절하고 부드러운 구어체 사용.
