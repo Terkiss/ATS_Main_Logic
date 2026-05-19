@@ -22,7 +22,7 @@ namespace TeruTeruServer.Runtime.Pipeline
             TeruTeruServer.SDK.Util.ServerMetrics.IncrementPacketCount();
             int index = 0;
 
-            Func<Task> next = null;
+            Func<Task>? next = null;
             next = async () =>
             {
                 if (index < _middlewares.Count)
@@ -30,7 +30,7 @@ namespace TeruTeruServer.Runtime.Pipeline
                     var middleware = _middlewares[index++];
                     var sw = System.Diagnostics.Stopwatch.StartNew();
                     
-                    await middleware.InvokeAsync(context, next);
+                    await middleware.InvokeAsync(context, next!);
                     
                     sw.Stop();
                     if (sw.ElapsedMilliseconds > 50)

@@ -12,7 +12,7 @@ namespace TeruTeruServer.Runtime.DB
     /// </summary>
     public class DatabaseConnector
     {
-        public static DatabaseHelper database = null;
+        public static DatabaseHelper? database = null;
         string bindUri = "Server={0};Port=3306;Database={1};Uid={2};Pwd={3}";
 
         public DatabaseConnector(string ip, string useDatabase, string id, string pwd)
@@ -33,7 +33,7 @@ namespace TeruTeruServer.Runtime.DB
                 this.uri = uri;
             }
 
-            public int SqlRunForCounter(string query, MySqlParameter[] parameters)
+            public int SqlRunForCounter(string query, MySqlParameter[]? parameters)
             {
                 using (var conn = new MySqlConnection(uri))
                 {
@@ -55,7 +55,7 @@ namespace TeruTeruServer.Runtime.DB
                 return cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
             }
 
-            public void SqlRunForNoReturn(string query, MySqlParameter[] parameters)
+            public void SqlRunForNoReturn(string query, MySqlParameter[]? parameters)
             {
                 using (var conn = new MySqlConnection(uri))
                 {
@@ -69,9 +69,9 @@ namespace TeruTeruServer.Runtime.DB
             }
 
             // 인터페이스 미구현 멤버 추가
-            public void SqlRun(string query, MySqlParameter[] parameters) => SqlRunForNoReturn(query, parameters);
+            public void SqlRun(string query, MySqlParameter[]? parameters) => SqlRunForNoReturn(query, parameters);
             public void SqlBatchRun(List<string> queries) { /* TODO */ }
-            public Task SqlParrelRun(string query, MySqlParameter[] parameters) => Task.CompletedTask;
+            public Task SqlParrelRun(string query, MySqlParameter[]? parameters) => Task.CompletedTask;
             public void Insert(string table, string[] values) { /* TODO */ }
         }
     }

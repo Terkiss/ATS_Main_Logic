@@ -24,7 +24,7 @@ namespace TeruTeruServer.SDK.Tests
         [Fact]
         public void ClientSession_UpdateLastSeen_ShouldWork()
         {
-            var session = new ClientSession(2, null, "gameID_2");
+            var session = new ClientSession(2, null!, "gameID_2");
             var oldTime = session.LastSeenUtc;
 
             System.Threading.Thread.Sleep(10);

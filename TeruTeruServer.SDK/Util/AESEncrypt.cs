@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,7 +18,7 @@ namespace TeruTeruServer.ManageLogic.Util
                 aesAlg.IV = GenerateRandomIV();
 
                 // PBKDF2를 사용하여 안전한 키 생성
-                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV); // salt로 복호화 시에도 동일한 IV를 사용함
+                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV, iterations: 10000, HashAlgorithmName.SHA256);
                 aesAlg.Key = keyGenerator.GetBytes(aesAlg.KeySize / 8);
 
                 ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -53,7 +53,7 @@ namespace TeruTeruServer.ManageLogic.Util
                 aesAlg.IV = iv;
 
                 // PBKDF2를 사용하여 키를 생성 (암호화 시와 동일한 salt 보장)
-                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV);
+                var keyGenerator = new Rfc2898DeriveBytes(password, salt: aesAlg.IV, iterations: 10000, HashAlgorithmName.SHA256);
                 aesAlg.Key = keyGenerator.GetBytes(aesAlg.KeySize / 8);
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);

@@ -15,10 +15,10 @@ namespace TeruTeruServer.SDK.Protocol
         public override int Command { get; set; }
         public override int HostId { get; set; }
 
-        public string UserId { get; set; }
-        public string Password { get; set; }
-        public string AuthToken { get; set; }
-        public string RefreshToken { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string AuthToken { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
 
         public LoginProtocol()
@@ -33,9 +33,9 @@ namespace TeruTeruServer.SDK.Protocol
         public override int Command { get; set; }
         public override int HostId { get; set; }
 
-        public string RefreshToken { get; set; }
-        public string NewAuthToken { get; set; }
-        public string NewRefreshToken { get; set; }
+        public string RefreshToken { get; set; } = string.Empty;
+        public string NewAuthToken { get; set; } = string.Empty;
+        public string NewRefreshToken { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
 
         public TokenRefreshProtocol()
@@ -50,9 +50,9 @@ namespace TeruTeruServer.SDK.Protocol
         public override int Command { get; set; }
         public override int HostId { get; set; }
 
-        public string Guid { get; set; }
+        public string Guid { get; set; } = string.Empty;
         public bool IsSuccess { get; set; }
-        public string Data { get; set; } // 서버 빌드 에러 대응
+        public string Data { get; set; } = string.Empty; // 서버 빌드 에러 대응
 
         public ConnectProtocol()
         {

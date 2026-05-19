@@ -11,7 +11,7 @@ namespace TeruTeruServer.Runtime
 {
     public class LogicProxy : ILogicService
     {
-        private ILogicService _currentLogic;
+        private ILogicService? _currentLogic;
         private readonly object _lock = new object();
         private int _consecutiveErrors = 0;
         private bool _isDisabled = false;
@@ -79,7 +79,7 @@ namespace TeruTeruServer.Runtime
         private readonly string _pluginPath;
         private readonly LogicProxy _proxy;
         private readonly IServiceProvider _serviceProvider;
-        private FileSystemWatcher _watcher;
+        private FileSystemWatcher? _watcher;
         private AssemblyLoadContext? _currentContext;
         private readonly System.Timers.Timer _debounceTimer;
 
@@ -169,8 +169,11 @@ namespace TeruTeruServer.Runtime
                         .Select(p => _serviceProvider.GetService(p.ParameterType))
                         .ToArray();
 
-                    var instance = (ILogicService)Activator.CreateInstance(target.LogicType, parameters);
-                    _proxy.UpdateLogic(instance);
+                    var instance = Activator.CreateInstance(target.LogicType, parameters) as ILogicService;
+                    if (instance != null)
+                    {
+                        _proxy.UpdateLogic(instance);
+                    }
                     Console.WriteLine($"[PluginManager] Logic plugin hot-reloaded: {target.Name}");
                 }
             }
@@ -251,8 +254,8 @@ namespace TeruTeruServer.Runtime
         {
             public string Name { get; set; } = string.Empty;
             public string[] DependsOn { get; set; } = Array.Empty<string>();
-            public Assembly Assembly { get; set; }
-            public Type LogicType { get; set; }
+            public Assembly Assembly { get; set; } = null!;
+            public Type LogicType { get; set; } = null!;
         }
     }
 }

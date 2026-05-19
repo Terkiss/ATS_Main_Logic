@@ -42,7 +42,12 @@ namespace TeruTeruServer.SDK.Interfaces
 
         public bool TryAddPlayer(int hostId, ClientSession session) => _store.TryAdd(hostId, session);
 
-        public bool EvictSession(int hostId, out ClientSession session) => _store.TryRemove(hostId, out session);
+        public bool EvictSession(int hostId, out ClientSession session)
+        {
+            bool result = _store.TryRemove(hostId, out ClientSession s);
+            session = s;
+            return result;
+        }
 
         public bool MarkAsGrace(int hostId)
         {

@@ -1,7 +1,13 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Phase 2 — Game Server Edition (Completed)
+## 현재 마일스톤: Milestone 13 — Playground Cleanup & Merge (In Progress)
  
+- [/] **Milestone 13 — Playground Cleanup & Merge (In Progress)**
+  - [x] **1. .DS_Store 파일들을 .gitignore에 추가 및 기존 추적 해제**
+  - [x] **2. 코드 정리 변경분 (경고 해결, nullable 어노테이션 등) 검토 및 Staging**
+  - [x] **3. Documents/my/ 신규 문서 Staging**
+  - [ ] **4. playground → master 병합 또는 PR 생성**
+
 - [x] **Milestone 12 — Live Operations & Scalability (Completed)**
   - [x] **1. 게임 서버 클러스터링 및 라우팅**
     - [x] ClusterNodeInfo 부하 메트릭 필드 확장

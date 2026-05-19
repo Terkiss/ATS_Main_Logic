@@ -23,4 +23,10 @@
 # 로그 및 임시 파일
 *.log
 *.tmp
-\n# Local Test Project\nDummyClient/
+
+# Local Test Project
+DummyClient/
+
+# macOS system files
+.DS_Store
+**/.DS_Store

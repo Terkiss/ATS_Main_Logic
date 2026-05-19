@@ -117,8 +117,8 @@ namespace TeruTeruServer.SDK.Util
 
         public static bool GetImageWork_PreOrder_Queue(out SendImageData data)
         {
-            bool check = _imageWorkPreOrderQueue.TryDequeue(out SendImageData imageData);
-            data = imageData;
+            bool check = _imageWorkPreOrderQueue.TryDequeue(out SendImageData? imageData);
+            data = imageData!;
             return check;
         }
 
@@ -133,8 +133,8 @@ namespace TeruTeruServer.SDK.Util
 
         public static bool GetImageWork_Complete_Queue(out YoloDetectResult data)
         {
-            bool check = _imageWorkCompleteQueue.TryDequeue(out YoloDetectResult imageData);
-            data = imageData;
+            bool check = _imageWorkCompleteQueue.TryDequeue(out YoloDetectResult? imageData);
+            data = imageData!;
             return check;
         }
 

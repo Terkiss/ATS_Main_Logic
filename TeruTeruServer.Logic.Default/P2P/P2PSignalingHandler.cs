@@ -96,7 +96,7 @@ namespace TeruTeruServer.Logic.Default.P2P
             }
         }
 
-        private void SendJsonResponse<T>(Socket socket, ProtocolSelect protocol, T data)
+        private void SendJsonResponse<T>(Socket? socket, ProtocolSelect protocol, T data)
         {
             if (socket == null || !socket.Connected) return;
             try

@@ -61,7 +61,7 @@ namespace TeruTeruServer.Runtime.Tests.Integration
 
             // Assert
             Assert.NotNull(response);
-            string json = response.ToString();
+            string json = response!.ToString();
             Assert.Contains("TeruTeru Server AI Engine", json);
         }
 

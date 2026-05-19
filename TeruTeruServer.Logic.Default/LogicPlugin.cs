@@ -177,22 +177,22 @@ namespace TeruTeruServer.Logic.Default
 
         [RequiresAuth]
         [Rpc("Echo")]
-        public async Task<string> HandleEcho(Socket socket, string message)
+        public Task<string> HandleEcho(Socket socket, string message)
         {
             TeruTeruLogger.LogInfo($"RPC Echo called with: {message}");
-            return $"Server Echo: {message} at {DateTime.Now}";
+            return Task.FromResult($"Server Echo: {message} at {DateTime.Now}");
         }
 
         [Rpc("GetServerInfo")]
-        public async Task<object> GetServerInfo(Socket socket)
+        public Task<object> GetServerInfo(Socket socket)
         {
-            return new
+            return Task.FromResult<object>(new
             {
                 ServerName = "TeruTeru Server AI Engine",
                 Version = "2.0.0-phase3-plugin-routing",
                 CurrentTime = DateTime.Now,
                 ActiveSessions = _sessionManager.Players.Count
-            };
+            });
         }
 
         // --- [기타 로직] ---

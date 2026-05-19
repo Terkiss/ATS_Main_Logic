@@ -36,7 +36,7 @@ namespace TeruTeruServer.SDK.Util
         /// </summary>
         /// <param name="data">바이너리 이미지 데이터</param>
         /// <returns>OpenCV Mat 객체</returns>
-        public static Mat ByteArrayToMat(byte[] data)
+        public static Mat? ByteArrayToMat(byte[] data)
         {
             if (data == null || data.Length == 0) return null;
             return Cv2.ImDecode(data, ImreadModes.Color);

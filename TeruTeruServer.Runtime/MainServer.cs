@@ -285,7 +285,7 @@ namespace TeruTeruServer.Runtime
                     Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
                     try { socket?.Close(); } catch { }
 
-                    if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
+                    if (socket != null && _sessionManager.TryGetHostIdBySocket(socket, out int hostID))
                     {
                         _sessionManager.MarkAsGrace(hostID);
                     }
@@ -374,7 +374,7 @@ namespace TeruTeruServer.Runtime
             }
         }
 
-        public bool IsConnected(Socket socket)
+        public bool IsConnected(Socket? socket)
         {
             if (_isUdp)
             {
@@ -409,7 +409,7 @@ namespace TeruTeruServer.Runtime
                 tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
                 tempArray[1] = (byte)hostID;
                 RpcStub rpcStub = new RpcStub(this, _sessionManager);
-                var result = rpcStub.HandleRequest(session.ClientSocket, tempArray);
+                var result = rpcStub.HandleRequest(session.ClientSocket!, tempArray);
 
                 if (result == null)
                 {

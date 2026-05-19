@@ -8,10 +8,10 @@ namespace TeruTeruServer.SDK.Interfaces
 {
     public interface IDatabaseService
     {
-        void SqlRun(string sql, MySqlParameter[] parameters = null);
+        void SqlRun(string sql, MySqlParameter[]? parameters = null);
         void SqlBatchRun(List<string> sqls);
-        Task SqlParrelRun(string sql, MySqlParameter[] parameters = null);
-        int SqlRunForCounter(string sql, MySqlParameter[] parameters = null);
+        Task SqlParrelRun(string sql, MySqlParameter[]? parameters = null);
+        int SqlRunForCounter(string sql, MySqlParameter[]? parameters = null);
         void Insert(string tableName, string[] field);
     }
 }

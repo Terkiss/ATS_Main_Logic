@@ -13,9 +13,9 @@ namespace TeruTeruServer.SDK.Attributes
         /// </summary>
         public string Name { get; }
 
-        public RpcAttribute(string name = null)
+        public RpcAttribute(string? name = null)
         {
-            Name = name;
+            Name = name ?? string.Empty;
         }
     }
 }

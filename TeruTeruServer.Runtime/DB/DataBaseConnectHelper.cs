@@ -11,7 +11,7 @@ namespace R19Management
 {
     public class DataBaseConnectHelper
     {
-        private string uri;
+        private string uri = string.Empty;
         public DataBaseConnectHelper()
         {
         }
@@ -29,7 +29,7 @@ namespace R19Management
         /// <summary>
         /// SQL RUN NO RESULT
         /// </summary>
-        public void sqlRun(string sql, MySqlParameter[] parameters = null)
+        public void sqlRun(string sql, MySqlParameter[]? parameters = null)
         {
             using (var conn = dataBaseOpen())
             {
@@ -75,7 +75,7 @@ namespace R19Management
             }
         }
 
-        public async Task sqlParrelRun(string sql, MySqlParameter[] parameters = null)
+        public async Task sqlParrelRun(string sql, MySqlParameter[]? parameters = null)
         {
             using (MySqlConnection conn = dataBaseOpen())
             {
@@ -94,7 +94,7 @@ namespace R19Management
         /// <summary>
         /// sql 결과물의 열 수를 반환 합니다.
         /// </summary>
-        public int sqlrunForCounter(string sql, MySqlParameter[] parameters = null)
+        public int sqlrunForCounter(string sql, MySqlParameter[]? parameters = null)
         {
             int i = 0;
             using (var conn = dataBaseOpen())
@@ -123,7 +123,7 @@ namespace R19Management
         /// <summary>
         /// 데이터 베이스 sql를 실행하고 콜백을 이용하여 처리합니다.
         /// </summary>
-        public void sqlRunResult(string sql, SqlResult sqlResult, MySqlParameter[] parameters = null)
+        public void sqlRunResult(string sql, SqlResult sqlResult, MySqlParameter[]? parameters = null)
         {
             using (var conn = dataBaseOpen())
             {

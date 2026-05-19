@@ -63,7 +63,7 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             byte[] iv = GenerateRandomIV();
             byte[] key;
-            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv))
+            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv, iterations: 10000, HashAlgorithmName.SHA256))
             {
                 key = keyGenerator.GetBytes(KeySize);
             }
@@ -89,7 +89,7 @@ namespace TeruTeruServer.ManageLogic.Util
             Buffer.BlockCopy(fullData, BlockSize, encryptedData, 0, encryptedData.Length);
 
             byte[] key;
-            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv))
+            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv, iterations: 10000, HashAlgorithmName.SHA256))
             {
                 key = keyGenerator.GetBytes(KeySize);
             }
