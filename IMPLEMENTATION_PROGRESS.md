@@ -1,7 +1,17 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 14 — Redis Production Integration (Completed)
- 
+## 현재 마일스톤: Milestone 15 — Database Hardening & ORM (In Progress)
+
+- [ ] **Milestone 15 — Database Hardening & ORM**
+  - [ ] **1. Dapper ORM 도입 및 의존성 추가**
+    - [ ] NuGet 패키지 추가 및 원시 ADO.NET 루프를 Dapper 쿼리로 교체
+  - [ ] **2. 커넥션 풀 및 자원 관리 하드닝**
+    - [ ] Max Pool Size 설정 최적화 및 DB 커넥션 Lifetime 자원 해제 관리 강화
+  - [ ] **3. Polly 기반 재시도 패턴(Retry Policy) 도입**
+    - [ ] DB 장애, 일시 단절 및 데드락 대비 재시도 정책 설계 및 연동
+  - [ ] **4. 통합 테스트 및 장애 극복 시나리오 작성**
+    - [ ] 데이터베이스 강제 지연/차단 시 복원력 검증 테스트 및 ORM 쿼리 정합성 테스트 통과
+
 - [x] **Milestone 14 — Redis Production Integration (Completed)**
   - [x] **1. StackExchange.Redis 통합**
     - [x] NuGet 패키지 추가 및 Redis ConnectionMultiplexer 싱글톤 연동
