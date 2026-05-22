@@ -28,6 +28,7 @@ namespace TeruTeruServer.Runtime.Tests.Integration
             services.AddSingleton<ISessionManager, SessionManager>();
             services.AddSingleton<IEventBus, LocalEventBus>();
             services.AddSingleton<IProtocolRouter, Rpc.ProtocolRouter>();
+            services.AddSingleton<IZoneManager>(new Mock<IZoneManager>().Object);
 
             services.AddSingleton<ILogicService>(sp => 
             {
@@ -36,7 +37,8 @@ namespace TeruTeruServer.Runtime.Tests.Integration
                 var session = sp.GetRequiredService<ISessionManager>();
                 var router = sp.GetRequiredService<IProtocolRouter>();
                 var bus = sp.GetRequiredService<IEventBus>();
-                return new LogicPlugin(sender, db, session, router, bus);
+                var zone = sp.GetRequiredService<IZoneManager>();
+                return new LogicPlugin(sender, db, session, router, bus, zone);
             });
 
             _serviceProvider = services.BuildServiceProvider();

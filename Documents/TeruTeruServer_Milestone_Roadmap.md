@@ -325,5 +325,43 @@ M10 + M11
 
 ---
 
-*최종 수정: 2026-05-09*
+# Phase 3 — Production-Ready Client & Infrastructure Hardening
+
+> TeruTeruServer를 실제 상용 서비스(Production) 환경에 투입하기 위해 클라이언트 연동 완성도를 높이고 백엔드 분산 인프라를 실전 수준으로 결합하는 고도화 로드맵입니다.
+
+## Phase 3 우선순위 요약
+
+| 순서 | 마일스톤 | 핵심 목표 | 선행 조건 |
+|:---:|---|---|---|
+| 13 | Client SDK Reinforcement | 클라이언트 재연결 및 보간/예측 고도화 | M12 |
+| 14 | Redis Production Integration | StackExchange.Redis 도입 및 실제 연동 | M12 |
+| 15 | Database Hardening & ORM | EF Core ORM 도입 및 쿼리 최적화 | M12 |
+| 16 | Monitoring & Observability | OpenTelemetry 및 대시보드 고도화 | M12 |
+| 17 | CI/CD Pipeline | 자동 빌드/테스트 및 Docker 패키징 | M12 |
+| 18 | Load Testing & Profiling | 부하 테스트 및 성능 병목 분석 | M13~M17 |
+
+---
+
+## Milestone 13 — Client SDK Reinforcement & Reconnection
+
+> **클라이언트 재연결 안정성 및 실시간 보간/예측 고도화**
+> 
+> 서버 측에 구현된 Grace Reconnection 및 실시간 Delta Snapshot, 지연 보상(Lag Compensation)의 파트너 기능을 클라이언트 SDK에 완성하여 완결성 있는 E2E 실시간 네트워크 동기화를 지원합니다.
+
+### 작업 항목
+
+- **ReconnectAsync 구현**: JWT 및 ReconnectToken을 사용한 소켓 비정상 종료 시 재연결 및 세션 유예 복구 기능 추가
+- **Zone/Room 관리 헬퍼 API**: `JoinZoneAsync`, `EnterRoomAsync`, `LeaveRoomAsync` 등 고수준 편의 메서드 추가
+- **SnapshotInterpolator 구현**: 수신된 이진 Delta 스냅샷 프레임들의 버퍼링 및 위치/상태 부드러운 보간(Lerp) 처리기
+- **ClientPredictionBuffer 구현**: 클라이언트 자체 로컬 예측(CSP) 후 서버 보정값 적용 시 발생하는 오차 보정 버퍼
+- **통합 테스트 작성**: 소켓 강제 차단 후 재연결 시나리오 및 보간 정확도 검증 테스트 작성
+
+### 완료 기준
+
+- 연결 해제 후 `ReconnectAsync` 호출 시 100% 확률로 이전 세션 복구 및 상태 동기화 재개
+- 스냅샷 수신 시 클라이언트 오브젝트 보간이 프레임 드롭 없이 안정적으로 동작
+
+---
+
+*최종 수정: 2026-05-20*
 *대상 프로젝트: TeruTeruServer v1.x — Engine Foundation + Game Server Edition*

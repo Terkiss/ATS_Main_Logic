@@ -36,6 +36,11 @@ namespace TeruTeruServer.Cli
 
                 // 플러그인 매니저 시작
                 var proxy = serviceProvider.GetRequiredService<LogicProxy>();
+                
+                // 기본 로직 플러그인을 프록시에 주입하여 핫릴로드 전에도 기본 로직이 작동하도록 함 (순환 참조 문제도 DI에서 직접 주입하지 않아 해결)
+                var defaultLogic = serviceProvider.GetRequiredService<TeruTeruServer.Logic.Default.LogicPlugin>();
+                proxy.UpdateLogic(defaultLogic);
+
                 var pluginManager = new PluginManager("plugins", proxy, serviceProvider);
                 pluginManager.StartMonitoring();
 
@@ -135,14 +140,18 @@ namespace TeruTeruServer.Cli
             // [Plugin Architecture] 로직 프록시를 ILogicService로 등록
             var logicProxy = new LogicProxy();
             services.AddSingleton<LogicProxy>(logicProxy);
-            services.AddSingleton<ILogicService>(sp => 
+            services.AddSingleton<ILogicService>(sp => sp.GetRequiredService<LogicProxy>());
+
+            // 기본 로직 플러그인 등록
+            services.AddSingleton<TeruTeruServer.Logic.Default.LogicPlugin>(sp => 
             {
                 var sender = sp.GetRequiredService<IMessageSender>();
                 var db = sp.GetRequiredService<IDatabaseService>();
                 var session = sp.GetRequiredService<ISessionManager>();
                 var router = sp.GetRequiredService<IProtocolRouter>();
                 var bus = sp.GetRequiredService<IEventBus>();
-                return new TeruTeruServer.Logic.Default.LogicPlugin(sender, db, session, router, bus);
+                var zone = sp.GetRequiredService<IZoneManager>();
+                return new TeruTeruServer.Logic.Default.LogicPlugin(sender, db, session, router, bus, zone);
             });
 
             // Protocol Router 등록 (기존 RpcStub을 대체)

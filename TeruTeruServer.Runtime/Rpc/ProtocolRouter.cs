@@ -138,14 +138,16 @@ namespace TeruTeruServer.Runtime.Rpc
 
                 var result = method.Invoke(_logicService, args);
 
+                bool isRpc = method.GetCustomAttribute<RpcAttribute>() != null;
+
                 if (result is Task task)
                 {
                     await task;
                     var resultProperty = task.GetType().GetProperty("Result");
-                    return resultProperty != null ? JsonSerializer.Serialize(resultProperty.GetValue(task)) : "{\"status\": \"ok\"}";
+                    return resultProperty != null ? JsonSerializer.Serialize(resultProperty.GetValue(task)) : (isRpc ? "{\"status\": \"ok\"}" : string.Empty);
                 }
 
-                return result != null ? JsonSerializer.Serialize(result) : "{\"status\": \"ok\"}";
+                return result != null ? JsonSerializer.Serialize(result) : (isRpc ? "{\"status\": \"ok\"}" : string.Empty);
             }
             catch (Exception ex)
             {

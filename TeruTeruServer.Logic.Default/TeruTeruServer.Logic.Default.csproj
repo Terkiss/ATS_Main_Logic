@@ -21,6 +21,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <MakeDir Directories="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
     <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(ProjectDir)../TeruTeruServer.Cli/plugins/" />
+    <MakeDir Directories="$(ProjectDir)../plugins/" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(ProjectDir)../plugins/" />
   </Target>
 
 </Project>

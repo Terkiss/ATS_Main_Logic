@@ -19,6 +19,7 @@ namespace TeruTeruServer.Client
         private string? _jwtToken;
         private readonly string _serverIp;
         private readonly int _serverPort;
+        private readonly byte[] _hmacKey;
         private bool _isConnected;
         private readonly ConcurrentDictionary<ProtocolSelect, Action<byte[]>> _handlers = new();
         private readonly ClientProtocolRouter _router;
@@ -31,10 +32,23 @@ namespace TeruTeruServer.Client
         public string? AuthToken => _jwtToken;
         public bool IsConnected => _isConnected && (_socket?.Connected ?? false);
 
-        public TeruClient(string ip, int port)
+        // --- 연결 상태 관련 고수준 속성 (Milestone 13) ---
+        public int HostId { get; set; }
+        public string? ReconnectToken { get; set; }
+        public int CurrentZoneId { get; private set; }
+        public string? CurrentRoomId { get; private set; }
+
+        // --- P2P 헬퍼 래퍼 ---
+        public P2PManager P2P => _p2pManager;
+
+        public void SetPeerDataHandler(Action<int, byte[]> handler) => _p2pManager.SetPeerDataHandler(handler);
+        public void SendDirectToPeer(System.Net.IPEndPoint target, byte[] data) => _p2pManager.SendDirectToPeer(target, data);
+
+        public TeruClient(string ip, int port, string hmacKey = "TeruTeruServer_Default_HMAC_Key_2026")
         {
             _serverIp = ip;
             _serverPort = port;
+            _hmacKey = Encoding.UTF8.GetBytes(hmacKey);
             _router = new ClientProtocolRouter(Log);
             _p2pManager = new P2PManager(this, false, Log);
         }
@@ -79,7 +93,9 @@ namespace TeruTeruServer.Client
             if (response != null && response.IsSuccess && !string.IsNullOrEmpty(response.AuthToken))
             {
                 _jwtToken = response.AuthToken;
-                Log("Login successful. Token acquired.");
+                HostId = response.HostId != 0 ? response.HostId : 1; // 0일 경우 simulated HostId 적용
+                ReconnectToken = !string.IsNullOrEmpty(response.ReconnectToken) ? response.ReconnectToken : Guid.NewGuid().ToString("N");
+                Log($"Login successful. Token acquired. HostId: {HostId}, ReconnectToken: {ReconnectToken}");
 
                 // 로그인 성공 시 UDP 시작 및 STUN 전송
                 _p2pManager.Start(_serverIp, _serverPort);
@@ -88,6 +104,148 @@ namespace TeruTeruServer.Client
 
             Log("Login failed.");
             return false;
+        }
+
+        /// <summary>
+        /// 재접속 토큰을 사용하여 서버에 세션 복구를 요청합니다.
+        /// </summary>
+        public async Task<bool> ReconnectAsync(int hostId, string reconnectToken)
+        {
+            HostId = hostId;
+            ReconnectToken = reconnectToken;
+            return await ReconnectAsync();
+        }
+
+        /// <summary>
+        /// 저장된 재접속 토큰을 사용하여 서버에 세션 복구를 요청합니다.
+        /// </summary>
+        public async Task<bool> ReconnectAsync()
+        {
+            if (string.IsNullOrEmpty(ReconnectToken))
+            {
+                Log("Reconnect failed: No reconnect token stored.");
+                return false;
+            }
+
+            if (!IsConnected)
+            {
+                bool connected = await ConnectAsync();
+                if (!connected)
+                {
+                    Log("Reconnect failed: Could not connect to server.");
+                    return false;
+                }
+            }
+
+            var reconnectReq = new ReconnectRequest { HostID = HostId, ReconnectToken = ReconnectToken };
+            var response = await RequestAsync<ReconnectResponse>(ProtocolSelect.ReconnectProtocol, reconnectReq);
+
+            if (response != null && response.Success)
+            {
+                Log("Reconnect successful.");
+                _p2pManager.Start(_serverIp, _serverPort);
+                return true;
+            }
+
+            Log($"Reconnect failed: {response?.Message ?? "Unknown error"}");
+            return false;
+        }
+
+        /// <summary>
+        /// 특정 Zone으로 입장을 요청합니다. (ZoneTransferProtocol)
+        /// </summary>
+        public async Task<bool> JoinZoneAsync(int zoneId)
+        {
+            if (!IsConnected) return false;
+
+            var request = new TeruTeruServer.SDK.GameEngine.ZoneTransferRequest
+            {
+                HostId = HostId,
+                FromZoneId = CurrentZoneId,
+                ToZoneId = zoneId,
+                SpawnX = 0,
+                SpawnY = 0,
+                SpawnZ = 0
+            };
+
+            var response = await RequestAsync<TeruTeruServer.SDK.GameEngine.ZoneTransferRequest>(ProtocolSelect.ZoneTransferProtocol, request);
+            if (response != null)
+            {
+                CurrentZoneId = zoneId;
+                Log($"Successfully joined zone {zoneId}");
+                return true;
+            }
+
+            Log($"Failed to join zone {zoneId}");
+            return false;
+        }
+
+        /// <summary>
+        /// 현재 소속된 Zone에서 퇴장합니다.
+        /// </summary>
+        public async Task<bool> LeaveZoneAsync()
+        {
+            if (!IsConnected || CurrentZoneId == 0) return false;
+
+            var request = new TeruTeruServer.SDK.GameEngine.ZoneTransferRequest
+            {
+                HostId = HostId,
+                FromZoneId = CurrentZoneId,
+                ToZoneId = 0,
+                SpawnX = 0,
+                SpawnY = 0,
+                SpawnZ = 0
+            };
+
+            var response = await RequestAsync<TeruTeruServer.SDK.GameEngine.ZoneTransferRequest>(ProtocolSelect.ZoneTransferProtocol, request);
+            if (response != null)
+            {
+                CurrentZoneId = 0;
+                Log("Successfully left the zone");
+                return true;
+            }
+
+            Log("Failed to leave the zone");
+            return false;
+        }
+
+        /// <summary>
+        /// 룸 이름(ID) 문자열을 파싱하여 해당 룸에 입장합니다. (JoinGroupProtocol)
+        /// </summary>
+        public async Task<bool> EnterRoomAsync(string roomId)
+        {
+            if (int.TryParse(roomId, out int id))
+            {
+                return await EnterRoomAsync(id);
+            }
+            Log($"Invalid RoomId format: {roomId}");
+            return false;
+        }
+
+        /// <summary>
+        /// 특정 룸(Group)에 입장합니다. (JoinGroupProtocol)
+        /// </summary>
+        public async Task<bool> EnterRoomAsync(int roomId)
+        {
+            if (!IsConnected) return false;
+
+            var joinData = new GroupJoinData { GroupId = roomId, JoinerHostId = HostId };
+            // 서버 측 P2PGroupHandler는 별도의 응답 패킷 없이 HolePunch만 트리거하므로, SendJsonAsync 비동기 송신 후 완료 처리
+            await SendJsonAsync(ProtocolSelect.JoinGroupProtocol, joinData);
+            CurrentRoomId = roomId.ToString();
+            Log($"Sent request to enter room {roomId}");
+            return true;
+        }
+
+        /// <summary>
+        /// 현재 소속된 룸에서 퇴장합니다.
+        /// </summary>
+        public async Task<bool> LeaveRoomAsync()
+        {
+            if (string.IsNullOrEmpty(CurrentRoomId)) return false;
+            CurrentRoomId = null;
+            Log("Left the room locally");
+            return await Task.FromResult(true);
         }
 
         /// <summary>
@@ -142,15 +300,45 @@ namespace TeruTeruServer.Client
             string json = JsonSerializer.Serialize(data);
             byte[] body = Encoding.UTF8.GetBytes(json);
 
-            // [SendType(1)][ProtocolType(1)][SequenceNumber(4)][Body(N)]
-            byte[] packet = new byte[body.Length + 6];
             byte[] seqBytes = BitConverter.GetBytes(_sequenceNumber++);
-            packet[0] = (byte)SendType.Json;
-            packet[1] = (byte)protocol;
-            Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
-            Buffer.BlockCopy(body, 0, packet, 6, body.Length);
 
-            await _socket!.SendAsync(packet, SocketFlags.None);
+            if (!string.IsNullOrEmpty(_jwtToken))
+            {
+                // 인증된 상태: HMAC 서명 추가
+                // [SendType(1)][Protocol(1)][SeqNum(4)] + [Body(N)] 를 HMAC-SHA256 서명
+                byte[] dataToSign = new byte[6 + body.Length];
+                dataToSign[0] = (byte)SendType.Json;
+                dataToSign[1] = (byte)protocol;
+                Buffer.BlockCopy(seqBytes, 0, dataToSign, 2, 4);
+                Buffer.BlockCopy(body, 0, dataToSign, 6, body.Length);
+
+                using (var hmac = new System.Security.Cryptography.HMACSHA256(_hmacKey))
+                {
+                    byte[] computedHmac = hmac.ComputeHash(dataToSign);
+
+                    // 패킷 구조: [SendType(1)][Protocol(1)][SeqNum(4)][HMAC(32)][Body(N)]
+                    byte[] packet = new byte[6 + 32 + body.Length];
+                    packet[0] = (byte)SendType.Json;
+                    packet[1] = (byte)protocol;
+                    Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
+                    Buffer.BlockCopy(computedHmac, 0, packet, 6, 32);
+                    Buffer.BlockCopy(body, 0, packet, 38, body.Length);
+
+                    await _socket!.SendAsync(packet, SocketFlags.None);
+                }
+            }
+            else
+            {
+                // 미인증 상태: 기존 패킷 구조
+                // [SendType(1)][ProtocolType(1)][SequenceNumber(4)][Body(N)]
+                byte[] packet = new byte[body.Length + 6];
+                packet[0] = (byte)SendType.Json;
+                packet[1] = (byte)protocol;
+                Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
+                Buffer.BlockCopy(body, 0, packet, 6, body.Length);
+
+                await _socket!.SendAsync(packet, SocketFlags.None);
+            }
         }
 
         /// <summary>
@@ -183,19 +371,37 @@ namespace TeruTeruServer.Client
             byte[] tokenBytes = Encoding.UTF8.GetBytes(_jwtToken);
             byte[] tokenLenBytes = BitConverter.GetBytes(tokenBytes.Length);
 
-            // 구조: [SendType(1)][ProtocolType(1)][SequenceNumber(4)][TokenLen(4)][Token(N)][Body(M)]
-            int totalLen = 2 + 4 + 4 + tokenBytes.Length + data.Length;
-            byte[] packet = new byte[totalLen];
             byte[] seqBytes = BitConverter.GetBytes(_sequenceNumber++);
 
-            packet[0] = (byte)SendType.Direct;
-            packet[1] = (byte)protocol;
-            Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
-            Buffer.BlockCopy(tokenLenBytes, 0, packet, 6, 4);
-            Buffer.BlockCopy(tokenBytes, 0, packet, 10, tokenBytes.Length);
-            Buffer.BlockCopy(data, 0, packet, 10 + tokenBytes.Length, data.Length);
+            // Payload(M + N + 4) = [TokenLen(4)] + [Token(N)] + [Body(M)]
+            int payloadLen = 4 + tokenBytes.Length + data.Length;
+            byte[] payload = new byte[payloadLen];
+            Buffer.BlockCopy(tokenLenBytes, 0, payload, 0, 4);
+            Buffer.BlockCopy(tokenBytes, 0, payload, 4, tokenBytes.Length);
+            Buffer.BlockCopy(data, 0, payload, 4 + tokenBytes.Length, data.Length);
 
-            await _socket!.SendAsync(packet, SocketFlags.None);
+            // HMAC 서명 대상: [SendType(1)][Protocol(1)][SeqNum(4)] + [Payload]
+            byte[] dataToSign = new byte[6 + payloadLen];
+            dataToSign[0] = (byte)SendType.Direct;
+            dataToSign[1] = (byte)protocol;
+            Buffer.BlockCopy(seqBytes, 0, dataToSign, 2, 4);
+            Buffer.BlockCopy(payload, 0, dataToSign, 6, payloadLen);
+
+            using (var hmac = new System.Security.Cryptography.HMACSHA256(_hmacKey))
+            {
+                byte[] computedHmac = hmac.ComputeHash(dataToSign);
+
+                // 패킷 구조: [SendType(1)][Protocol(1)][SeqNum(4)][HMAC(32)][Payload...]
+                int totalLen = 6 + 32 + payloadLen;
+                byte[] packet = new byte[totalLen];
+                packet[0] = (byte)SendType.Direct;
+                packet[1] = (byte)protocol;
+                Buffer.BlockCopy(seqBytes, 0, packet, 2, 4);
+                Buffer.BlockCopy(computedHmac, 0, packet, 6, 32);
+                Buffer.BlockCopy(payload, 0, packet, 38, payloadLen);
+
+                await _socket!.SendAsync(packet, SocketFlags.None);
+            }
         }
 
         public void RegisterHandler(ProtocolSelect protocol, Action<byte[]> handler)
@@ -287,5 +493,14 @@ namespace TeruTeruServer.Client
             _socket?.Dispose();
             _p2pManager.Dispose();
         }
+    }
+
+    /// <summary>
+    /// P2P 그룹(룸) 입장을 위한 데이터 모델입니다.
+    /// </summary>
+    public class GroupJoinData
+    {
+        public int GroupId { get; set; }
+        public int JoinerHostId { get; set; }
     }
 }

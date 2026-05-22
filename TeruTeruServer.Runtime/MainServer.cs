@@ -163,8 +163,17 @@ namespace TeruTeruServer.Runtime
             while (true)
             {
                 Thread.Sleep(1000);
+                if (Console.IsInputRedirected)
+                {
+                    continue;
+                }
                 string? strCMD = Console.ReadLine();
-                if (strCMD == null || !HandleConsoleCommand(strCMD))
+                if (strCMD == null)
+                {
+                    // Standard input is closed/redirected, keep sleeping
+                    continue;
+                }
+                if (!HandleConsoleCommand(strCMD))
                     break;
             }
         }

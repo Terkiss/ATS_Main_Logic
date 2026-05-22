@@ -62,7 +62,21 @@ namespace TeruTeruServer.Logic.Default.P2P
                 var buffer = rawData;
                 string json = buffer.ExtractJsonPayload();
                 var data = System.Text.Json.JsonSerializer.Deserialize<HolePunchRequestData>(json);
+                if (data != null)
+                {
+                    HandleHolePunchRequest(data, requesterHostID);
+                }
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"HolePunchRequest 에러: {ex.Message}");
+            }
+        }
 
+        public void HandleHolePunchRequest(HolePunchRequestData data, int requesterHostID)
+        {
+            try
+            {
                 if (data != null)
                 {
                     if (_sessionManager.Players.TryGetValue(requesterHostID, out var requesterSession) &&
@@ -92,7 +106,7 @@ namespace TeruTeruServer.Logic.Default.P2P
             }
             catch (Exception ex)
             {
-                TeruTeruLogger.LogError($"HolePunchRequest 에러: {ex.Message}");
+                TeruTeruLogger.LogError($"HolePunchRequest 처리 중 에러: {ex.Message}");
             }
         }
 

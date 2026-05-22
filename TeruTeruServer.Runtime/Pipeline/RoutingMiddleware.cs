@@ -29,9 +29,7 @@ namespace TeruTeruServer.Runtime.Pipeline
 
             if (sendType == SendType.Direct)
             {
-                byte[] data = new byte[buffer.Length - 1];
-                Array.Copy(buffer, 1, data, 0, buffer.Length - 1);
-                _serverLogic.ProcessDirectProtocol(data, context.ClientSocket);
+                _serverLogic.ProcessDirectProtocol(buffer, context.ClientSocket);
             }
             else if (sendType == SendType.Json)
             {

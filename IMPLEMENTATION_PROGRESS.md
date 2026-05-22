@@ -1,7 +1,30 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Phase 2 — Game Server Edition (Completed)
+## 현재 마일스톤: Milestone 14 — Redis Production Integration (In Progress)
  
+- [/] **Milestone 14 — Redis Production Integration (In Progress)**
+  - [ ] **1. StackExchange.Redis 통합**
+    - [ ] NuGet 패키지 추가 및 Redis ConnectionMultiplexer 싱글톤 연동
+  - [ ] **2. RedisSessionStore 실구현**
+    - [ ] Hash 및 String 구조를 사용한 실제 Redis 세션 읽기/쓰기 구현, 로컬 캐시와의 동기화
+  - [ ] **3. RedisEventBus 실구현**
+    - [ ] Redis Pub/Sub을 사용한 분산 서버 간 이벤트 브로드캐스팅
+  - [ ] **4. 안전한 장애 전파 (Failover)**
+    - [ ] Redis 장애 시 로컬 캐시 백업 전환 및 장애 복구 로직 연동
+  - [ ] **5. 통합 부하 테스트**
+    - [ ] 다중 서버 인스턴스가 단일 Redis 세션을 공유하여 Reconnect 및 이벤트 송수신 검증
+
+- [x] **Milestone 13 — Client SDK Reinforcement & Reconnection (Completed)**
+  - [x] **1. 재연결 기능 (ReconnectAsync) 구현**
+    - [x] JWT 및 ReconnectToken 기반 유예 세션 복구 로직 연동
+    - [x] 소켓 비정상 종료 시 자동 재시도 및 세션 복원
+  - [x] **2. Zone / Room 관리 고수준 API 추가**
+    - [x] JoinZoneAsync, LeaveZoneAsync, EnterRoomAsync, LeaveRoomAsync 래퍼 구현
+  - [x] **3. 클라이언트 보간기 (SnapshotInterpolator) 구현**
+    - [x] 수신된 이진 Delta 스냅샷 프레임 버퍼링 및 Lerp 보간 처리
+  - [x] **4. 클라이언트 예측 버퍼 (ClientPredictionBuffer) 구현**
+    - [x] AckSequence 기반 로컬 입력 기록 및 롤백/재시뮬레이션 오차 제어
+
 - [x] **Milestone 12 — Live Operations & Scalability (Completed)**
   - [x] **1. 게임 서버 클러스터링 및 라우팅**
     - [x] ClusterNodeInfo 부하 메트릭 필드 확장

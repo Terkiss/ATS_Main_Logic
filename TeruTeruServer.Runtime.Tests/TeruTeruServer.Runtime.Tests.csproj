@@ -27,6 +27,7 @@
     <ProjectReference Include="..\TeruTeruServer.Runtime\TeruTeruServer.Runtime.csproj" />
     <ProjectReference Include="..\TeruTeruServer.SDK\TeruTeruServer.SDK.csproj" />
     <ProjectReference Include="..\TeruTeruServer.Logic.Default\TeruTeruServer.Logic.Default.csproj" />
+    <ProjectReference Include="..\TeruTeruServer.Client\TeruTeruServer.Client.csproj" />
   </ItemGroup>
 
 </Project>

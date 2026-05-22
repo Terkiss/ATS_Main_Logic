@@ -1,5 +1,6 @@
 using TeruTeruServer.SDK.Interfaces;
 using System;
+using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,11 +57,34 @@ namespace TeruTeruServer.Runtime.Pipeline
                 if (tokenLength > 0 && buffer.Length >= 10 + tokenLength)
                 {
                     string token = Encoding.UTF8.GetString(buffer, 10, tokenLength);
-                    ValidateToken(token);
+                    string userId = ValidateToken(token);
 
-                    if (context.Session != null)
+                    if (!string.IsNullOrEmpty(userId))
                     {
-                        context.Session.IsAuthenticated = true;
+                        ClientSession? session = null;
+                        foreach (var player in _sessionManager.Players.Values)
+                        {
+                            if (player.GameID == userId)
+                            {
+                                session = player;
+                                break;
+                            }
+                        }
+
+                        if (session != null)
+                        {
+                            context.Session = session;
+                            context.Session.IsAuthenticated = true;
+
+                            if (protocolType == (byte)ProtocolSelect.UdpRegisterProtocol)
+                            {
+                                session.UdpEndPoint = context.ClientSocket.RemoteEndPoint;
+                            }
+                        }
+                        else if (context.Session != null)
+                        {
+                            context.Session.IsAuthenticated = true;
+                        }
                     }
 
                     // 검증 성공 시, 실제 데이터만 남기도록 RawData 재설정
@@ -82,11 +106,11 @@ namespace TeruTeruServer.Runtime.Pipeline
             await next();
         }
 
-        private void ValidateToken(string token)
+        private string ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(SecretKey);
-            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -94,6 +118,10 @@ namespace TeruTeruServer.Runtime.Pipeline
                 ValidateAudience = false,
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            var idClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "id");
+            return idClaim?.Value ?? string.Empty;
         }
 
         private void HandleReconnect(PacketContext context)

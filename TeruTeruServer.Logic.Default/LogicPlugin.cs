@@ -13,6 +13,7 @@ using TeruTeruServer.SDK.Interfaces;
 using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Util;
 using TeruTeruServer.SDK.Attributes;
+using TeruTeruServer.Logic.Default.P2P;
 
 namespace TeruTeruServer.Logic.Default
 {
@@ -27,16 +28,18 @@ namespace TeruTeruServer.Logic.Default
         private readonly TeruTeruServer.Logic.Default.P2P.P2PRelayHandler _p2pRelayHandler;
         private readonly TeruTeruServer.Logic.Default.P2P.P2PGroupHandler _p2pGroupHandler;
         private readonly IEventBus _eventBus;
+        private readonly IZoneManager _zoneManager;
 
         private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026";
 
-        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router, IEventBus eventBus)
+        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router, IEventBus eventBus, IZoneManager zoneManager)
         {
             _messageSender = messageSender;
             _dbService = dbService;
             _sessionManager = sessionManager;
             _router = router;
             _eventBus = eventBus;
+            _zoneManager = zoneManager;
             _rpcProxy = new RpcProxy(_messageSender, _sessionManager);
 
             // 중요: 라우터에 자기 자신을 등록하여 어트리뷰트 분석 활성화
@@ -143,6 +146,20 @@ namespace TeruTeruServer.Logic.Default
         public void HandleLogin(Socket socket, LoginProtocol loginData)
         {
             string token = GenerateJwtToken(loginData.UserId, out string refreshToken);
+            int hostId = Math.Abs(loginData.UserId.GetHashCode());
+            if (hostId == 0) hostId = 1;
+
+            string reconnectToken = Guid.NewGuid().ToString("N");
+
+            var session = new ClientSession(hostId, socket, loginData.UserId);
+            session.IsAuthenticated = true;
+            session.AuthToken = token;
+            session.ReconnectToken = reconnectToken;
+
+            _sessionManager.TryAddPlayer(hostId, session);
+
+            loginData.HostId = hostId;
+            loginData.ReconnectToken = reconnectToken;
             loginData.IsSuccess = true;
             loginData.AuthToken = token;
             loginData.RefreshToken = refreshToken;
@@ -268,6 +285,48 @@ namespace TeruTeruServer.Logic.Default
             {
                 return false;
             }
+        }
+
+        [Protocol(ProtocolSelect.ZoneTransferProtocol)]
+        public object HandleZoneTransfer(Socket socket, TeruTeruServer.SDK.GameEngine.ZoneTransferRequest request)
+        {
+            if (request.ToZoneId > 0 && _zoneManager.GetZone(request.ToZoneId) == null)
+            {
+                _zoneManager.CreateZone($"Zone_{request.ToZoneId}");
+            }
+
+            bool success = _zoneManager.TransferPlayer(request);
+            if (success)
+            {
+                TeruTeruLogger.LogInfo($"[ZoneTransfer] Player {request.HostId} transferred from Zone {request.FromZoneId} to {request.ToZoneId}");
+                return request;
+            }
+            else
+            {
+                if (request.ToZoneId == 0)
+                {
+                    _zoneManager.LeaveZone(request.FromZoneId, request.HostId);
+                    TeruTeruLogger.LogInfo($"[ZoneTransfer] Player {request.HostId} left Zone {request.FromZoneId}");
+                    return request;
+                }
+                TeruTeruLogger.LogWarning($"[ZoneTransfer] Player {request.HostId} failed to transfer from Zone {request.FromZoneId} to {request.ToZoneId}");
+                return new { error = "Transfer failed" };
+            }
+        }
+
+        [Protocol(ProtocolSelect.HolePunchRequest)]
+        public void HandleHolePunchRequest(Socket socket, HolePunchRequestData requestData)
+        {
+            if (_sessionManager.TryGetHostIdBySocket(socket, out int requesterHostID))
+            {
+                _p2pSignalingHandler.HandleHolePunchRequest(requestData, requesterHostID);
+            }
+        }
+
+        [Protocol(ProtocolSelect.JoinGroupProtocol)]
+        public void HandleJoinGroup(Socket socket, GroupJoinData joinData)
+        {
+            _p2pGroupHandler.HandleJoinGroup(joinData);
         }
     }
 }

@@ -44,9 +44,35 @@ namespace TeruTeruServer.Logic.Default.P2P
                 var buffer = rawData;
                 string json = buffer.ExtractJsonPayload();
                 var data = System.Text.Json.JsonSerializer.Deserialize<GroupJoinData>(json);
-
-                if (data != null && _groups.TryGetValue(data.GroupId, out var group))
+                if (data != null)
                 {
+                    HandleJoinGroup(data);
+                }
+            }
+            catch (Exception ex)
+            {
+                TeruTeruLogger.LogError($"JoinGroup 처리 중 에러: {ex.Message}");
+            }
+        }
+
+        public void HandleJoinGroup(GroupJoinData data)
+        {
+            try
+            {
+                if (data != null)
+                {
+                    if (!_groups.TryGetValue(data.GroupId, out var group))
+                    {
+                        group = new P2PGroup(data.JoinerHostId);
+                        var prop = typeof(P2PGroup).GetProperty("GroupId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                        if (prop != null)
+                        {
+                            prop.SetValue(group, data.GroupId);
+                        }
+                        _groups[data.GroupId] = group;
+                        TeruTeruLogger.LogInfo($"그룹 자동 생성됨 (요청): GroupID {data.GroupId}, 방장: {data.JoinerHostId}");
+                    }
+
                     // 새로 들어온 유저
                     int joiner = data.JoinerHostId;
 

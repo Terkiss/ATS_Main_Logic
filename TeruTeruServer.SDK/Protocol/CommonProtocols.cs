@@ -19,6 +19,7 @@ namespace TeruTeruServer.SDK.Protocol
         public string Password { get; set; }
         public string AuthToken { get; set; }
         public string RefreshToken { get; set; }
+        public string ReconnectToken { get; set; }
         public bool IsSuccess { get; set; }
 
         public LoginProtocol()
