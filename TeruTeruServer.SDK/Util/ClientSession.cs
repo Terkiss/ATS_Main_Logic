@@ -19,7 +19,7 @@ namespace TeruTeruServer.SDK.Util
         public string GameID { get; set; } // 게임 내 고유 ID
         public string HostIP { get; set; } // 호스트 IP 주소
         public int HostPort { get; set; } // 호스트 포트 번호
-        public Socket ClientSocket { get; set; } // 클라이언트 소켓
+        public Socket? ClientSocket { get; set; } // 클라이언트 소켓
 
         public string Role { get; set; } // 클라이언트 역할 (예: Detector)
         public string ClientName { get; set; } // 클라이언트 이름
@@ -59,7 +59,7 @@ namespace TeruTeruServer.SDK.Util
             LastPingUtc = DateTime.UtcNow;
         }
 
-        public ClientSession(int hostID, Socket clientSocket, string gameID)
+        public ClientSession(int hostID, Socket? clientSocket, string gameID)
         {
             HostID = hostID;
             GameID = gameID;
