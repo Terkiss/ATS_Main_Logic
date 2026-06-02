@@ -88,18 +88,21 @@ namespace TeruTeruServer.Logic.Default.P2P
                             return;
                         }
 
-                        // Send target's EndPoint to requester
-                        if (targetSession.UdpEndPoint is IPEndPoint targetIP)
+                        if (requesterSession.ClientSocket != null && targetSession.ClientSocket != null)
                         {
-                            var targetInfo = new PeerEndpointInfo { PeerHostID = data.TargetHostID, IP = targetIP.Address.ToString(), Port = targetIP.Port };
-                            SendJsonResponse(requesterSession.ClientSocket, ProtocolSelect.HolePunchRequest, targetInfo);
-                        }
+                            // Send target's EndPoint to requester
+                            if (targetSession.UdpEndPoint is IPEndPoint targetIP)
+                            {
+                                var targetInfo = new PeerEndpointInfo { PeerHostID = data.TargetHostID, IP = targetIP.Address.ToString(), Port = targetIP.Port };
+                                requesterSession.ClientSocket.SendJsonResponse(ProtocolSelect.HolePunchRequest, targetInfo);
+                            }
 
-                        // Send requester's EndPoint to target
-                        if (requesterSession.UdpEndPoint is IPEndPoint reqIP)
-                        {
-                            var reqInfo = new PeerEndpointInfo { PeerHostID = requesterHostID, IP = reqIP.Address.ToString(), Port = reqIP.Port };
-                            SendJsonResponse(targetSession.ClientSocket, ProtocolSelect.HolePunchRequest, reqInfo);
+                            // Send requester's EndPoint to target
+                            if (requesterSession.UdpEndPoint is IPEndPoint reqIP)
+                            {
+                                var reqInfo = new PeerEndpointInfo { PeerHostID = requesterHostID, IP = reqIP.Address.ToString(), Port = reqIP.Port };
+                                targetSession.ClientSocket.SendJsonResponse(ProtocolSelect.HolePunchRequest, reqInfo);
+                            }
                         }
                     }
                 }
@@ -110,21 +113,6 @@ namespace TeruTeruServer.Logic.Default.P2P
             }
         }
 
-        private void SendJsonResponse<T>(Socket socket, ProtocolSelect protocol, T data)
-        {
-            if (socket == null || !socket.Connected) return;
-            try
-            {
-                string json = System.Text.Json.JsonSerializer.Serialize(data);
-                byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-                byte[] packet = new byte[body.Length + 6];
-                packet[0] = (byte)SendType.Json;
-                packet[1] = (byte)protocol;
-                // SequenceNumber (2-5) remains 0 for signaling
-                Array.Copy(body, 0, packet, 6, body.Length);
-                socket.Send(packet);
-            }
-            catch { }
-        }
+
     }
 }

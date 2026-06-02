@@ -1,8 +1,8 @@
 # 프로젝트 구현 진행 상황 (Implementation Progress)
 
-## 현재 마일스톤: Milestone 15 — Database Hardening & ORM (Planning)
+## 현재 마일스톤: Milestone 16 — Monitoring & Observability (Planning)
 
-- [ ] **Milestone 15 — Database Hardening & ORM**
+- [ ] **Milestone 16 — Monitoring & Observability**
   - [ ] **1. [세부 작업 1]**
     - [ ] [상세 작업 내용]
   - [ ] **2. [세부 작업 2]**

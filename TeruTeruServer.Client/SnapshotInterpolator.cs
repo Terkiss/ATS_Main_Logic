@@ -14,6 +14,16 @@ namespace TeruTeruServer.Client
         private readonly object _lock = new();
         private readonly int _maxBufferSize;
 
+        private class WorldStateComparer : IComparer<WorldState>
+        {
+            public static readonly WorldStateComparer Instance = new();
+            public int Compare(WorldState? x, WorldState? y)
+            {
+                if (x == null || y == null) return 0;
+                return x.Timestamp.CompareTo(y.Timestamp);
+            }
+        }
+
         public SnapshotInterpolator(int maxBufferSize = 100)
         {
             _maxBufferSize = maxBufferSize;
@@ -32,8 +42,16 @@ namespace TeruTeruServer.Client
                 if (_snapshots.Any(s => s.TickNumber == snapshot.TickNumber))
                     return;
 
-                _snapshots.Add(snapshot.DeepClone());
-                _snapshots.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+                // 이진 검색으로 삽입 위치 탐색
+                int index = _snapshots.BinarySearch(snapshot, WorldStateComparer.Instance);
+                if (index >= 0)
+                {
+                    // 동일한 타임스탬프의 스냅샷이 이미 존재하면 무시
+                    return;
+                }
+
+                int insertIndex = ~index;
+                _snapshots.Insert(insertIndex, snapshot.DeepClone());
 
                 // 버퍼가 최대 크기를 초과하면 가장 오래된 스냅샷 제거
                 while (_snapshots.Count > _maxBufferSize)
@@ -66,33 +84,41 @@ namespace TeruTeruServer.Client
                 if (_snapshots.Count == 0) return null;
                 if (_snapshots.Count == 1) return _snapshots[0].DeepClone();
 
-                // 보간할 수 있는 구간 탐색: left(<= targetTime), right(> targetTime)
-                WorldState? left = null;
-                WorldState? right = null;
+                var targetState = new WorldState { Timestamp = targetTime };
+                int index = _snapshots.BinarySearch(targetState, WorldStateComparer.Instance);
 
-                for (int i = 0; i < _snapshots.Count; i++)
+                int leftIndex;
+                int rightIndex;
+
+                if (index >= 0)
                 {
-                    if (_snapshots[i].Timestamp <= targetTime)
-                    {
-                        left = _snapshots[i];
-                    }
-                    else
-                    {
-                        right = _snapshots[i];
-                        break;
-                    }
+                    leftIndex = index;
+                    rightIndex = index;
+                }
+                else
+                {
+                    rightIndex = ~index;
+                    leftIndex = rightIndex - 1;
                 }
 
                 // 타겟 시간 이전의 스냅샷이 없다면 가장 첫 스냅샷 반환
-                if (left == null)
+                if (leftIndex < 0)
                 {
                     return _snapshots[0].DeepClone();
                 }
 
-                // 타겟 시간 이후의 스냅샷이 없다면(버퍼링 부족 또는 패킷 유실) 가장 마지막 스냅샷 반환 (보간 불가, 외삽 대신 최종 상태로 대체)
-                if (right == null)
+                // 타겟 시간 이후의 스냅샷이 없다면 가장 마지막 스냅샷 반환 (보간 불가, 외삽 대신 최종 상태로 대체)
+                if (rightIndex >= _snapshots.Count)
                 {
                     return _snapshots[_snapshots.Count - 1].DeepClone();
+                }
+
+                var left = _snapshots[leftIndex];
+                var right = _snapshots[rightIndex];
+
+                if (leftIndex == rightIndex)
+                {
+                    return left.DeepClone();
                 }
 
                 // left와 right 스냅샷 사이에서 선형 보간 수행

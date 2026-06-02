@@ -14,12 +14,12 @@ namespace TeruTeruServer.SDK.Protocol
         /// <summary>
         /// 호출할 RPC 메서드 이름 (RpcAttribute에 정의된 이름 혹은 메서드 명)
         /// </summary>
-        public string MethodName { get; set; }
+        public string MethodName { get; set; } = string.Empty;
 
         /// <summary>
         /// 메서드 매개변수 데이터 (JSON 직렬화된 문자열)
         /// </summary>
-        public string Params { get; set; }
+        public string Params { get; set; } = string.Empty;
 
         public RpcRequest()
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Enums;
 
@@ -12,8 +13,6 @@ namespace TeruTeruServer.SDK.Util
     /// </summary>
     public class ServerMemory
     {
-        public static object HostIDGeneratorLock = new object();
-
         private static ConcurrentDictionary<int, ClientSession> _hosts = new ConcurrentDictionary<int, ClientSession>();
         private static ConcurrentDictionary<string, int> _gameID2HostID = new ConcurrentDictionary<string, int>();
 
@@ -30,16 +29,7 @@ namespace TeruTeruServer.SDK.Util
         /// <summary>
         /// 새로운 고유 호스트 ID를 생성합니다.
         /// </summary>
-        public static int GetHostID
-        {
-            get
-            {
-                lock (HostIDGeneratorLock)
-                {
-                    return _currentHostID++;
-                }
-            }
-        }
+        public static int GetHostID => Interlocked.Increment(ref _currentHostID) - 1;
 
         public static List<ClientSession> GetClientSessions()
         {
@@ -117,8 +107,8 @@ namespace TeruTeruServer.SDK.Util
 
         public static bool GetImageWork_PreOrder_Queue(out SendImageData data)
         {
-            bool check = _imageWorkPreOrderQueue.TryDequeue(out SendImageData imageData);
-            data = imageData;
+            bool check = _imageWorkPreOrderQueue.TryDequeue(out var imageData);
+            data = imageData ?? null!;
             return check;
         }
 
@@ -133,8 +123,8 @@ namespace TeruTeruServer.SDK.Util
 
         public static bool GetImageWork_Complete_Queue(out YoloDetectResult data)
         {
-            bool check = _imageWorkCompleteQueue.TryDequeue(out YoloDetectResult imageData);
-            data = imageData;
+            bool check = _imageWorkCompleteQueue.TryDequeue(out var imageData);
+            data = imageData ?? null!;
             return check;
         }
 

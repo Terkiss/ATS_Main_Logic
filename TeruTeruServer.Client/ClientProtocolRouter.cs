@@ -59,10 +59,17 @@ namespace TeruTeruServer.Client
 
             if (protocol == ProtocolSelect.RpcProtocol)
             {
-                var rpcReq = JsonSerializer.Deserialize<RpcRequest>(jsonPayload);
-                if (rpcReq != null && _rpcMethods.TryGetValue(rpcReq.MethodName, out methodToInvoke))
+                try
                 {
-                    actualJson = rpcReq.Params ?? "";
+                    var rpcReq = JsonSerializer.Deserialize<RpcRequest>(jsonPayload);
+                    if (rpcReq != null && _rpcMethods.TryGetValue(rpcReq.MethodName, out methodToInvoke))
+                    {
+                        actualJson = rpcReq.Params ?? "";
+                    }
+                }
+                catch (JsonException ex)
+                {
+                    Log($"Failed to deserialize RpcRequest: {ex.Message}. Payload: {jsonPayload}");
                 }
             }
             else
@@ -99,8 +106,14 @@ namespace TeruTeruServer.Client
                         {
                             args[i] = JsonSerializer.Deserialize(jsonPayload, param.ParameterType);
                         }
-                        catch
+                        catch (JsonException jsonEx)
                         {
+                            Log($"JSON Deserialization failed for parameter '{param.Name}' ({param.ParameterType.Name}) in '{method.Name}'. Payload: {(jsonPayload.Length > 100 ? jsonPayload.Substring(0, 100) + "..." : jsonPayload)}. Error: {jsonEx.Message}");
+                            args[i] = null;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log($"Unexpected error deserializing parameter '{param.Name}' in '{method.Name}'. Error: {ex.Message}");
                             args[i] = null;
                         }
                     }

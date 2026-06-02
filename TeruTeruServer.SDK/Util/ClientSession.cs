@@ -16,18 +16,18 @@ namespace TeruTeruServer.SDK.Util
     public class ClientSession
     {
         public int HostID { get; set; } // 호스트 고유 ID
-        public string GameID { get; set; } // 게임 내 고유 ID
-        public string HostIP { get; set; } // 호스트 IP 주소
+        public string GameID { get; set; } = string.Empty; // 게임 내 고유 ID
+        public string HostIP { get; set; } = string.Empty; // 호스트 IP 주소
         public int HostPort { get; set; } // 호스트 포트 번호
         public Socket? ClientSocket { get; set; } // 클라이언트 소켓
 
-        public string Role { get; set; } // 클라이언트 역할 (예: Detector)
-        public string ClientName { get; set; } // 클라이언트 이름
-        public string AuthToken { get; set; } // 인증 토큰 (Phase 2 추가)
+        public string Role { get; set; } = string.Empty; // 클라이언트 역할 (예: Detector)
+        public string ClientName { get; set; } = string.Empty; // 클라이언트 이름
+        public string AuthToken { get; set; } = string.Empty; // 인증 토큰 (Phase 2 추가)
 
         public DateTime LastSeenUtc { get; set; }
         public SessionState State { get; set; }
-        public string ReconnectToken { get; set; }
+        public string ReconnectToken { get; set; } = string.Empty;
         public P2PStatus P2PState { get; set; }
         public System.Net.EndPoint? UdpEndPoint { get; set; } // UDP 공인 IP/Port 정보
 

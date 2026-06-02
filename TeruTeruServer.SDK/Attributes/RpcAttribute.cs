@@ -11,9 +11,9 @@ namespace TeruTeruServer.SDK.Attributes
         /// <summary>
         /// RPC 프로토콜 이름 (생략 시 메서드 이름 사용)
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
-        public RpcAttribute(string name = null)
+        public RpcAttribute(string? name = null)
         {
             Name = name;
         }

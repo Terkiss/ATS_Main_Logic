@@ -67,7 +67,7 @@ namespace TeruTeruServer.Runtime.Tests
         {
             // Arrange
             var bus = new RedisEventBus(InvalidConnectionString);
-            string receivedMessage = null;
+            string? receivedMessage = null;
             var signal = new ManualResetEvent(false);
 
             bus.Subscribe<string>("test:channel", (msg) =>

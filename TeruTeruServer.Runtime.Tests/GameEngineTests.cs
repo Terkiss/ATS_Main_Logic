@@ -30,18 +30,50 @@ namespace TeruTeruServer.Runtime.Tests
         public async Task GameLoop_ShouldTriggerHandlersAtCorrectRate()
         {
             const int tickRate = 20; // 50ms per tick
+            const double targetFrameTimeMs = 1000.0 / tickRate;
             var loop = new GameLoop(tickRate);
-            int callCount = 0;
+            
+            var stopwatch = new Stopwatch();
+            var tickTimes = new List<double>();
+            var lockObj = new object();
             
             loop.RegisterTickHandler(tick => {
-                Interlocked.Increment(ref callCount);
+                lock (lockObj)
+                {
+                    if (!stopwatch.IsRunning)
+                    {
+                        stopwatch.Start();
+                    }
+                    tickTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+                }
             });
 
             loop.Start();
-            await Task.Delay(220); // Should trigger ~4 ticks (0, 50, 100, 150, 200)
+            await Task.Delay(300); // 300ms 대기로 틱이 충분히 발생할 여유 제공
             loop.Stop();
 
-            Assert.InRange(callCount, 3, 8); // 환경 지연을 고려하여 범위를 약간 넓힘 (목표: ~5회)
+            int callCount;
+            List<double> localTickTimes;
+            lock (lockObj)
+            {
+                callCount = tickTimes.Count;
+                localTickTimes = new List<double>(tickTimes);
+            }
+
+            // 최소 3회 이상 틱이 발생했는지 검증 (시작 지연을 감안해도 300ms 대기 시 반드시 만족)
+            Assert.True(callCount >= 3, $"Actual call count: {callCount}");
+
+            // 첫 번째 틱과 마지막 틱 사이의 실제 경과 시간
+            double actualElapsed = localTickTimes[callCount - 1] - localTickTimes[0];
+            
+            // 틱 횟수에 따른 기대 경과 시간 (예: 5회 틱인 경우 첫 틱 기준 4개 프레임이 흘렀어야 함 -> 4 * 50ms = 200ms)
+            double expectedElapsed = (callCount - 1) * targetFrameTimeMs;
+
+            // 허용 오차 (OS의 타이머 분해능 및 스레드 대기 편차를 고려하여 1.5 틱 크기 정도로 설정)
+            double tolerance = targetFrameTimeMs * 1.5;
+
+            Assert.True(Math.Abs(actualElapsed - expectedElapsed) < tolerance,
+                $"Expected elapsed time for {callCount} ticks was {expectedElapsed}ms, but actual was {actualElapsed}ms (Diff: {Math.Abs(actualElapsed - expectedElapsed)}ms).");
         }
 
         [Fact]

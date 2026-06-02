@@ -13,7 +13,7 @@ namespace TeruTeruServer.SDK.Util
     public static class Utility
     {
         // 고유 ID 생성에 사용될 문자 집합
-        private static readonly char[] _characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
+        private const string Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         /// <summary>
         /// 보안 상으로 안전한 랜덤 바이트를 사용하여 고유 ID를 생성합니다.
@@ -21,11 +21,10 @@ namespace TeruTeruServer.SDK.Util
         public static string GenerateUniqueId()
         {
             byte[] data = RandomNumberGenerator.GetBytes(24);
-            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             StringBuilder result = new StringBuilder(30);
             foreach (byte b in data)
             {
-                result.Append(characters[b % characters.Length]);
+                result.Append(Characters[b % Characters.Length]);
             }
 
             return result.ToString();
@@ -36,7 +35,7 @@ namespace TeruTeruServer.SDK.Util
         /// </summary>
         /// <param name="data">바이너리 이미지 데이터</param>
         /// <returns>OpenCV Mat 객체</returns>
-        public static Mat ByteArrayToMat(byte[] data)
+        public static Mat? ByteArrayToMat(byte[] data)
         {
             if (data == null || data.Length == 0) return null;
             return Cv2.ImDecode(data, ImreadModes.Color);

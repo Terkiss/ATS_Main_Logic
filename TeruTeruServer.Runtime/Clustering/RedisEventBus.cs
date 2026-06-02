@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using StackExchange.Redis;
 using TeruTeruServer.SDK.Interfaces;
 
 namespace TeruTeruServer.Runtime.Clustering
@@ -31,7 +32,7 @@ namespace TeruTeruServer.Runtime.Clustering
                 if (sub != null)
                 {
                     string json = JsonSerializer.Serialize(message);
-                    sub.Publish(channel, json);
+                    sub.Publish(RedisChannel.Literal(channel), json);
                     redisPublished = true;
                 }
             }
@@ -58,7 +59,7 @@ namespace TeruTeruServer.Runtime.Clustering
                 var sub = _provider.GetSubscriber();
                 if (sub != null)
                 {
-                    sub.Subscribe(channel, (redisChannel, value) =>
+                    sub.Subscribe(RedisChannel.Literal(channel), (redisChannel, value) =>
                     {
                         try
                         {
@@ -95,7 +96,7 @@ namespace TeruTeruServer.Runtime.Clustering
                 var sub = _provider.GetSubscriber();
                 if (sub != null)
                 {
-                    sub.Unsubscribe(channel);
+                    sub.Unsubscribe(RedisChannel.Literal(channel));
                 }
             }
             catch (Exception ex)

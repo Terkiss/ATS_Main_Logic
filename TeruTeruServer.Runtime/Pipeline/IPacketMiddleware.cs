@@ -13,7 +13,7 @@ namespace TeruTeruServer.Runtime.Pipeline
     {
         public Socket ClientSocket { get; }
         public byte[] RawData { get; set; }
-        public ClientSession Session { get; set; }
+        public ClientSession? Session { get; set; }
         public bool IsProcessed { get; set; } = false;
 
         public PacketContext(Socket socket, byte[] data)

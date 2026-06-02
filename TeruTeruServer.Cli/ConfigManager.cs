@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeruTeruServer.Runtime;
+using TeruTeruServer.SDK.Util;
 
 namespace TeruTeruServer.Cli
 {
@@ -23,7 +20,7 @@ namespace TeruTeruServer.Cli
                 }
                 else
                 {
-                    Console.WriteLine($"[Config] {filePath} not found. Using default settings.");
+                    TeruTeruLogger.LogWarning($"[Config] {filePath} not found. Using default settings.");
                     return new ServerConnectConfigParameter();
                 }
             }
@@ -34,7 +31,10 @@ namespace TeruTeruServer.Cli
                 var lines = File.ReadAllLines(filePath);
                 foreach (var line in lines)
                 {
-                    var parts = line.Split('=');
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#') || line.StartsWith("//"))
+                        continue;
+
+                    var parts = line.Split('=', 2);
                     if (parts.Length != 2) continue;
 
                     var key = parts[0].Trim().ToLower();
@@ -42,19 +42,36 @@ namespace TeruTeruServer.Cli
 
                     switch (key)
                     {
-                        case "port": config.SetPort(int.Parse(value)); break;
-                        case "max_connection": config.SetMaxConnection(int.Parse(value)); break;
-                        case "isudp": config.SetUdp(bool.Parse(value)); break;
-                        case "istcp": config.SetTcp(bool.Parse(value)); break;
-                        case "sendmassagesize": config.SendBufferSize = int.Parse(value); break;
-                        case "receivemassagesize": config.ReceiveBufferSize = int.Parse(value); break;
-                        case "guid": config.Guid = value; break;
+                        case "port" when int.TryParse(value, out var port):
+                            config.SetPort(port);
+                            break;
+                        case "max_connection" when int.TryParse(value, out var maxConn):
+                            config.SetMaxConnection(maxConn);
+                            break;
+                        case "isudp" when bool.TryParse(value, out var isUdp):
+                            config.SetUdp(isUdp);
+                            break;
+                        case "istcp" when bool.TryParse(value, out var isTcp):
+                            config.SetTcp(isTcp);
+                            break;
+                        case "sendmassagesize" when int.TryParse(value, out var sendSize):
+                            config.SendBufferSize = sendSize;
+                            break;
+                        case "receivemassagesize" when int.TryParse(value, out var recvSize):
+                            config.ReceiveBufferSize = recvSize;
+                            break;
+                        case "guid":
+                            config.Guid = value;
+                            break;
+                        default:
+                            TeruTeruLogger.LogWarning($"[Config] Unknown or invalid key/value pair: {line}");
+                            break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Config] Error parsing config file: {ex.Message}");
+                TeruTeruLogger.LogError($"[Config] Error parsing config file: {ex.Message}");
             }
 
             return config;

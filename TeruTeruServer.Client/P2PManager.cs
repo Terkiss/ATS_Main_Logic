@@ -23,7 +23,8 @@ namespace TeruTeruServer.Client
         private Socket? _udpSocket;
         private readonly TeruClient _client;
         private IPEndPoint? _serverUdpEndpoint;
-        private bool _isRunning;
+        private volatile bool _isRunning;
+        private System.Threading.CancellationTokenSource? _cts;
         private Action<string>? _onLog;
         private Action<int, byte[]>? _onPeerDataReceived;
         private P2PStatus _currentStatus = P2PStatus.Signaling;
@@ -61,6 +62,7 @@ namespace TeruTeruServer.Client
                 _serverUdpEndpoint = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
                 _udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 _udpSocket.Bind(new IPEndPoint(IPAddress.Any, localPort));
+                _cts = new System.Threading.CancellationTokenSource();
                 _isRunning = true;
 
                 _ = Task.Run(ReceiveLoop);
@@ -203,12 +205,13 @@ namespace TeruTeruServer.Client
         {
             byte[] buffer = new byte[8192];
             EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
+            var token = _cts?.Token ?? System.Threading.CancellationToken.None;
 
             try
             {
-                while (_isRunning && _udpSocket != null)
+                while (_isRunning && _udpSocket != null && !token.IsCancellationRequested)
                 {
-                    var result = await _udpSocket.ReceiveFromAsync(new ArraySegment<byte>(buffer), SocketFlags.None, remoteEP);
+                    var result = await _udpSocket.ReceiveFromAsync(new Memory<byte>(buffer), SocketFlags.None, remoteEP, token);
                     if (result.ReceivedBytes >= 6)
                     {
                         byte[] data = new byte[result.ReceivedBytes];
@@ -250,9 +253,16 @@ namespace TeruTeruServer.Client
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // Normal shutdown via CancellationToken
+            }
             catch (Exception ex)
             {
-                Log($"UDP Receive Loop Error: {ex.Message}");
+                if (_isRunning)
+                {
+                    Log($"UDP Receive Loop Error: {ex.Message}");
+                }
             }
         }
 
@@ -264,10 +274,22 @@ namespace TeruTeruServer.Client
         public void Dispose()
         {
             _isRunning = false;
+            try
+            {
+                _cts?.Cancel();
+                _cts?.Dispose();
+            }
+            catch { }
+
             _pingTimer.Stop();
             _pingTimer.Dispose();
-            _udpSocket?.Close();
-            _udpSocket?.Dispose();
+
+            try
+            {
+                _udpSocket?.Close();
+                _udpSocket?.Dispose();
+            }
+            catch { }
         }
     }
 }

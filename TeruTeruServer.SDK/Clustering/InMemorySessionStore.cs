@@ -16,9 +16,19 @@ namespace TeruTeruServer.SDK.Clustering
 
         public bool TryAdd(int hostId, ClientSession session) => InternalDictionary.TryAdd(hostId, session);
 
-        public bool TryGet(int hostId, out ClientSession session) => InternalDictionary.TryGetValue(hostId, out session);
+        public bool TryGet(int hostId, out ClientSession session)
+        {
+            var res = InternalDictionary.TryGetValue(hostId, out var temp);
+            session = temp!;
+            return res;
+        }
 
-        public bool TryRemove(int hostId, out ClientSession session) => InternalDictionary.TryRemove(hostId, out session);
+        public bool TryRemove(int hostId, out ClientSession session)
+        {
+            var res = InternalDictionary.TryRemove(hostId, out var temp);
+            session = temp!;
+            return res;
+        }
 
         public ClientSession? FindByReconnectToken(string token)
         {

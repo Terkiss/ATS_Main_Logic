@@ -26,7 +26,7 @@ namespace TeruTeruServer.Client
     /// </summary>
     public class ClientPredictionBuffer
     {
-        private readonly List<PredictionEntry> _buffer = new();
+        private readonly SortedDictionary<long, PredictionEntry> _buffer = new();
         private readonly object _lock = new();
 
         /// <summary>
@@ -39,9 +39,7 @@ namespace TeruTeruServer.Client
             lock (_lock)
             {
                 // 동일한 틱의 기존 예측 항목이 존재하면 덮어씌움
-                _buffer.RemoveAll(e => e.Input.ClientTick == input.ClientTick);
-                _buffer.Add(new PredictionEntry(input, predictedState.DeepClone()));
-                _buffer.Sort((a, b) => a.Input.ClientTick.CompareTo(b.Input.ClientTick));
+                _buffer[input.ClientTick] = new PredictionEntry(input, predictedState.DeepClone());
             }
         }
 
@@ -59,7 +57,7 @@ namespace TeruTeruServer.Client
             lock (_lock)
             {
                 // 1. 서버가 마지막으로 처리한 클라이언트 틱 찾기
-                PredictionEntry? ackedEntry = _buffer.FirstOrDefault(e => e.Input.ClientTick == ack.LastProcessedClientTick);
+                _buffer.TryGetValue(ack.LastProcessedClientTick, out PredictionEntry? ackedEntry);
 
                 if (ackedEntry != null)
                 {
@@ -83,8 +81,8 @@ namespace TeruTeruServer.Client
 
                         // 3.2. 이후 버퍼에 남아있는 모든 unacknowledged 입력들을 순차적으로 다시 시뮬레이션
                         var subsequent = _buffer
-                            .Where(e => e.Input.ClientTick > ack.LastProcessedClientTick)
-                            .OrderBy(e => e.Input.ClientTick)
+                            .Where(e => e.Key > ack.LastProcessedClientTick)
+                            .Select(e => e.Value)
                             .ToList();
 
                         foreach (var entry in subsequent)
@@ -96,10 +94,18 @@ namespace TeruTeruServer.Client
                 }
 
                 // 4. 서버가 이미 승인한 이전 틱의 항목들은 버퍼에서 완전히 정리
-                _buffer.RemoveAll(e => e.Input.ClientTick <= ack.LastProcessedClientTick);
+                var keysToRemove = _buffer.Keys.Where(k => k <= ack.LastProcessedClientTick).ToList();
+                foreach (var key in keysToRemove)
+                {
+                    _buffer.Remove(key);
+                }
 
                 // 5. 가장 최신 예측(또는 방금 보정 완료된) 클라이언트 상태 반환
-                return _buffer.LastOrDefault()?.State ?? (ackedEntry != null ? ackedEntry.State.DeepClone() : null);
+                if (_buffer.Count > 0)
+                {
+                    return _buffer.Values.Last().State;
+                }
+                return ackedEntry != null ? ackedEntry.State.DeepClone() : null;
             }
         }
 

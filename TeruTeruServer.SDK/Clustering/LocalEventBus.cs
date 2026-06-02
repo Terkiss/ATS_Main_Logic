@@ -16,14 +16,17 @@ namespace TeruTeruServer.SDK.Clustering
         {
             if (_subscriptions.TryGetValue(channel, out var handlers))
             {
+                Delegate[] handlersCopy;
                 lock (handlers)
                 {
-                    foreach (var handler in handlers)
+                    handlersCopy = handlers.ToArray();
+                }
+
+                foreach (var handler in handlersCopy)
+                {
+                    if (handler is Action<T> typedHandler)
                     {
-                        if (handler is Action<T> typedHandler)
-                        {
-                            typedHandler.Invoke(message);
-                        }
+                        typedHandler.Invoke(message);
                     }
                 }
             }

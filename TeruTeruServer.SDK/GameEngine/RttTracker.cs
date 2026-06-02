@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TeruTeruServer.SDK.GameEngine
 {
@@ -30,14 +29,20 @@ namespace TeruTeruServer.SDK.GameEngine
                     _samples.Dequeue();
                 }
 
-                AverageRttMs = (long)_samples.Average();
-                
-                // Jitter 계산 (Max - Min)
-                if (_samples.Count > 1)
+                long sum = 0;
+                long min = long.MaxValue;
+                long max = long.MinValue;
+
+                foreach (var sample in _samples)
                 {
-                    JitterMs = _samples.Max() - _samples.Min();
+                    sum += sample;
+                    if (sample < min) min = sample;
+                    if (sample > max) max = sample;
                 }
-                
+
+                AverageRttMs = sum / _samples.Count;
+                JitterMs = _samples.Count > 1 ? (max - min) : 0;
+
                 return AverageRttMs;
             }
         }

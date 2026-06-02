@@ -2,6 +2,8 @@ using Xunit;
 using TeruTeruServer.SDK.Util;
 using System.Reflection;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace TeruTeruServer.SDK.Tests
 {
     [Collection("ServerMemoryCollection")]

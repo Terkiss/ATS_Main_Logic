@@ -8,8 +8,6 @@ namespace TeruTeruServer.SDK.Util
 {
     public class TeruTeruLogger
     {
-        public TeruTeruLogger Instance { get; } = new TeruTeruLogger();
-
         private static readonly Serilog.ILogger _mainLogger;
         private static readonly Serilog.ILogger _hardwareLogger;
 

@@ -31,7 +31,7 @@ namespace TeruTeruServer.Logic.Default.P2P
 
         public P2PGroup CreateGroup(int ownerHostId)
         {
-            var group = new P2PGroup(ownerHostId);
+            var group = P2PGroupFactory.Create(ownerHostId);
             _groups.TryAdd(group.GroupId, group);
             TeruTeruLogger.LogInfo($"그룹 생성됨: GroupID {group.GroupId}, 방장: {ownerHostId}");
             return group;
@@ -63,12 +63,7 @@ namespace TeruTeruServer.Logic.Default.P2P
                 {
                     if (!_groups.TryGetValue(data.GroupId, out var group))
                     {
-                        group = new P2PGroup(data.JoinerHostId);
-                        var prop = typeof(P2PGroup).GetProperty("GroupId", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                        if (prop != null)
-                        {
-                            prop.SetValue(group, data.GroupId);
-                        }
+                        group = P2PGroupFactory.Create(data.JoinerHostId, data.GroupId);
                         _groups[data.GroupId] = group;
                         TeruTeruLogger.LogInfo($"그룹 자동 생성됨 (요청): GroupID {data.GroupId}, 방장: {data.JoinerHostId}");
                     }
@@ -82,20 +77,22 @@ namespace TeruTeruServer.Logic.Default.P2P
                         if (memberId != joiner)
                         {
                             // Trigger signaling for joiner <-> memberId
-                            // (In real scenario, we might call P2PSignalingHandler directly or send packets)
                             if (_sessionManager.Players.TryGetValue(memberId, out var memberSession) &&
                                 _sessionManager.Players.TryGetValue(joiner, out var joinerSession))
                             {
-                                if (joinerSession.UdpEndPoint is System.Net.IPEndPoint reqIP)
+                                if (memberSession.ClientSocket != null && joinerSession.ClientSocket != null)
                                 {
-                                    var reqInfo = new PeerEndpointInfo { PeerHostID = joiner, IP = reqIP.Address.ToString(), Port = reqIP.Port };
-                                    SendJsonResponse(memberSession.ClientSocket, ProtocolSelect.HolePunchRequest, reqInfo);
-                                }
+                                    if (joinerSession.UdpEndPoint is System.Net.IPEndPoint reqIP)
+                                    {
+                                        var reqInfo = new PeerEndpointInfo { PeerHostID = joiner, IP = reqIP.Address.ToString(), Port = reqIP.Port };
+                                        memberSession.ClientSocket.SendJsonResponse(ProtocolSelect.HolePunchRequest, reqInfo);
+                                    }
 
-                                if (memberSession.UdpEndPoint is System.Net.IPEndPoint targetIP)
-                                {
-                                    var targetInfo = new PeerEndpointInfo { PeerHostID = memberId, IP = targetIP.Address.ToString(), Port = targetIP.Port };
-                                    SendJsonResponse(joinerSession.ClientSocket, ProtocolSelect.HolePunchRequest, targetInfo);
+                                    if (memberSession.UdpEndPoint is System.Net.IPEndPoint targetIP)
+                                    {
+                                        var targetInfo = new PeerEndpointInfo { PeerHostID = memberId, IP = targetIP.Address.ToString(), Port = targetIP.Port };
+                                        joinerSession.ClientSocket.SendJsonResponse(ProtocolSelect.HolePunchRequest, targetInfo);
+                                    }
                                 }
                             }
                         }
@@ -158,21 +155,6 @@ namespace TeruTeruServer.Logic.Default.P2P
             }
         }
 
-        private void SendJsonResponse<T>(Socket socket, ProtocolSelect protocol, T data)
-        {
-            if (socket == null || !socket.Connected) return;
-            try
-            {
-                string json = System.Text.Json.JsonSerializer.Serialize(data);
-                byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-                byte[] packet = new byte[body.Length + 6];
-                packet[0] = (byte)SendType.Json;
-                packet[1] = (byte)protocol;
-                // SequenceNumber (2-5) remains 0
-                Array.Copy(body, 0, packet, 6, body.Length);
-                socket.Send(packet);
-            }
-            catch { }
-        }
+
     }
 }

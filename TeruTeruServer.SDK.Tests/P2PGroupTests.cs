@@ -8,9 +8,19 @@ using System.Reflection;
 namespace TeruTeruServer.SDK.Tests
 {
     [Collection("ServerMemoryCollection")]
-    public class P2PGroupTests
+    public class P2PGroupTests : IDisposable
     {
         public P2PGroupTests()
+        {
+            ResetStaticState();
+        }
+
+        public void Dispose()
+        {
+            ResetStaticState();
+        }
+
+        private void ResetStaticState()
         {
             // Reset ServerMemory ID to ensure predictable tests
             var field = typeof(ServerMemory).GetField("_currentHostID", BindingFlags.Static | BindingFlags.NonPublic);

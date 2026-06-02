@@ -14,6 +14,7 @@ using TeruTeruServer.SDK.Protocol;
 using TeruTeruServer.SDK.Util;
 using TeruTeruServer.SDK.Attributes;
 using TeruTeruServer.Logic.Default.P2P;
+using TeruTeruServer.Logic.Default.Services;
 
 namespace TeruTeruServer.Logic.Default
 {
@@ -29,10 +30,14 @@ namespace TeruTeruServer.Logic.Default
         private readonly TeruTeruServer.Logic.Default.P2P.P2PGroupHandler _p2pGroupHandler;
         private readonly IEventBus _eventBus;
         private readonly IZoneManager _zoneManager;
-
-        private const string SecretKey = "TeruTeruServer_Super_Secret_Key_2026";
+        private readonly ITokenProvider _tokenProvider;
 
         public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router, IEventBus eventBus, IZoneManager zoneManager)
+            : this(messageSender, dbService, sessionManager, router, eventBus, zoneManager, new JwtTokenProvider())
+        {
+        }
+
+        public LogicPlugin(IMessageSender messageSender, IDatabaseService dbService, ISessionManager sessionManager, IProtocolRouter router, IEventBus eventBus, IZoneManager zoneManager, ITokenProvider tokenProvider)
         {
             _messageSender = messageSender;
             _dbService = dbService;
@@ -41,6 +46,7 @@ namespace TeruTeruServer.Logic.Default
             _eventBus = eventBus;
             _zoneManager = zoneManager;
             _rpcProxy = new RpcProxy(_messageSender, _sessionManager);
+            _tokenProvider = tokenProvider ?? new JwtTokenProvider();
 
             // 중요: 라우터에 자기 자신을 등록하여 어트리뷰트 분석 활성화
             _router.Initialize(this);
@@ -194,22 +200,22 @@ namespace TeruTeruServer.Logic.Default
 
         [RequiresAuth]
         [Rpc("Echo")]
-        public async Task<string> HandleEcho(Socket socket, string message)
+        public Task<string> HandleEcho(Socket socket, string message)
         {
             TeruTeruLogger.LogInfo($"RPC Echo called with: {message}");
-            return $"Server Echo: {message} at {DateTime.Now}";
+            return Task.FromResult($"Server Echo: {message} at {DateTime.Now}");
         }
 
         [Rpc("GetServerInfo")]
-        public async Task<object> GetServerInfo(Socket socket)
+        public Task<object> GetServerInfo(Socket socket)
         {
-            return new
+            return Task.FromResult<object>(new
             {
                 ServerName = "TeruTeru Server AI Engine",
                 Version = "2.0.0-phase3-plugin-routing",
                 CurrentTime = DateTime.Now,
                 ActiveSessions = _sessionManager.Players.Count
-            };
+            });
         }
 
         // --- [기타 로직] ---
@@ -230,61 +236,12 @@ namespace TeruTeruServer.Logic.Default
 
         private string GenerateJwtToken(string userId, out string refreshToken)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(SecretKey);
-            
-            // Access Token (2 hours)
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", userId), new Claim("type", "access") }),
-                Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            
-            // Refresh Token (7 days)
-            var refreshDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", userId), new Claim("type", "refresh") }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var rToken = tokenHandler.CreateToken(refreshDescriptor);
-            refreshToken = tokenHandler.WriteToken(rToken);
-
-            return tokenHandler.WriteToken(token);
+            return _tokenProvider.GenerateJwtToken(userId, out refreshToken);
         }
 
         private bool ValidateRefreshToken(string token, out string userId)
         {
-            userId = string.Empty;
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(SecretKey);
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var typeClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == "type");
-                
-                if (typeClaim != null && typeClaim.Value == "refresh")
-                {
-                    userId = jwtToken.Claims.First(x => x.Type == "id").Value;
-                    return true;
-                }
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
+            return _tokenProvider.ValidateRefreshToken(token, out userId);
         }
 
         [Protocol(ProtocolSelect.ZoneTransferProtocol)]

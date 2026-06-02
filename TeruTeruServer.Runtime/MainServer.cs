@@ -287,12 +287,13 @@ namespace TeruTeruServer.Runtime
 
         public async void SendData(Socket socket, byte[] data)
         {
+            if (socket == null) return;
             try
             {
                 if (!await TrySend(socket, data))
                 {
                     Console.WriteLine("연결이 끊긴 소켓입니다. 소켓을 닫습니다.");
-                    try { socket?.Close(); } catch { }
+                    try { socket.Close(); } catch { }
 
                     if (_sessionManager.TryGetHostIdBySocket(socket, out int hostID))
                     {
@@ -383,13 +384,14 @@ namespace TeruTeruServer.Runtime
             }
         }
 
-        public bool IsConnected(Socket socket)
+        public bool IsConnected(Socket? socket)
         {
+            if (socket == null) return false;
             if (_isUdp)
             {
-                return socket != null && !socket.SafeHandle.IsInvalid && !socket.SafeHandle.IsClosed;
+                return !socket.SafeHandle.IsInvalid && !socket.SafeHandle.IsClosed;
             }
-            return socket != null && socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
+            return socket.Connected && !(socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0);
         }
 
         public void HandleDisconnectedSession(int hostID, TeruTeruServer.SDK.Util.ClientSession session)
@@ -414,15 +416,18 @@ namespace TeruTeruServer.Runtime
 
                 ServerMemory.RemoveGameIDFromDictionary(hostID);
 
-                byte[] tempArray = new byte[2];
-                tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
-                tempArray[1] = (byte)hostID;
-                RpcStub rpcStub = new RpcStub(this, _sessionManager);
-                var result = rpcStub.HandleRequest(session.ClientSocket, tempArray);
-
-                if (result == null)
+                if (session.ClientSocket != null)
                 {
-                    TeruTeruLogger.LogInfo("플레이어 " + hostID + " 퇴장 알림 전송 완료");
+                    byte[] tempArray = new byte[2];
+                    tempArray[0] = (byte)ProtocolSelect.ConnectProtocol;
+                    tempArray[1] = (byte)hostID;
+                    RpcStub rpcStub = new RpcStub(this, _sessionManager);
+                    var result = rpcStub.HandleRequest(session.ClientSocket, tempArray);
+
+                    if (result == null)
+                    {
+                        TeruTeruLogger.LogInfo("플레이어 " + hostID + " 퇴장 알림 전송 완료");
+                    }
                 }
             }
         }

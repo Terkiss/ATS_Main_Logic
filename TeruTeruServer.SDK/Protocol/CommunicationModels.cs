@@ -55,7 +55,7 @@ namespace TeruTeruServer.SDK.Protocol
             // 2~5는 SequenceNumber. 서버 응답은 0으로 채움.
             Array.Copy(body, 0, packet, 6, body.Length);
 
-            _messageSender.SendData(socket, packet);
+            _messageSender?.SendData(socket, packet);
         }
 
         /// <summary>
@@ -63,6 +63,7 @@ namespace TeruTeruServer.SDK.Protocol
         /// </summary>
         public void BroadcastDetectResult(YoloDetectResult result)
         {
+            if (_sessionManager?.Players == null) return;
             foreach (var session in _sessionManager.Players.Values)
             {
                 if (session.ClientSocket != null && session.State == SessionState.Connected)
@@ -96,7 +97,7 @@ namespace TeruTeruServer.SDK.Protocol
             _sessionManager = sessionManager;
         }
 
-        public byte[] HandleRequest(Socket socket, byte[] buffer)
+        public byte[]? HandleRequest(Socket socket, byte[] buffer)
         {
             if (buffer.Length < 2) return null;
             // 미들웨어에서 이미 인증을 거친 안전한 패킷만 이리로 옵니다.

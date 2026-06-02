@@ -4,45 +4,98 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 using MySql.Data;
 using MySql.Data.MySqlClient;
+using Dapper;
+using Polly;
+using Polly.Retry;
 
 namespace R19Management
 {
     public class DataBaseConnectHelper
     {
-        private string uri;
+        private string uri = string.Empty;
+        private readonly Func<string, IDbConnection> _connectionFactory;
+
+        private static bool IsTransient(Exception ex)
+        {
+            if (ex is MySqlException mysqlEx)
+            {
+                return mysqlEx.Number == 1213 || mysqlEx.Number == 1205 || mysqlEx.Number == 1040 ||
+                       mysqlEx.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
+        }
+
+        private static readonly ResiliencePipeline ResiliencePipeline = new ResiliencePipelineBuilder()
+            .AddRetry(new RetryStrategyOptions
+            {
+                ShouldHandle = new PredicateBuilder().Handle<Exception>(ex => IsTransient(ex)),
+                MaxRetryAttempts = 3,
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = false,
+                Delay = TimeSpan.FromSeconds(1)
+            })
+            .Build();
+
         public DataBaseConnectHelper()
         {
+            this._connectionFactory = connStr => new MySqlConnection(connStr);
         }
 
-        public DataBaseConnectHelper(string connectionStr)
+        public DataBaseConnectHelper(string connectionStr, Func<string, IDbConnection>? connectionFactory = null)
         {
-            this.uri = connectionStr;
+            var builder = new MySqlConnectionStringBuilder(connectionStr);
+            if (!builder.Pooling)
+            {
+                builder.Pooling = true;
+            }
+            if (builder.MaximumPoolSize < 100)
+            {
+                builder.MaximumPoolSize = 100;
+            }
+            if (builder.MinimumPoolSize < 10)
+            {
+                builder.MinimumPoolSize = 10;
+            }
+            this.uri = builder.ConnectionString;
+
+            this._connectionFactory = connectionFactory ?? (connStr => new MySqlConnection(connStr));
         }
 
-        private MySqlConnection dataBaseOpen()
+        private DynamicParameters ConvertParams(MySqlParameter[]? parameters)
         {
-            return new MySqlConnection(uri);
+            var dynamicParams = new DynamicParameters();
+            if (parameters != null)
+            {
+                foreach (var p in parameters)
+                {
+                    dynamicParams.Add(p.ParameterName, p.Value, p.DbType, p.Direction, p.Size);
+                }
+            }
+            return dynamicParams;
+        }
+
+        private IDbConnection dataBaseOpen()
+        {
+            var conn = _connectionFactory(uri);
+            if (conn.State != ConnectionState.Open) conn.Open();
+            return conn;
         }
 
         /// <summary>
         /// SQL RUN NO RESULT
         /// </summary>
-        public void sqlRun(string sql, MySqlParameter[] parameters = null)
+        public void sqlRun(string sql, MySqlParameter[]? parameters = null)
         {
-            using (var conn = dataBaseOpen())
+            ResiliencePipeline.Execute(() =>
             {
-                conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                using (var conn = dataBaseOpen())
                 {
-                    if (parameters != null)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                    }
-                    cmd.ExecuteNonQuery();
+                    conn.Execute(sql, ConvertParams(parameters));
                 }
-            }
+            });
         }
 
         /// <summary>
@@ -50,72 +103,56 @@ namespace R19Management
         /// </summary>
         public void sqlBatchRun(List<string> sqls)
         {
-            using (MySqlConnection conn = dataBaseOpen())
+            if (sqls == null || sqls.Count == 0) return;
+
+            ResiliencePipeline.Execute(() =>
             {
-                conn.Open();
-                using (MySqlTransaction transaction = conn.BeginTransaction())
+                using (IDbConnection conn = dataBaseOpen())
                 {
-                    try
+                    using (var transaction = conn.BeginTransaction())
                     {
-                        foreach (var sql in sqls)
+                        try
                         {
-                            using (MySqlCommand cmd = new MySqlCommand(sql, conn, transaction))
+                            foreach (var sql in sqls)
                             {
-                                cmd.ExecuteNonQuery();
+                                conn.Execute(sql, transaction: transaction);
                             }
+                            transaction.Commit();
                         }
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
                     }
                 }
-            }
+            });
         }
 
-        public async Task sqlParrelRun(string sql, MySqlParameter[] parameters = null)
+        public async Task sqlParrelRun(string sql, MySqlParameter[]? parameters = null)
         {
-            using (MySqlConnection conn = dataBaseOpen())
+            await ResiliencePipeline.ExecuteAsync(async token =>
             {
-                await conn.OpenAsync();
-                using (var cmd = new MySqlCommand(sql, conn))
+                using (IDbConnection conn = dataBaseOpen())
                 {
-                    if (parameters != null)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                    }
-                    await cmd.ExecuteNonQueryAsync();
+                    await conn.ExecuteAsync(sql, ConvertParams(parameters));
                 }
-            }
+            });
         }
 
         /// <summary>
         /// sql 결과물의 열 수를 반환 합니다.
         /// </summary>
-        public int sqlrunForCounter(string sql, MySqlParameter[] parameters = null)
+        public int sqlrunForCounter(string sql, MySqlParameter[]? parameters = null)
         {
-            int i = 0;
-            using (var conn = dataBaseOpen())
+            return ResiliencePipeline.Execute(() =>
             {
-                conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                using (var conn = dataBaseOpen())
                 {
-                    if (parameters != null)
-                    {
-                        cmd.Parameters.AddRange(parameters);
-                    }
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            i++;
-                        }
-                    }
+                    var result = conn.Query(sql, ConvertParams(parameters));
+                    return result.Count();
                 }
-            }
-            return i;
+            });
         }
 
         public delegate void SqlResult(MySqlDataReader reader);
@@ -123,23 +160,18 @@ namespace R19Management
         /// <summary>
         /// 데이터 베이스 sql를 실행하고 콜백을 이용하여 처리합니다.
         /// </summary>
-        public void sqlRunResult(string sql, SqlResult sqlResult, MySqlParameter[] parameters = null)
+        public void sqlRunResult(string sql, SqlResult sqlResult, MySqlParameter[]? parameters = null)
         {
-            using (var conn = dataBaseOpen())
+            ResiliencePipeline.Execute(() =>
             {
-                conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                using (var conn = dataBaseOpen())
                 {
-                    if (parameters != null)
+                    using (var reader = conn.ExecuteReader(sql, ConvertParams(parameters)))
                     {
-                        cmd.Parameters.AddRange(parameters);
-                    }
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        sqlResult?.Invoke(reader);
+                        sqlResult?.Invoke((MySqlDataReader)reader);
                     }
                 }
-            }
+            });
         }
 
         /// <summary>
@@ -147,46 +179,48 @@ namespace R19Management
         /// </summary>
         public void insert(string tableName, string[] field)
         {
-            string fieldSelect = "show full columns FROM " + tableName;
-            List<string> fieldNames = new List<string>();
+            if (field == null) return;
 
-            using (var conn = dataBaseOpen())
+            ResiliencePipeline.Execute(() =>
             {
-                conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(fieldSelect, conn))
+                using (var conn = dataBaseOpen())
                 {
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    string fieldSelect = "show full columns FROM " + tableName;
+                    var columns = conn.Query(fieldSelect);
+                    var fieldNames = new List<string>();
+                    foreach (var col in columns)
                     {
-                        while (reader.Read())
+                        var dict = (IDictionary<string, object>)col;
+                        if (dict.TryGetValue("Field", out var fieldName) || dict.Values.Count > 0)
                         {
-                            fieldNames.Add(reader.GetString(0));
+                            var nameObj = fieldName ?? dict.Values.FirstOrDefault();
+                            if (nameObj != null)
+                            {
+                                fieldNames.Add(nameObj.ToString() ?? string.Empty);
+                            }
                         }
                     }
-                }
 
-                if (fieldNames.Count == field.Length)
-                {
-                    StringBuilder sqlBuilder = new StringBuilder();
-                    sqlBuilder.Append($"INSERT INTO {tableName} (");
-                    sqlBuilder.Append(string.Join(", ", fieldNames));
-                    sqlBuilder.Append(") VALUES (");
-
-                    List<MySqlParameter> parameters = new List<MySqlParameter>();
-                    for (int i = 0; i < field.Length; i++)
+                    if (fieldNames.Count == field.Length)
                     {
-                        string paramName = $"@p{i}";
-                        sqlBuilder.Append(i == field.Length - 1 ? paramName : paramName + ", ");
-                        parameters.Add(new MySqlParameter(paramName, field[i]));
-                    }
-                    sqlBuilder.Append(");");
+                        StringBuilder sqlBuilder = new StringBuilder();
+                        sqlBuilder.Append($"INSERT INTO {tableName} (");
+                        sqlBuilder.Append(string.Join(", ", fieldNames));
+                        sqlBuilder.Append(") VALUES (");
 
-                    using (MySqlCommand insertCmd = new MySqlCommand(sqlBuilder.ToString(), conn))
-                    {
-                        insertCmd.Parameters.AddRange(parameters.ToArray());
-                        insertCmd.ExecuteNonQuery();
+                        var dynamicParams = new DynamicParameters();
+                        for (int i = 0; i < field.Length; i++)
+                        {
+                            string paramName = $"p{i}";
+                            sqlBuilder.Append(i == field.Length - 1 ? $"@{paramName}" : $"@{paramName}, ");
+                            dynamicParams.Add(paramName, field[i]);
+                        }
+                        sqlBuilder.Append(");");
+
+                        conn.Execute(sqlBuilder.ToString(), dynamicParams);
                     }
                 }
-            }
+            });
         }
     }
 }

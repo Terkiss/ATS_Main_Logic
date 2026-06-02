@@ -3,9 +3,9 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace TeruTeruServer.ManageLogic.Util
+namespace TeruTeruServer.SDK.Util
 {
-    public class SeedEncrypt : baseEncrypt
+    public class SeedEncrypt : BaseEncrypt
     {
         private const int BlockSize = 16; // 128 bits
         private const int KeySize = 16;   // 128 bits
@@ -63,7 +63,7 @@ namespace TeruTeruServer.ManageLogic.Util
         {
             byte[] iv = GenerateRandomIV();
             byte[] key;
-            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv))
+            using (var keyGenerator = new Rfc2898DeriveBytes(password, iv, 1000, HashAlgorithmName.SHA1))
             {
                 key = keyGenerator.GetBytes(KeySize);
             }
@@ -89,7 +89,7 @@ namespace TeruTeruServer.ManageLogic.Util
             Buffer.BlockCopy(fullData, BlockSize, encryptedData, 0, encryptedData.Length);
 
             byte[] key;
-            using (var keyGenerator = new Rfc2898DeriveBytes(password, salt: iv))
+            using (var keyGenerator = new Rfc2898DeriveBytes(password, iv, 1000, HashAlgorithmName.SHA1))
             {
                 key = keyGenerator.GetBytes(KeySize);
             }

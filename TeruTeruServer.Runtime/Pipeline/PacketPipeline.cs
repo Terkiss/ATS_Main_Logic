@@ -22,7 +22,7 @@ namespace TeruTeruServer.Runtime.Pipeline
             TeruTeruServer.SDK.Util.ServerMetrics.IncrementPacketCount();
             int index = 0;
 
-            Func<Task> next = null;
+            Func<Task> next = null!;
             next = async () =>
             {
                 if (index < _middlewares.Count)

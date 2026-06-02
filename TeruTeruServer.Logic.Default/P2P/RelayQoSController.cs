@@ -23,18 +23,18 @@ namespace TeruTeruServer.Logic.Default.P2P
         private class SessionTraffic
         {
             private long _totalBytesInCurrentSecond;
-            private DateTime _lastSecondStart = DateTime.UtcNow;
+            private long _lastSecondStartTicks = Environment.TickCount64;
             private readonly object _lock = new object();
 
             public bool CheckAndAdd(int packetSize, long limit)
             {
                 lock (_lock)
                 {
-                    var now = DateTime.UtcNow;
-                    if ((now - _lastSecondStart).TotalSeconds >= 1.0)
+                    long now = Environment.TickCount64;
+                    if (now - _lastSecondStartTicks >= 1000)
                     {
                         _totalBytesInCurrentSecond = 0;
-                        _lastSecondStart = now;
+                        _lastSecondStartTicks = now;
                     }
 
                     if (_totalBytesInCurrentSecond + packetSize > limit)
